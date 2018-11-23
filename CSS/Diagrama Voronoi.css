@@ -1,0 +1,57 @@
+#Titlu
+	  {
+		margin-top: -1%;
+		margin-left: 10%;
+		color: #003366;
+		text-decoration: underline;
+		letter-spacing: 2px; 
+		font-family: Comic Sans MS, Helvetica, sans-serif;
+	  }
+#voronoiCanvas
+{ 
+	top:6%; 
+	left:10%; 
+	border:1px solid; 
+	border-color: #003366;
+}	
+
+#voronoiNoCanvasAlert
+{
+	display:none;
+	padding:1em;
+	background-color:#fcc;
+	color:black;
+}
+	
+.buton
+      {
+		 background-color: #003366;
+		 border: none;
+		 color: white;
+		 text-align: center;
+		 text-decoration: none;
+		 display: inline-block;
+         font-size: 16px;
+      }
+	 
+	  
+#voronoiClearSites
+{
+	margin-top: 1%;
+}
+
+#voronoiMoveSweepline
+{
+	margin-top: 1%;
+}
+
+#voronoiAnimateSweeplineStop
+{
+	margin-left: 5%;
+}
+
+#voronoiAnimateSweepline
+{
+	margin-top: 1%;
+}
+
