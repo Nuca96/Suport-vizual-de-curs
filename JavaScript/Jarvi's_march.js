@@ -2,6 +2,7 @@ function load() {
 	this.canvas = document.getElementById("myCanvas");
 	this.startButton = document.getElementById("startButton");
 	this.message = document.getElementById("message");
+	this.loadButton = document.getElementById("loadButton");
 	// this.nextButton = document.getElementById("nextButton");
 	// this.prev = document.getElementById("prev");
 	this.ctx = canvas.getContext("2d");
@@ -12,6 +13,7 @@ function load() {
 function init() {
 	canvas.addEventListener("click", coordonate);
 	startButton.addEventListener("click", startAlgorithm);
+	loadButton.addEventListener("click", loadDots);
 	canvas.puncte = [];
 	canvas.litera = 'A';
 	this.drawings = [];
@@ -27,8 +29,8 @@ function init() {
 
 function coordonate(event) {
 	var punct = {
-		x: event.clientX - this.offsetLeft,
-		y: event.clientY - this.offsetTop,
+		x: event.clientX - canvas.offsetLeft,
+		y: event.clientY - canvas.offsetTop,
 		litera: canvas.litera
 	};
 	canvas.litera = nextChar(canvas.litera);
@@ -39,10 +41,20 @@ function coordonate(event) {
     ctx.fillText(punct.litera, punct.x-10, punct.y-10);
 }
 
+function loadDots() {
+	for (var idx in Jarvis) {
+		var ev = {
+			"clientX": Jarvis[idx].x,
+			"clientY": Jarvis[idx].y
+		}
+		coordonate(ev);
+	}
+	loadButton.removeEventListener("click", loadDots);
+}
+
 function run(){
 	if(canvas.puncte.length < 3){
-		message.innerText = "at least 3 dots";
-		return;
+		return null;
 	}
 	var k = 0;
 	var valid = true;
@@ -152,11 +164,16 @@ function run(){
 }
 
 function startAlgorithm() {
-	console.log("startAlgorithm");
+	var res = run();
+	if (res == null) {
+		message.innerText = "at least 3 dots";
+		return		
+	}
+
+	nextStep();
 	startButton.removeEventListener("click", startAlgorithm);
 	canvas.removeEventListener("click", coordonate);
-	console.log(run());
-
+	loadButton.removeEventListener("click", loadDots);
 	startButton.addEventListener("click", nextStep);
 	startButton.innerText = "Next";
 	eventIdx = 0;
