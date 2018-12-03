@@ -3,6 +3,7 @@ function load() {
 	this.startButton = document.getElementById("startButton");
 	this.message = document.getElementById("message");
 	this.loadButton = document.getElementById("loadButton");
+	this.panel = document.getElementById("panel");
 	// this.nextButton = document.getElementById("nextButton");
 	// this.prev = document.getElementById("prev");
 	this.ctx = canvas.getContext("2d");
@@ -82,7 +83,8 @@ function run(){
 	to_draw = {
 		"shape": "dot",
 		"colour": "cyan",
-		"dot": L[0]
+		"dot": L[0],
+		"message": "Punctul " + L[0].litera + " e cel mai din dreapta."
 	};
 	drawings.push(to_draw)
 	while (valid == true) {
@@ -102,24 +104,33 @@ function run(){
 			"shape": "dot",
 			"colour": "cyan",
 			"dot": S,
-			"events": ["push"]
+			"events": ["push"],
+			"message": "Punctul " + S.litera + " a fost ales random."
 		}];
 		drawings.push(to_draw);
 
 		for (var idx in canvas.puncte) {
 			var pct = canvas.puncte[idx];
+			var orient = orientation(L[k], S, pct);
+			var message1 = "Punctul " + pct.litera + " ";
+			var message2 = " la dreapta muchiei orientate " + L[k].litera + S.litera;
+
 			// break point
 			to_draw = {
 				"shape": "dot",
 				"colour": "red",
 				"dot": pct
 			};
-			drawings.push(to_draw);
-
-			var orient = orientation(L[k], S, pct);
+			
 			if (orient !== "dreapta") {
-				continue
+				var message = message1 + "<b>NU ESTE</b>" + message2;
+				to_draw.message = message;
+				drawings.push(to_draw);
+				continue;
 			}
+			var message = message1 + "<b>ESTE</b>" + message2;
+			to_draw.message = message;
+			drawings.push(to_draw);
 
 			// break point
 			to_draw = [{
@@ -144,7 +155,8 @@ function run(){
 			"colour": "black",
 			"dot1": L[k],
 			"dot2": S,
-			"events": ["pop", "pop", "push"]
+			"events": ["pop", "pop", "push"],
+			"message": "Muchia " + L[k].litera + S.litera + " face parte din acoperirea convexa."
 		};
 		drawings.push(to_draw);
 
@@ -194,6 +206,9 @@ function nextStep() {
 	drawingsIdx += 1;
 
 	function action(drawing) {
+		if (typeof drawing.message !== "undefined") {
+			 $("#panel").append( '<li>' + drawing.message + '</li>' );
+		}
 		for (idx in drawing.events) {
 			var ev = drawing.events[idx];
 			if (ev == "push") {
