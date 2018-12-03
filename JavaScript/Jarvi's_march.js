@@ -16,6 +16,7 @@ function init() {
 	loadButton.addEventListener("click", loadDots);
 	canvas.puncte = [];
 	canvas.litera = 'A';
+	canvas.permanent_drawings = [];
 	this.drawings = [];
 	this.drawingsIdx = 0;
 // {
@@ -27,18 +28,33 @@ function init() {
 // }
 }
 
+function draw(drawing) {
+	if (drawing.shape == "line") {
+		drawLine(ctx, drawing.dot1, drawing.dot2, drawing.colour);
+	}
+	if (drawing.shape == "dot") {
+		drawDot(ctx, drawing.dot, drawing.colour);
+		ctx.font = "15px Arial";
+	    ctx.fillText(drawing.dot.litera, drawing.dot.x-10, drawing.dot.y-10);
+	}
+}
+
 function coordonate(event) {
 	var punct = {
-		x: event.clientX - canvas.offsetLeft,
-		y: event.clientY - canvas.offsetTop,
-		litera: canvas.litera
+		"x": event.clientX - canvas.offsetLeft,
+		"y": event.clientY - canvas.offsetTop,
+		"litera": canvas.litera
 	};
 	canvas.litera = nextChar(canvas.litera);
 	canvas.puncte.push(punct);
 
-	drawDot(ctx, punct);
-	ctx.font = "15px Arial";
-    ctx.fillText(punct.litera, punct.x-10, punct.y-10);
+	var drawing = {
+		"shape":"dot",
+		"dot": punct,
+		"colour": "black"
+	}
+	canvas.permanent_drawings.push(drawing);
+	draw(drawing);
 }
 
 function loadDots() {
@@ -53,7 +69,7 @@ function loadDots() {
 }
 
 function run(){
-	if(canvas.puncte.length < 3){
+	if(canvas.puncte.length < 2){
 		return null;
 	}
 	var k = 0;
@@ -74,26 +90,19 @@ function run(){
 			var nr = Math.floor(random(0, canvas.puncte.length));
 			S = canvas.puncte[nr];
 		} while(S == L[k])
-		//artificiu pentru a evita stergerea din canvas a liniei de frontiera anterioare
-		if (k>0 && S == L[k-1]) {
-			console.log("artificiu");
-			continue;
-		}
 
 		// break point
 		to_draw = [{
-			"shape": "dot",
-			"colour": "black",
-			"dot": L[k]
-		},{
 			"shape": "line",
 			"colour": "yellow",
 			"dot1": L[k],
-			"dot2": S
+			"dot2": S,
+			"events": ["push"]
 		},{
 			"shape": "dot",
 			"colour": "cyan",
-			"dot": S
+			"dot": S,
+			"events": ["push"]
 		}];
 		drawings.push(to_draw);
 
@@ -109,35 +118,21 @@ function run(){
 
 			var orient = orientation(L[k], S, pct);
 			if (orient !== "dreapta") {
-				// break point
-				to_draw = {
-					"shape": "dot",
-					"colour": "black",
-					"dot": pct
-				};
-				drawings.push(to_draw);
 				continue
 			}
 
 			// break point
 			to_draw = [{
 				"shape": "line",
-				"colour": "white",
-				"dot1": L[k],
-				"dot2": S
-			},{
-				"shape": "dot",
-				"colour": "black",
-				"dot": S
-			},{
-				"shape": "line",
 				"colour": "yellow",
 				"dot1": L[k],
-				"dot2": pct
+				"dot2": pct,
+				"events": ["pop", "pop", "push"]
 			},{
 				"shape": "dot",
 				"colour": "cyan",
-				"dot": pct
+				"dot": pct,
+				"events": ["push"]
 			}];
 			drawings.push(to_draw);
 			S = pct;
@@ -146,9 +141,10 @@ function run(){
 		// break point
 		to_draw = {
 			"shape": "line",
-			"colour": "green",
+			"colour": "black",
 			"dot1": L[k],
-			"dot2": S
+			"dot2": S,
+			"events": ["pop", "pop", "push"]
 		};
 		drawings.push(to_draw);
 
@@ -166,7 +162,7 @@ function run(){
 function startAlgorithm() {
 	var res = run();
 	if (res == null) {
-		message.innerText = "at least 3 dots";
+		message.innerText = "at least 2 dots";
 		return		
 	}
 
@@ -180,30 +176,44 @@ function startAlgorithm() {
 	// prev.addEventListener("click", prev);
 }
 
-function draw(drawing) {
-	if (drawing.shape == "line") {
-		drawLine(ctx, drawing.dot1, drawing.dot2, drawing.colour);
-	}
-	if (drawing.shape == "dot") {
-		drawDot(ctx, drawing.dot, drawing.colour);
+function redraw() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	for (var idx in canvas.permanent_drawings) {
+		draw(canvas.permanent_drawings[idx]);
 	}
 }
 
 function nextStep() {
 	if (drawingsIdx > drawings.length - 1) {
 		message.innerText = "Algoritmul s-a sfarsit";
+		startButton.removeEventListener("click", nextStep);
 		return;
 	}
 
 	to_draw = drawings[drawingsIdx];
 	drawingsIdx += 1;
 
+	function action(drawing) {
+		for (idx in drawing.events) {
+			var ev = drawing.events[idx];
+			if (ev == "push") {
+				canvas.permanent_drawings.push(drawing);
+			}
+			if (ev == "pop") {
+				canvas.permanent_drawings.pop();
+			}
+		}
+		drawing.events = [];
+		redraw();
+		draw(drawing);
+	}
+
 	if (false === Array.isArray(to_draw)) {
-		draw(to_draw);
+		action(to_draw);
 		return;
 	}
 	for (var idx in to_draw) {
-		draw(to_draw[idx]);
+		action(to_draw[idx]);
 	}
 }
 
