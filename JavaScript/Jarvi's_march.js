@@ -3,7 +3,8 @@ function load() {
 	this.startButton = document.getElementById("startButton");
 	this.message = document.getElementById("message");
 	this.loadButton = document.getElementById("loadButton");
-	this.panel = document.getElementById("panel");
+	this.panel = $("#panel");
+	this.dotList = $("#dotList");
 	// this.nextButton = document.getElementById("nextButton");
 	// this.prev = document.getElementById("prev");
 	this.ctx = canvas.getContext("2d");
@@ -12,9 +13,11 @@ function load() {
 
 
 function init() {
-	canvas.addEventListener("click", coordonate);
+	canvas.addEventListener("click", addDot);
 	startButton.addEventListener("click", startAlgorithm);
 	loadButton.addEventListener("click", loadDots);
+	panel.innerText = "";
+	dotList.innerText = "";
 	canvas.puncte = [];
 	canvas.litera = 'A';
 	canvas.permanent_drawings = [];
@@ -40,7 +43,7 @@ function draw(drawing) {
 	}
 }
 
-function coordonate(event) {
+function addDot(event) {
 	var punct = {
 		"x": event.clientX - canvas.offsetLeft,
 		"y": event.clientY - canvas.offsetTop,
@@ -48,6 +51,8 @@ function coordonate(event) {
 	};
 	canvas.litera = nextChar(canvas.litera);
 	canvas.puncte.push(punct);
+
+	dotList.append("<li>" + punct.litera + " (" + punct.x + ", " + punct.y + ")</li>");
 
 	var drawing = {
 		"shape":"dot",
@@ -64,7 +69,7 @@ function loadDots() {
 			"clientX": Jarvis[idx].x,
 			"clientY": Jarvis[idx].y
 		}
-		coordonate(ev);
+		addDot(ev);
 	}
 	loadButton.removeEventListener("click", loadDots);
 }
@@ -180,7 +185,7 @@ function startAlgorithm() {
 
 	nextStep();
 	startButton.removeEventListener("click", startAlgorithm);
-	canvas.removeEventListener("click", coordonate);
+	canvas.removeEventListener("click", addDot);
 	loadButton.removeEventListener("click", loadDots);
 	startButton.addEventListener("click", nextStep);
 	startButton.innerText = "Next";
@@ -207,7 +212,7 @@ function nextStep() {
 
 	function action(drawing) {
 		if (typeof drawing.message !== "undefined") {
-			 $("#panel").append( '<li>' + drawing.message + '</li>' );
+			panel.append( '<li>' + drawing.message + '</li>' );
 		}
 		for (idx in drawing.events) {
 			var ev = drawing.events[idx];
