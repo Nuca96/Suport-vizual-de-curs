@@ -1,13 +1,18 @@
+var speedMap = [0, 500, 1000, 3000, 5000];
+
 function load() {
 	this.canvas = document.getElementById("myCanvas");
 	this.startButton = document.getElementById("startButton");
 	this.message = document.getElementById("message");
 	this.loadButton = document.getElementById("loadButton");
+	this.runButton = document.getElementById("runButton");
+	this.speedSelector = document.getElementById("speedSelector");
 	this.panel = $("#panel");
 	this.dotList = $("#dotList");
 	// this.nextButton = document.getElementById("nextButton");
 	// this.prev = document.getElementById("prev");
 	this.ctx = canvas.getContext("2d");
+	this.drawingsIdx = null;
 	init();
 }
 
@@ -16,13 +21,13 @@ function init() {
 	canvas.addEventListener("click", addDot);
 	startButton.addEventListener("click", startAlgorithm);
 	loadButton.addEventListener("click", loadDots);
-	panel.innerText = "";
-	dotList.innerText = "";
+	runButton.addEventListener("click", autorun);
+	$('#panel').empty();
+	$('#dotList').empty();
 	canvas.puncte = [];
 	canvas.litera = 'A';
 	canvas.permanent_drawings = [];
 	this.drawings = [];
-	this.drawingsIdx = 0;
 // {
 // 	"shape": [dot, line],
 // 	"colour": ...,
@@ -101,7 +106,7 @@ function run(){
 		// break point
 		to_draw = [{
 			"shape": "line",
-			"colour": "yellow",
+			"colour": "CadetBlue",
 			"dot1": L[k],
 			"dot2": S,
 			"events": ["push"]
@@ -140,7 +145,7 @@ function run(){
 			// break point
 			to_draw = [{
 				"shape": "line",
-				"colour": "yellow",
+				"colour": "CadetBlue",
 				"dot1": L[k],
 				"dot2": pct,
 				"events": ["pop", "pop", "push"]
@@ -176,35 +181,27 @@ function run(){
 	return L;
 }
 
-function startAlgorithm() {
+function firstPart() {
 	var res = run();
 	if (res == null) {
 		message.innerText = "at least 2 dots";
-		return		
+		return null;	
 	}
 
-	nextStep();
 	startButton.removeEventListener("click", startAlgorithm);
 	canvas.removeEventListener("click", addDot);
 	loadButton.removeEventListener("click", loadDots);
-	startButton.addEventListener("click", nextStep);
-	startButton.innerText = "Next";
-	eventIdx = 0;
-	// prev.addEventListener("click", prev);
-}
+	runButton.removeEventListener("click", autorun);
 
-function redraw() {
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	for (var idx in canvas.permanent_drawings) {
-		draw(canvas.permanent_drawings[idx]);
-	}
+	drawingsIdx = 0;
+	return true;
 }
 
 function nextStep() {
 	if (drawingsIdx > drawings.length - 1) {
 		message.innerText = "Algoritmul s-a sfarsit";
 		startButton.removeEventListener("click", nextStep);
-		return;
+		return null;
 	}
 
 	to_draw = drawings[drawingsIdx];
@@ -234,6 +231,38 @@ function nextStep() {
 	}
 	for (var idx in to_draw) {
 		action(to_draw[idx]);
+	}
+	return true;
+}
+
+function startAlgorithm() {
+	if (null === firstPart())
+		return null;
+
+	startButton.addEventListener("click", nextStep);
+	startButton.innerText = "Next";
+
+	nextStep();
+}
+
+function autorun() {
+	if (!firstPart())
+		return null;
+	var speed = speedMap[speedSelector.value];
+
+	function timer() {
+		if (null === nextStep()){
+			return null;
+		}
+		setTimeout(timer, speed);
+	}
+	timer();
+}
+
+function redraw() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	for (var idx in canvas.permanent_drawings) {
+		draw(canvas.permanent_drawings[idx]);
 	}
 }
 
