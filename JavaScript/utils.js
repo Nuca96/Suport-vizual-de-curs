@@ -68,6 +68,14 @@ function drawDot(ctx, dot, colour="black") {
 	ctx.closePath();
 }
 
+function drawLiter(ctx, dot, colour="black") {
+	ctx.beginPath();
+	ctx.font = "15px Arial";
+	ctx.fillStyle = colour;
+    ctx.fillText(dot.litera, dot.x-10, dot.y-10);
+	ctx.closePath();
+}
+
 function drawLine(ctx, dot1, dot2, colour="black") {
 	ctx.beginPath();  
 	ctx.lineWidth = 3;

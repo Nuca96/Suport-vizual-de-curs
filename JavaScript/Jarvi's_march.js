@@ -3,22 +3,23 @@ function init() {
 	canvas.addEventListener("click", addDot);
 	loadButton.addEventListener("click", loadDots);
 	canvas.puncte = [];
-	canvas.litera = 'A';
 }
 
 function addDot(event) {
-	var punct = {
-		"x": event.clientX - canvas.offsetLeft,
-		"y": event.clientY - canvas.offsetTop,
-		"litera": canvas.litera
-	};
-	canvas.litera = nextChar(canvas.litera);
+	var punct = genericClick(event);
 	canvas.puncte.push(punct);
 
 	dotList.append("<li>" + punct.litera + " (" + punct.x + ", " + punct.y + ")</li>");
 
 	var drawing = {
 		"shape":"dot",
+		"dot": punct,
+		"colour": "black"
+	}
+	canvas.permanent_drawings.push(drawing);
+	draw(drawing);
+	var drawing = {
+		"shape":"liter",
 		"dot": punct,
 		"colour": "black"
 	}

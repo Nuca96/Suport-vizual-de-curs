@@ -14,7 +14,6 @@ function load() {
 	init();
 }
 
-
 function genericInit() {
 	startButton.addEventListener("click", startAlgorithm);
 	runButton.addEventListener("click", autorun);
@@ -22,6 +21,7 @@ function genericInit() {
 	$('#dotList').empty();
 	canvas.permanent_drawings = [];
 	this.drawings = [];
+	canvas.litera = 'A';
 // {
 // 	"shape": [dot, line],
 // 	"colour": ...,
@@ -31,14 +31,26 @@ function genericInit() {
 // }
 }
 
+function genericClick(event) {
+	var punct = {
+		"x": event.clientX - canvas.offsetLeft,
+		"y": event.clientY - canvas.offsetTop,
+		"litera": canvas.litera
+	};
+	canvas.litera = nextChar(canvas.litera);
+
+	return punct;
+}
+
 function draw(drawing) {
 	if (drawing.shape == "line") {
 		drawLine(ctx, drawing.dot1, drawing.dot2, drawing.colour);
 	}
 	if (drawing.shape == "dot") {
 		drawDot(ctx, drawing.dot, drawing.colour);
-		ctx.font = "15px Arial";
-	    ctx.fillText(drawing.dot.litera, drawing.dot.x-10, drawing.dot.y-10);
+	}
+	if (drawing.shape == "liter"){
+		drawLiter(ctx, drawing.dot, drawing.colour);
 	}
 }
 
@@ -50,6 +62,7 @@ function nextStep() {
 	}
 
 	to_draw = drawings[drawingsIdx];
+	console.log(to_draw);
 	drawingsIdx += 1;
 
 	function action(drawing) {
