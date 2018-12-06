@@ -86,3 +86,47 @@ function drawLine(ctx, dot1, dot2, colour="black") {
 	ctx.stroke();	
 	ctx.closePath();
 }
+
+function sort(list, compare) {
+	var len = list.length;
+	if (len < 2) {
+		return list;
+	}
+	var st = list.slice(0, len/2);
+	var dr = list.slice(len/2, len);
+
+	var sort_st = sort(st, compare);
+	var sort_dr = sort(dr, compare);
+
+	var sorted = [];
+	var idx_st = 0, idx_dr = 0;
+	while (idx_st < sort_st.length && idx_dr < sort_dr.length) {
+		if (compare(sort_st[idx_st], sort_dr[idx_dr]) > 0) {
+			sorted.push(sort_dr[idx_dr]);
+			idx_dr++;
+		} else {
+			sorted.push(sort_st[idx_st]);
+			idx_st++;
+		}
+	}
+	sorted.push.apply(sorted, sort_st.slice(idx_st, sort_st.length));
+	sorted.push.apply(sorted, sort_dr.slice(idx_dr, sort_dr.length));
+
+	return sorted;
+}
+
+function compareDotsY(p1, p2) {
+	if (p1.y < p2.y) return -1;
+	if (p1.y > p2.y) return 1;
+	if (p1.x < p2.x) return -1;
+	if (p1.x > p2.x) return 1;
+	return 0;
+}
+
+function compareLinesY(l1, l2) {
+	var compSup = compareDotsY(l1.dot1, l2.dot1);
+	if (compSup != 0) {
+		return compSup;
+	}
+	return compareDotsY(l1.dot2, l2.dot2);
+}

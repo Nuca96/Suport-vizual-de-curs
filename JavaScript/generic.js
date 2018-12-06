@@ -62,7 +62,6 @@ function nextStep() {
 	}
 
 	to_draw = drawings[drawingsIdx];
-	console.log(to_draw);
 	drawingsIdx += 1;
 
 	function action(drawing) {

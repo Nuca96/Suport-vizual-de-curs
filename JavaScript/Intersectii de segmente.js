@@ -1,6 +1,7 @@
 function init() {
 	genericInit();
 	canvas.segmente = [];
+	canvas.puncte = [];
 	canvas.addEventListener("click", firstClick);
 }
 
@@ -34,16 +35,24 @@ function secondClick(event) {
 	canvas.permanent_drawings.push(drawing);
 	draw(drawing);
 
-	var drawing = {
+	var line = {
 		"shape": "line",
-		"dot1": canvas.firstDot,
-		"dot2": punct,
 		"colour": "DarkCyan" 
 	};
-	canvas.permanent_drawings.push(drawing);
-	draw(drawing);
 
-	canvas.segmente.push(drawing);
+	if(compareDotsY(canvas.firstDot, punct) < 1) {
+		line.dot1 = canvas.firstDot;
+		line.dot2 = punct;
+	} else {
+		line.dot1 = punct;
+		line.dot2 = canvas.firstDot;
+	}
+	canvas.permanent_drawings.push(line);
+	draw(line);
+
+	canvas.segmente.push(line);
+	canvas.puncte.push(line.dot1);
+	canvas.puncte.push(line.dot2);
 
 	canvas.firstDot = null;
 	canvas.addEventListener("click", firstClick);
