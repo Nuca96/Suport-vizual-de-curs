@@ -74,20 +74,24 @@ function mouseMove(event) {
 }
 
 function run() {
-	for (var idx in canvas.segmente) {
-		var seg = canvas.segmente[idx];
-		var to_draw = {
-			"shape": "dot",
-			"dot": seg.dot1,
-			"colour": "red"
-		};
-		drawings.push(to_draw);
-		to_draw = {
-			"shape": "dot",
-			"dot": seg.dot2,
-			"colour": "red"
-		};
-		drawings.push(to_draw);
+	for (var idx1 = 0; idx1<canvas.segmente.length; idx1++) {
+		var seg1 = canvas.segmente[idx1];
+		for (var idx2 = idx1 + 1; idx2<canvas.segmente.length; idx2++) {
+			var seg2 = canvas.segmente[idx2];
+
+			var int = has_intersection(seg1, seg2);
+			if (false === int) {
+				continue;
+			}
+
+			var drawing = {
+				"shape": "dot",
+				"dot": int,
+				"colour": "red"
+			};
+			draw(drawing);
+			canvas.permanent_drawings.push(drawing);
+		}
 	}
 	return true;
 }

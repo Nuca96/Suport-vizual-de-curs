@@ -42,18 +42,6 @@ function genericClick(event) {
 	return punct;
 }
 
-function draw(drawing) {
-	if (drawing.shape == "line") {
-		drawLine(ctx, drawing.dot1, drawing.dot2, drawing.colour);
-	}
-	if (drawing.shape == "dot") {
-		drawDot(ctx, drawing.dot, drawing.colour);
-	}
-	if (drawing.shape == "liter"){
-		drawLiter(ctx, drawing.dot, drawing.colour);
-	}
-}
-
 function nextStep() {
 	if (drawingsIdx > drawings.length - 1) {
 		message.innerText = "Algoritmul s-a sfarsit";

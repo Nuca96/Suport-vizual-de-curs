@@ -29,7 +29,7 @@ function random(min, max) {
 	return nr;
 }
 
-function delta(matrice) {
+function determinant3(matrice) {
 	if (matrice.length != 3){
 		console.log("cannot calculate delta");
 		return null;
@@ -40,15 +40,31 @@ function delta(matrice) {
 
 	if (l0.length != 3 || l1.length != 3 || l2.length != 3){
 		console.log("cannot calculate delta");
-		return null;		
+		return null;
 	}
 
 	return l0[0]*l1[1]*l2[2] + l0[1]*l1[2]*l2[0] + l0[2]*l1[0]*l2[1] -
 		l0[2]*l1[1]*l2[0] - l0[1]*l1[0]*l2[2] - l0[0]*l1[2]*l2[1];
 }
 
+function determinant2(matrice) {
+	if (matrice.length != 2){
+		console.log("cannot calculate delta");
+		return null;
+	}
+	var l0 = matrice[0];
+	var l1 = matrice[1];
+
+	if (l0.length != 2 || l1.length != 2){
+		console.log("cannot calculate delta");
+		return null;		
+	}
+
+	return l0[0]*l1[1] - l0[1]*l1[0];
+}
+
 function orientation(p1, p2, p3) {
-	var D = delta([[1, 1, 1], [p1.x, p2.x, p3.x], [p1.y, p2.y, p3.y]]);
+	var D = determinant3([[1, 1, 1], [p1.x, p2.x, p3.x], [p1.y, p2.y, p3.y]]);
 
 	if (D == 0) 
 		return "fata";
@@ -85,6 +101,27 @@ function drawLine(ctx, dot1, dot2, colour="black") {
 	ctx.lineWidth = 3;
 	ctx.stroke();	
 	ctx.closePath();
+}
+
+function draw(drawing) {
+	switch (drawing.shape) {
+	case "line": {
+		drawLine(ctx, drawing.dot1, drawing.dot2, drawing.colour);
+		break;
+	}
+	case "dot": {
+		drawDot(ctx, drawing.dot, drawing.colour);
+		break;
+	}
+	case "liter": {
+		drawLiter(ctx, drawing.dot, drawing.colour);
+		break;
+	}
+	default: {
+		console.log("wrong shape");
+	}
+	}
+
 }
 
 function sort(list, compare) {
@@ -129,4 +166,58 @@ function compareLinesY(l1, l2) {
 		return compSup;
 	}
 	return compareDotsY(l1.dot2, l2.dot2);
+}
+
+function ecuatia_dreptei(A, B) {
+	// x * x_coef + y * y_coef = termen_liber
+	return {
+		"x_coef": A.y - B.y,
+		"y_coef": B.x - A.x,
+		"termen_liber": A.x*B.y - B.x*A.y
+	}
+}
+
+function intersection(seg1, seg2) {
+	var dr1 = ecuatia_dreptei(seg1.dot1, seg1.dot2);
+	var dr2 = ecuatia_dreptei(seg2.dot1, seg2.dot2);
+	var matrice = [[dr1.x_coef, dr1.y_coef],
+				   [dr2.x_coef, dr2.y_coef]];
+	var deltha = determinant2(matrice);
+
+	if (deltha == 0)
+		return false;
+
+	matrice = [[-dr1.termen_liber, dr1.y_coef],
+			   [-dr2.termen_liber, dr2.y_coef]];
+	var x = determinant2(matrice) / deltha;
+
+	matrice = [[-dr1.termen_liber, dr1.x_coef],
+			   [-dr2.termen_liber, dr2.x_coef]]
+	var y = - determinant2(matrice) / deltha;
+
+	return {
+		"x": x,
+		"y": y
+	}
+}
+
+function has_intersection(seg1, seg2) {
+	var int = intersection(seg1, seg2);
+
+	if (false === int)
+		return false;
+
+	function between(P1, P2, verif) {
+		if (P1.x <= verif.x && verif.x <= P2.x)
+			return true;
+		if (P2.x <= verif.x && verif.x <= P1.x)
+			return true;
+		return false;
+	}
+
+	if (between(seg1.dot1, seg1.dot2, int) && between(seg2.dot1, seg2.dot2, int)) {
+		return int;
+	}
+
+	return false;
 }
