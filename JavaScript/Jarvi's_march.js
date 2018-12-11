@@ -13,15 +13,13 @@ function addPoint(event) {
 
 	var drawing = {
 		"shape":"point",
-		"point": punct,
-		"colour": "black"
+		"point": punct
 	}
 	canvas.permanent_drawings.push(drawing);
 	draw(drawing);
 	var drawing = {
 		"shape":"liter",
-		"point": punct,
-		"colour": "black"
+		"point": punct
 	}
 	canvas.permanent_drawings.push(drawing);
 	draw(drawing);
@@ -119,7 +117,6 @@ function run(){
 		// break point
 		to_draw = {
 			"shape": "segment",
-			"colour": "black",
 			"segment": get_segment(L[k], S),
 			"events": ["pop", "pop", "push"],
 			"message": "Muchia " + L[k].litera + S.litera + " face parte din acoperirea convexa."

@@ -1,7 +1,7 @@
 function init() {
 	genericInit();
 	canvas.segmente = [];
-	canvas.puncte = [];
+	canvas.points = [];
 	canvas.addEventListener("click", firstClick);
 }
 
@@ -12,8 +12,7 @@ function firstClick(event) {
 
 	var drawing = {
 		"shape": "liter",
-		"point": punct,
-		"colour": "black"
+		"point": punct
 	};
 	canvas.permanent_drawings.push(drawing);
 	draw(drawing);
@@ -27,29 +26,42 @@ function secondClick(event) {
 	canvas.removeEventListener("mousemove", mouseMove);
 	
 	var punct = genericClick(event);
-	canvas.puncte.push(canvas.firstPoint);
-	canvas.puncte.push(punct);
+	var segment = get_segment(canvas.firstPoint, punct);
+	canvas.segmente.push(segment);
 
-	var drawing = {
-		"shape": "liter",
-		"point": punct,
-		"colour": "black"
+	var upperPoint = {
+		"x": segment.upperPoint.x,
+		"y": segment.upperPoint.y,
+		"type": "upper",
+		"segment": segment
 	};
-	canvas.permanent_drawings.push(drawing);
-	draw(drawing);
-
-	var drawing = {
-		"shape": "segment",
-		"colour": "DarkCyan",
-		"segment": get_segment(canvas.firstPoint, punct)
+	var lowerPoint = {
+		"x": segment.lowerPoint.x,
+		"y": segment.lowerPoint.y,
+		"type": "lower",
+		"segment": segment
 	};
-	canvas.permanent_drawings.push(drawing);
-	draw(drawing);
-
-	canvas.segmente.push(drawing.segment);
+	canvas.points.push(upperPoint);
+	canvas.points.push(lowerPoint);
 
 	canvas.firstPoint = null;
 	canvas.addEventListener("click", firstClick);
+
+	//draw new elements
+	var drawing = {
+		"shape": "liter",
+		"point": punct
+	};
+	canvas.permanent_drawings.push(drawing);
+	draw(drawing);
+	
+	var drawing = {
+		"shape": "segment",
+		"colour": "DarkCyan",
+		"segment": segment
+	};
+	canvas.permanent_drawings.push(drawing);
+	draw(drawing);
 }
 
 function mouseMove(event) {
@@ -66,7 +78,7 @@ function mouseMove(event) {
 	draw(drawing);
 }
 
-function run() {
+function run2() {
 	for (var idx1 = 0; idx1<canvas.segmente.length; idx1++) {
 		var seg1 = canvas.segmente[idx1];
 		for (var idx2 = idx1 + 1; idx2<canvas.segmente.length; idx2++) {
@@ -85,6 +97,24 @@ function run() {
 			draw(drawing);
 			canvas.permanent_drawings.push(drawing);
 		}
+	}
+	return true;
+}
+
+function run() {
+	var sortedPoints = sort(canvas.points, comparePointsY);
+	for (var idx in sortedPoints) {
+		var point = sortedPoints[idx];
+		var drawing = [{
+			"shape": "point",
+			"point": point,
+			"colour": "red"
+		}, {
+			"shape": "sweep",
+			"point": point,
+			"size": 1
+		}];
+		drawings.push(drawing);
 	}
 	return true;
 }

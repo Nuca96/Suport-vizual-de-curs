@@ -76,15 +76,15 @@ function orientation(p1, p2, p3) {
 		return "stanga";
 }
 
-function drawPoint(ctx, point, colour="black") {
+function drawPoint(ctx, point, colour, size) {
 	ctx.beginPath();		
-	ctx.arc(point.x, point.y, 4, 0, 2 * Math.PI);		// un punct este de fapt un cerc plin
+	ctx.arc(point.x, point.y, size, 0, 2 * Math.PI);		// un punct este de fapt un cerc plin
 	ctx.fillStyle = colour;
 	ctx.fill();
 	ctx.closePath();
 }
 
-function drawLiter(ctx, point, colour="black") {
+function drawLiter(ctx, point, colour) {
 	ctx.beginPath();
 	ctx.font = "15px Arial";
 	ctx.fillStyle = colour;
@@ -92,36 +92,14 @@ function drawLiter(ctx, point, colour="black") {
 	ctx.closePath();
 }
 
-function drawLine(ctx, segment, colour="black") {
-	ctx.beginPath();  
-	ctx.lineWidth = 3;
-    ctx.strokeStyle=colour;
-	ctx.moveTo(segment.upperPoint.x, segment.upperPoint.y);
-	ctx.lineTo(segment.lowerPoint.x, segment.lowerPoint.y);
-	ctx.lineWidth = 3;
+function drawLine(ctx, startPoint, endPoint, colour, width) {
+	ctx.beginPath();
+	ctx.moveTo(startPoint.x, startPoint.y);
+	ctx.lineTo(endPoint.x, endPoint.y);
+	ctx.lineWidth = width;
+    ctx.strokeStyle = colour;
 	ctx.stroke();	
 	ctx.closePath();
-}
-
-function draw(drawing) {
-	switch (drawing.shape) {
-	case "segment": {
-		drawLine(ctx, drawing.segment, drawing.colour);
-		break;
-	}
-	case "point": {
-		drawPoint(ctx, drawing.point, drawing.colour);
-		break;
-	}
-	case "liter": {
-		drawLiter(ctx, drawing.point, drawing.colour);
-		break;
-	}
-	default: {
-		console.log("wrong shape");
-	}
-	}
-
 }
 
 function sort(list, compare) {

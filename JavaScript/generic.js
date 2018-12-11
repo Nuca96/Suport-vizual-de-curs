@@ -111,3 +111,36 @@ function reset() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	init();
 }
+
+function draw(drawing) {
+	if (typeof drawing.colour == "undefined") {
+		drawing.colour = "black";
+	}
+	if (typeof drawing.size == "undefined") {
+		drawing.size = 3;
+	}
+	switch (drawing.shape) {
+	case "segment": {
+		var seg = drawing.segment;
+		drawLine(ctx, seg.lowerPoint, seg.upperPoint, drawing.colour, drawing.size);
+		break;
+	}
+	case "point": {
+		drawPoint(ctx, drawing.point, drawing.colour, drawing.size);
+		break;
+	}
+	case "liter": {
+		drawLiter(ctx, drawing.point, drawing.colour);
+		break;
+	}
+	case "sweep": {
+		var y = drawing.point.y;
+		console.log(y);
+		drawLine(ctx, {"x": 0, "y": y}, {"x": canvas.width, "y": y}, drawing.colour, drawing.size);
+		break;
+	}
+	default: {
+		console.log("wrong shape");
+	}
+	}
+}
