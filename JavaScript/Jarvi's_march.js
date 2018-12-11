@@ -1,41 +1,41 @@
 function init() {
 	genericInit();
-	canvas.addEventListener("click", addDot);
-	loadButton.addEventListener("click", loadDots);
+	canvas.addEventListener("click", addPoint);
+	loadButton.addEventListener("click", loadPoints);
 	canvas.puncte = [];
 }
 
-function addDot(event) {
+function addPoint(event) {
 	var punct = genericClick(event);
 	canvas.puncte.push(punct);
 
-	dotList.append("<li>" + punct.litera + " (" + punct.x + ", " + punct.y + ")</li>");
+	pointList.append("<li>" + punct.litera + " (" + punct.x + ", " + punct.y + ")</li>");
 
 	var drawing = {
-		"shape":"dot",
-		"dot": punct,
+		"shape":"point",
+		"point": punct,
 		"colour": "black"
 	}
 	canvas.permanent_drawings.push(drawing);
 	draw(drawing);
 	var drawing = {
 		"shape":"liter",
-		"dot": punct,
+		"point": punct,
 		"colour": "black"
 	}
 	canvas.permanent_drawings.push(drawing);
 	draw(drawing);
 }
 
-function loadDots() {
+function loadPoints() {
 	for (var idx in Jarvis) {
 		var ev = {
 			"clientX": Jarvis[idx].x,
 			"clientY": Jarvis[idx].y
 		}
-		addDot(ev);
+		addPoint(ev);
 	}
-	loadButton.removeEventListener("click", loadDots);
+	loadButton.removeEventListener("click", loadPoints);
 }
 
 function run(){
@@ -46,13 +46,13 @@ function run(){
 	var valid = true;
 	var S, to_draw;
 	var L = [];
-	L.push(leftmostDot(canvas.puncte));
+	L.push(leftmostPoint(canvas.puncte));
 
 	// break point
 	to_draw = {
-		"shape": "dot",
+		"shape": "point",
 		"colour": "cyan",
-		"dot": L[0],
+		"point": L[0],
 		"message": "Punctul " + L[0].litera + " e cel mai din dreapta."
 	};
 	drawings.push(to_draw)
@@ -64,15 +64,14 @@ function run(){
 
 		// break point
 		to_draw = [{
-			"shape": "line",
+			"shape": "segment",
 			"colour": "CadetBlue",
-			"dot1": L[k],
-			"dot2": S,
+			"segment": get_segment(L[k], S),
 			"events": ["push"]
 		},{
-			"shape": "dot",
+			"shape": "point",
 			"colour": "cyan",
-			"dot": S,
+			"point": S,
 			"events": ["push"],
 			"message": "Punctul " + S.litera + " a fost ales random."
 		}];
@@ -86,9 +85,9 @@ function run(){
 
 			// break point
 			to_draw = {
-				"shape": "dot",
+				"shape": "point",
 				"colour": "red",
-				"dot": pct
+				"point": pct
 			};
 			
 			if (orient !== "dreapta") {
@@ -103,15 +102,14 @@ function run(){
 
 			// break point
 			to_draw = [{
-				"shape": "line",
+				"shape": "segment",
 				"colour": "CadetBlue",
-				"dot1": L[k],
-				"dot2": pct,
+				"segment": get_segment(L[k], pct),
 				"events": ["pop", "pop", "push"]
 			},{
-				"shape": "dot",
+				"shape": "point",
 				"colour": "cyan",
-				"dot": pct,
+				"point": pct,
 				"events": ["push"]
 			}];
 			drawings.push(to_draw);
@@ -120,10 +118,9 @@ function run(){
 
 		// break point
 		to_draw = {
-			"shape": "line",
+			"shape": "segment",
 			"colour": "black",
-			"dot1": L[k],
-			"dot2": S,
+			"segment": get_segment(L[k], S),
 			"events": ["pop", "pop", "push"],
 			"message": "Muchia " + L[k].litera + S.litera + " face parte din acoperirea convexa."
 		};
@@ -143,13 +140,13 @@ function run(){
 function firstPart() {
 	var res = run();
 	if (res == null) {
-		message.innerText = "at least 2 dots";
+		message.innerText = "at least 2 points";
 		return null;	
 	}
 
 	startButton.removeEventListener("click", startAlgorithm);
-	canvas.removeEventListener("click", addDot);
-	loadButton.removeEventListener("click", loadDots);
+	canvas.removeEventListener("click", addPoint);
+	loadButton.removeEventListener("click", loadPoints);
 	runButton.removeEventListener("click", autorun);
 
 	drawingsIdx = 0;

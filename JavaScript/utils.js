@@ -2,19 +2,19 @@ function nextChar(c) {
     return String.fromCharCode(c.charCodeAt(0) + 1);
 }
 
-function leftmostDot(dotList) {
-	if (dotList.length == 0) 
+function leftmostPoint(pointList) {
+	if (pointList.length == 0) 
 		return null;
 
-	var leftmost = dotList[0];
-	for (idx in dotList) {
-		dot = dotList[idx];
-		if (dot.x == "undefined"){
-			console.log("leftDot function must get list of correct dots");
+	var leftmost = pointList[0];
+	for (idx in pointList) {
+		point = pointList[idx];
+		if (point.x == "undefined"){
+			console.log("leftPoint function must get list of correct points");
 			return null;
 		}
-		if (dot.x < leftmost.x){
-			leftmost = dot;
+		if (point.x < leftmost.x){
+			leftmost = point;
 		}
 	}
 
@@ -76,28 +76,28 @@ function orientation(p1, p2, p3) {
 		return "stanga";
 }
 
-function drawDot(ctx, dot, colour="black") {
+function drawPoint(ctx, point, colour="black") {
 	ctx.beginPath();		
-	ctx.arc(dot.x, dot.y, 4, 0, 2 * Math.PI);		// un punct este de fapt un cerc plin
+	ctx.arc(point.x, point.y, 4, 0, 2 * Math.PI);		// un punct este de fapt un cerc plin
 	ctx.fillStyle = colour;
 	ctx.fill();
 	ctx.closePath();
 }
 
-function drawLiter(ctx, dot, colour="black") {
+function drawLiter(ctx, point, colour="black") {
 	ctx.beginPath();
 	ctx.font = "15px Arial";
 	ctx.fillStyle = colour;
-    ctx.fillText(dot.litera, dot.x-10, dot.y-10);
+    ctx.fillText(point.litera, point.x-10, point.y-10);
 	ctx.closePath();
 }
 
-function drawLine(ctx, dot1, dot2, colour="black") {
+function drawLine(ctx, segment, colour="black") {
 	ctx.beginPath();  
 	ctx.lineWidth = 3;
     ctx.strokeStyle=colour;
-	ctx.moveTo(dot1.x, dot1.y);
-	ctx.lineTo(dot2.x, dot2.y);
+	ctx.moveTo(segment.upperPoint.x, segment.upperPoint.y);
+	ctx.lineTo(segment.lowerPoint.x, segment.lowerPoint.y);
 	ctx.lineWidth = 3;
 	ctx.stroke();	
 	ctx.closePath();
@@ -105,16 +105,16 @@ function drawLine(ctx, dot1, dot2, colour="black") {
 
 function draw(drawing) {
 	switch (drawing.shape) {
-	case "line": {
-		drawLine(ctx, drawing.dot1, drawing.dot2, drawing.colour);
+	case "segment": {
+		drawLine(ctx, drawing.segment, drawing.colour);
 		break;
 	}
-	case "dot": {
-		drawDot(ctx, drawing.dot, drawing.colour);
+	case "point": {
+		drawPoint(ctx, drawing.point, drawing.colour);
 		break;
 	}
 	case "liter": {
-		drawLiter(ctx, drawing.dot, drawing.colour);
+		drawLiter(ctx, drawing.point, drawing.colour);
 		break;
 	}
 	default: {
@@ -152,7 +152,7 @@ function sort(list, compare) {
 	return sorted;
 }
 
-function compareDotsY(p1, p2) {
+function comparePointsY(p1, p2) {
 	if (p1.y < p2.y) return -1;
 	if (p1.y > p2.y) return 1;
 	if (p1.x < p2.x) return -1;
@@ -160,12 +160,12 @@ function compareDotsY(p1, p2) {
 	return 0;
 }
 
-function compareLinesY(l1, l2) {
-	var compSup = compareDotsY(l1.dot1, l2.dot1);
+function compareSegmentsY(s1, s2) {
+	var compSup = comparePointsY(s1.upperPoint, s2.upperPoint);
 	if (compSup != 0) {
 		return compSup;
 	}
-	return compareDotsY(l1.dot2, l2.dot2);
+	return comparePointsY(s1.lowerPoint, s2.lowerPoint);
 }
 
 function ecuatia_dreptei(A, B) {
@@ -178,22 +178,22 @@ function ecuatia_dreptei(A, B) {
 }
 
 function intersection(seg1, seg2) {
-	var dr1 = ecuatia_dreptei(seg1.dot1, seg1.dot2);
-	var dr2 = ecuatia_dreptei(seg2.dot1, seg2.dot2);
+	var dr1 = ecuatia_dreptei(seg1.upperPoint, seg1.lowerPoint);
+	var dr2 = ecuatia_dreptei(seg2.upperPoint, seg2.lowerPoint);
 	var matrice = [[dr1.x_coef, dr1.y_coef],
 				   [dr2.x_coef, dr2.y_coef]];
-	var deltha = determinant2(matrice);
+	var delta = determinant2(matrice);
 
-	if (deltha == 0)
+	if (delta == 0)
 		return false;
 
 	matrice = [[-dr1.termen_liber, dr1.y_coef],
 			   [-dr2.termen_liber, dr2.y_coef]];
-	var x = determinant2(matrice) / deltha;
+	var x = determinant2(matrice) / delta;
 
 	matrice = [[-dr1.termen_liber, dr1.x_coef],
 			   [-dr2.termen_liber, dr2.x_coef]]
-	var y = - determinant2(matrice) / deltha;
+	var y = - determinant2(matrice) / delta;
 
 	return {
 		"x": x,
@@ -207,17 +207,31 @@ function has_intersection(seg1, seg2) {
 	if (false === int)
 		return false;
 
-	function between(P1, P2, verif) {
-		if (P1.x <= verif.x && verif.x <= P2.x)
-			return true;
-		if (P2.x <= verif.x && verif.x <= P1.x)
-			return true;
-		return false;
+	function between(seg, point) {
+		// punctul este mai decat altul daca are y mai mic
+		return seg.upperPoint.y <= point.y && point.y <= seg.lowerPoint.y;
 	}
 
-	if (between(seg1.dot1, seg1.dot2, int) && between(seg2.dot1, seg2.dot2, int)) {
+	if (between(seg1, int) && between(seg2, int)) {
 		return int;
 	}
 
 	return false;
+}
+
+function get_segment(point1, point2) {
+	var upperPoint, lowerPoint;
+
+	if (comparePointsY(point1, point2) <= 0) {
+		upperPoint = point1;
+		lowerPoint = point2;
+	} else {
+		upperPoint = point2;
+		lowerPoint = point1;
+	}
+
+	return {
+		"upperPoint": upperPoint,
+		"lowerPoint": lowerPoint
+	}
 }

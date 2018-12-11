@@ -8,7 +8,7 @@ function load() {
 	this.runButton = document.getElementById("runButton");
 	this.speedSelector = document.getElementById("speedSelector");
 	this.panel = $("#panel");
-	this.dotList = $("#dotList");
+	this.pointList = $("#pointList");
 	this.ctx = canvas.getContext("2d");
 	this.drawingsIdx = null;
 	init();
@@ -18,17 +18,10 @@ function genericInit() {
 	startButton.addEventListener("click", startAlgorithm);
 	runButton.addEventListener("click", autorun);
 	$('#panel').empty();
-	$('#dotList').empty();
+	$('#pointList').empty();
 	canvas.permanent_drawings = [];
 	this.drawings = [];
 	canvas.litera = 'A';
-// {
-// 	"shape": [dot, line],
-// 	"colour": ...,
-// 	"dot1":
-// 	"dot2":
-// 	"dot"
-// }
 }
 
 function genericClick(event) {

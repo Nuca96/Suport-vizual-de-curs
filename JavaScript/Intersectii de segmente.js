@@ -8,11 +8,11 @@ function init() {
 function firstClick(event) {
 	canvas.removeEventListener("click", firstClick);
 	var punct = genericClick(event);
-	canvas.firstDot = punct;
+	canvas.firstPoint = punct;
 
 	var drawing = {
 		"shape": "liter",
-		"dot": punct,
+		"point": punct,
 		"colour": "black"
 	};
 	canvas.permanent_drawings.push(drawing);
@@ -25,36 +25,30 @@ function firstClick(event) {
 function secondClick(event) {
 	canvas.removeEventListener("click", secondClick);
 	canvas.removeEventListener("mousemove", mouseMove);
+	
 	var punct = genericClick(event);
+	canvas.puncte.push(canvas.firstPoint);
+	canvas.puncte.push(punct);
 
 	var drawing = {
 		"shape": "liter",
-		"dot": punct,
+		"point": punct,
 		"colour": "black"
 	};
 	canvas.permanent_drawings.push(drawing);
 	draw(drawing);
 
-	var line = {
-		"shape": "line",
-		"colour": "DarkCyan" 
+	var drawing = {
+		"shape": "segment",
+		"colour": "DarkCyan",
+		"segment": get_segment(canvas.firstPoint, punct)
 	};
+	canvas.permanent_drawings.push(drawing);
+	draw(drawing);
 
-	if(compareDotsY(canvas.firstDot, punct) < 1) {
-		line.dot1 = canvas.firstDot;
-		line.dot2 = punct;
-	} else {
-		line.dot1 = punct;
-		line.dot2 = canvas.firstDot;
-	}
-	canvas.permanent_drawings.push(line);
-	draw(line);
+	canvas.segmente.push(drawing.segment);
 
-	canvas.segmente.push(line);
-	canvas.puncte.push(line.dot1);
-	canvas.puncte.push(line.dot2);
-
-	canvas.firstDot = null;
+	canvas.firstPoint = null;
 	canvas.addEventListener("click", firstClick);
 }
 
@@ -65,9 +59,8 @@ function mouseMove(event) {
 		"y": event.clientY - canvas.offsetTop
 	};
 	var drawing = {
-		"shape": "line",
-		"dot1": canvas.firstDot,
-		"dot2": punct,
+		"shape": "segment",
+		"segment": get_segment(canvas.firstPoint, punct),
 		"colour": "CadetBlue"
 	};
 	draw(drawing);
@@ -85,8 +78,8 @@ function run() {
 			}
 
 			var drawing = {
-				"shape": "dot",
-				"dot": int,
+				"shape": "point",
+				"point": int,
 				"colour": "red"
 			};
 			draw(drawing);
@@ -97,7 +90,7 @@ function run() {
 }
 
 function firstPart() {
-	if (canvas.firstDot != null) {
+	if (canvas.firstPoint != null) {
 		canvas.permanent_drawings.pop();
 		canvas.removeEventListener("click", secondClick);
 		canvas.removeEventListener("mousemove", mouseMove);
