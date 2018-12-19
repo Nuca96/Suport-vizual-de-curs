@@ -92,10 +92,10 @@ function drawLiter(ctx, point, colour) {
 	ctx.closePath();
 }
 
-function drawLine(ctx, startPoint, endPoint, colour, width) {
+function drawLine(ctx, segment, colour, width) {
 	ctx.beginPath();
-	ctx.moveTo(startPoint.x, startPoint.y);
-	ctx.lineTo(endPoint.x, endPoint.y);
+	ctx.moveTo(segment.upperPoint.x, segment.upperPoint.y);
+	ctx.lineTo(segment.lowerPoint.x, segment.lowerPoint.y);
 	ctx.lineWidth = width;
     ctx.strokeStyle = colour;
 	ctx.stroke();	
@@ -146,6 +146,22 @@ function compareSegmentsY(s1, s2) {
 	return comparePointsY(s1.lowerPoint, s2.lowerPoint);
 }
 
+function comparePointsX(p1, p2) {
+	if (p1.x < p2.x) return -1;
+	if (p1.x > p2.x) return 1;
+	if (p1.y < p2.y) return -1;
+	if (p1.y > p2.y) return 1;
+	return 0;
+}
+
+function compareSegmentsX(s1, s2) {
+	var compSup = comparePointsX(s1.upperPoint, s2.upperPoint);
+	if (compSup != 0) {
+		return compSup;
+	}
+	return comparePointsX(s1.lowerPoint, s2.lowerPoint);
+}
+
 function ecuatia_dreptei(A, B) {
 	// x * x_coef + y * y_coef = termen_liber
 	return {
@@ -174,8 +190,8 @@ function intersection(seg1, seg2) {
 	var y = - determinant2(matrice) / delta;
 
 	return {
-		"x": x,
-		"y": y
+		"x": Math.floor(x),
+		"y": Math.floor(y)
 	}
 }
 

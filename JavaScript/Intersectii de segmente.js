@@ -24,7 +24,7 @@ function firstClick(event) {
 function secondClick(event) {
 	canvas.removeEventListener("click", secondClick);
 	canvas.removeEventListener("mousemove", mouseMove);
-	
+
 	var punct = genericClick(event);
 	var segment = get_segment(canvas.firstPoint, punct);
 	canvas.segmente.push(segment);
@@ -54,7 +54,7 @@ function secondClick(event) {
 	};
 	canvas.permanent_drawings.push(drawing);
 	draw(drawing);
-	
+
 	var drawing = {
 		"shape": "segment",
 		"colour": "DarkCyan",
@@ -101,20 +101,95 @@ function run2() {
 	return true;
 }
 
+function insertSegm(array, point) {
+	var idx = 0;
+	for (; idx < array.length; idx++) {
+		var int = intersection(array[idx], get_sweep(point));
+
+		if (int.x < point.x)
+			continue;
+		array.splice(idx, 0, point.segment);
+		return idx;
+	}
+	array.push(point.segment);
+	return idx;
+}
+
+function addIntersection(points, seg1, seg2, sweep) {
+	if (typeof seg1 == "undefined" || typeof seg2 == "undefined") {
+		return;
+	}
+	var int = has_intersection(seg1, seg2);
+	if (false == int) {
+		return;
+	}
+
+	int.type = "inter";
+	int.leftSeg = seg1;
+	int.rightSeg = seg2;
+
+	for (var i in points) {
+		if(_.isEqual(points[i], int)) {
+			return;
+		}
+	}
+
+	for (var idx in points) {
+		if (points[idx].y <= int.y)
+			continue;
+		points.splice(idx, 0, int);
+		return int;
+	}
+	points.push(int);
+	return int;
+}
+
 function run() {
 	var sortedPoints = sort(canvas.points, comparePointsY);
-	for (var idx in sortedPoints) {
+	var activeSegments = [];
+	for (var idx=0; idx<sortedPoints.length; idx++) {
 		var point = sortedPoints[idx];
+
 		var drawing = [{
+			"shape": "sweep",
+			"point": point,
+			"size": 1,
+			"events": ["push"]
+		}, {
 			"shape": "point",
 			"point": point,
 			"colour": "red"
-		}, {
-			"shape": "sweep",
-			"point": point,
-			"size": 1
 		}];
 		drawings.push(drawing);
+
+		switch (point["type"]) {
+			case "upper": {
+				var index = insertSegm(activeSegments, point);
+
+				var int1 = addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index], point.y);
+				var int2 = addIntersection(sortedPoints, activeSegments[index], activeSegments[index + 1]);
+
+				break;
+			}
+			case "lower": {
+				var index = activeSegments.indexOf(point["segment"]);
+				activeSegments.splice(index, 1);
+				addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index], point.y);
+				break
+			}
+			case "inter": {
+				var index = activeSegments.indexOf(point["leftSeg"]);
+				var aux = activeSegments[index];
+				activeSegments[index] = activeSegments[index + 1];
+				activeSegments[index + 1] = aux;
+				addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index], point.y);
+				addIntersection(sortedPoints, activeSegments[index + 1], activeSegments[index + 2], point.y);
+				break;
+			}
+			default: {
+				break;
+			}
+		}
 	}
 	return true;
 }
@@ -130,7 +205,7 @@ function firstPart() {
 	var res = run();
 	if (res == null) {
 		message.innerText = "error";
-		return null;	
+		return null;
 	}
 	canvas.removeEventListener("click", firstClick);
 	startButton.removeEventListener("click", startAlgorithm);

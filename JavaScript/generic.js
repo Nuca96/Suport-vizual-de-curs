@@ -37,6 +37,7 @@ function genericClick(event) {
 
 function nextStep() {
 	if (drawingsIdx > drawings.length - 1) {
+		redraw();
 		message.innerText = "Algoritmul s-a sfarsit";
 		startButton.removeEventListener("click", nextStep);
 		return null;
@@ -57,15 +58,16 @@ function nextStep() {
 			if (ev == "pop") {
 				canvas.permanent_drawings.pop();
 			}
+			redraw();
 		}
-		drawing.events = [];
-		redraw();
+
 		draw(drawing);
 	}
 
+	redraw();
 	if (false === Array.isArray(to_draw)) {
 		action(to_draw);
-		return;
+		return true;
 	}
 	for (var idx in to_draw) {
 		action(to_draw[idx]);
@@ -112,6 +114,19 @@ function reset() {
 	init();
 }
 
+function get_sweep(point) {
+	return {
+		"upperPoint": {
+			"x": 0,
+			"y": point.y
+		},
+		"lowerPoint": {
+			"x": canvas.width,
+			"y": point.y
+		}
+	}
+}
+
 function draw(drawing) {
 	if (typeof drawing.colour == "undefined") {
 		drawing.colour = "black";
@@ -121,8 +136,7 @@ function draw(drawing) {
 	}
 	switch (drawing.shape) {
 	case "segment": {
-		var seg = drawing.segment;
-		drawLine(ctx, seg.lowerPoint, seg.upperPoint, drawing.colour, drawing.size);
+		drawLine(ctx, drawing.segment, drawing.colour, drawing.size);
 		break;
 	}
 	case "point": {
@@ -134,9 +148,7 @@ function draw(drawing) {
 		break;
 	}
 	case "sweep": {
-		var y = drawing.point.y;
-		console.log(y);
-		drawLine(ctx, {"x": 0, "y": y}, {"x": canvas.width, "y": y}, drawing.colour, drawing.size);
+		drawLine(ctx, get_sweep(drawing.point), drawing.colour, drawing.size);
 		break;
 	}
 	default: {
