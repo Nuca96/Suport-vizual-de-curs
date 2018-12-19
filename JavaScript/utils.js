@@ -1,9 +1,11 @@
-function nextChar(c) {
-    return String.fromCharCode(c.charCodeAt(0) + 1);
+function getNextLiter(canvas) {
+	var lit = canvas.litera;
+    canvas.litera = String.fromCharCode(canvas.litera.charCodeAt(0) + 1);
+    return lit;
 }
 
 function leftmostPoint(pointList) {
-	if (pointList.length == 0) 
+	if (pointList.length == 0)
 		return null;
 
 	var leftmost = pointList[0];
@@ -57,7 +59,7 @@ function determinant2(matrice) {
 
 	if (l0.length != 2 || l1.length != 2){
 		console.log("cannot calculate delta");
-		return null;		
+		return null;
 	}
 
 	return l0[0]*l1[1] - l0[1]*l1[0];
@@ -66,18 +68,18 @@ function determinant2(matrice) {
 function orientation(p1, p2, p3) {
 	var D = determinant3([[1, 1, 1], [p1.x, p2.x, p3.x], [p1.y, p2.y, p3.y]]);
 
-	if (D == 0) 
+	if (D == 0)
 		return "fata";
 	// invers fata de sistemul de coordonate xOy
 	// in canvas, "cresterea" coordonatei y este de sus in jos
-	if (D > 0) 
+	if (D > 0)
 		return "dreapta";
 	if (D < 0)
 		return "stanga";
 }
 
 function drawPoint(ctx, point, colour, size) {
-	ctx.beginPath();		
+	ctx.beginPath();
 	ctx.arc(point.x, point.y, size, 0, 2 * Math.PI);		// un punct este de fapt un cerc plin
 	ctx.fillStyle = colour;
 	ctx.fill();
@@ -98,7 +100,7 @@ function drawLine(ctx, segment, colour, width) {
 	ctx.lineTo(segment.lowerPoint.x, segment.lowerPoint.y);
 	ctx.lineWidth = width;
     ctx.strokeStyle = colour;
-	ctx.stroke();	
+	ctx.stroke();
 	ctx.closePath();
 }
 

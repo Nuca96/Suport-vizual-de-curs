@@ -33,12 +33,14 @@ function secondClick(event) {
 	var upperPoint = {
 		"x": segment.upperPoint.x,
 		"y": segment.upperPoint.y,
+		"litera": segment.upperPoint.litera,
 		"type": "upper",
 		"segment": segment
 	};
 	var lowerPoint = {
 		"x": segment.lowerPoint.x,
 		"y": segment.lowerPoint.y,
+		"litera": segment.lowerPoint.litera,
 		"type": "lower",
 		"segment": segment
 	};
@@ -134,12 +136,20 @@ function insertSegm(array, point) {
 }
 
 function equalInters(p1, p2) {
-	if (_.isEqual(p1, p2)) {
+	if (p1.type != "inter" || p2.type != "inter") {
+		return false;
+	}
+
+	if ( _.isEqual(p1.leftSeg, p2.rightSeg) &&
+		_.isEqual(p2.leftSeg, p1.rightSeg) ) {
 		return true;
 	}
 
-	return _.isEqual(p1.leftSeg, p2.rightSeg) &&
-		_.isEqual(p2.leftSeg, p1.rightSeg)
+	if ( _.isEqual(p1.leftSeg, p2.leftSeg) &&
+		_.isEqual(p2.rightSeg, p1.rightSeg) ) {
+		return true;
+	}
+	return false;
 }
 
 function addIntersection(points, seg1, seg2, sweep) {
@@ -155,22 +165,36 @@ function addIntersection(points, seg1, seg2, sweep) {
 	int.leftSeg = seg1;
 	int.rightSeg = seg2;
 
-	console.log(int);
 	for (var i in points) {
 		if(equalInters(points[i], int)) {
-			console.log("nu");
 			return;
 		}
 	}
-	console.log("da");
+	int.litera = getNextLiter(canvas);
+
+	function addToDrawings(int) {
+		var drawing = [{
+			"shape": "point",
+			"point": int,
+			"events": ["push"],
+			"size": 4
+		}, {
+			"shape": "liter",
+			"point": int,
+			"events": ["push"]
+		}];
+		drawings.push(drawing);
+	}
 
 	for (var idx in points) {
 		if (points[idx].y <= int.y)
 			continue;
 		points.splice(idx, 0, int);
+		addToDrawings(int)
 		return int;
 	}
 	points.push(int);
+	addToDrawings(int)
 	return int;
 }
 
@@ -188,7 +212,8 @@ function run() {
 		}, {
 			"shape": "point",
 			"point": point,
-			"colour": "red"
+			"colour": "red",
+			"message": "Dreapta de baleiere a cooborat la punctul " + point.litera
 		}];
 		drawings.push(drawing);
 
@@ -196,8 +221,8 @@ function run() {
 			case "upper": {
 				var index = insertSegm(activeSegments, point);
 
-				var int1 = addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index], point.y);
-				var int2 = addIntersection(sortedPoints, activeSegments[index], activeSegments[index + 1]);
+				addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index], point.y);
+				addIntersection(sortedPoints, activeSegments[index], activeSegments[index + 1]);
 
 				break;
 			}
@@ -205,6 +230,7 @@ function run() {
 				var index = activeSegments.indexOf(point["segment"]);
 				activeSegments.splice(index, 1);
 				addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index], point.y);
+
 				break
 			}
 			case "inter": {

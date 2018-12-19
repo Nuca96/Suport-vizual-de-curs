@@ -28,9 +28,8 @@ function genericClick(event) {
 	var punct = {
 		"x": event.clientX - canvas.offsetLeft,
 		"y": event.clientY - canvas.offsetTop,
-		"litera": canvas.litera
+		"litera": getNextLiter(canvas)
 	};
-	canvas.litera = nextChar(canvas.litera);
 
 	return punct;
 }
@@ -153,7 +152,7 @@ function draw(drawing) {
 		break;
 	}
 	default: {
-		console.log("wrong shape");
+		console.log("wrong shape: " + drawing.shape);
 	}
 	}
 }

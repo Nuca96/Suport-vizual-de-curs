@@ -86,6 +86,7 @@ function run(){
 				"shape": "point",
 				"colour": "red",
 				"point": pct,
+				"size": 4,
 				"events": ["redraw"]
 			};
 
