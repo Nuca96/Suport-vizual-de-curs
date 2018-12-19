@@ -58,13 +58,14 @@ function nextStep() {
 			if (ev == "pop") {
 				canvas.permanent_drawings.pop();
 			}
-			redraw();
+			if (ev == "redraw") {
+				redraw();
+			}
 		}
 
 		draw(drawing);
 	}
 
-	redraw();
 	if (false === Array.isArray(to_draw)) {
 		action(to_draw);
 		return true;

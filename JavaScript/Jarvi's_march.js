@@ -65,12 +65,12 @@ function run(){
 			"shape": "segment",
 			"colour": "CadetBlue",
 			"segment": get_segment(L[k], S),
-			"events": ["push"]
+			"events": ["push", "redraw"]
 		},{
 			"shape": "point",
 			"colour": "cyan",
 			"point": S,
-			"events": ["push"],
+			"events": ["push", "redraw"],
 			"message": "Punctul " + S.litera + " a fost ales random."
 		}];
 		drawings.push(to_draw);
@@ -85,9 +85,10 @@ function run(){
 			to_draw = {
 				"shape": "point",
 				"colour": "red",
-				"point": pct
+				"point": pct,
+				"events": ["redraw"]
 			};
-			
+
 			if (orient !== "dreapta") {
 				var message = message1 + "<b>NU ESTE</b>" + message2;
 				to_draw.message = message;
@@ -103,12 +104,12 @@ function run(){
 				"shape": "segment",
 				"colour": "CadetBlue",
 				"segment": get_segment(L[k], pct),
-				"events": ["pop", "pop", "push"]
+				"events": ["pop", "pop", "push", "redraw"]
 			},{
 				"shape": "point",
 				"colour": "cyan",
 				"point": pct,
-				"events": ["push"]
+				"events": ["push", "redraw"]
 			}];
 			drawings.push(to_draw);
 			S = pct;
@@ -118,7 +119,7 @@ function run(){
 		to_draw = {
 			"shape": "segment",
 			"segment": get_segment(L[k], S),
-			"events": ["pop", "pop", "push"],
+			"events": ["pop", "pop", "push", "redraw"],
 			"message": "Muchia " + L[k].litera + S.litera + " face parte din acoperirea convexa."
 		};
 		drawings.push(to_draw);
@@ -130,7 +131,7 @@ function run(){
 		else {
 			valid = false;
 		}
-	}	
+	}
 	return L;
 }
 
@@ -138,7 +139,7 @@ function firstPart() {
 	var res = run();
 	if (res == null) {
 		message.innerText = "at least 2 points";
-		return null;	
+		return null;
 	}
 
 	startButton.removeEventListener("click", startAlgorithm);

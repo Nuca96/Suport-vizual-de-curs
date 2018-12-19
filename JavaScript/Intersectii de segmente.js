@@ -3,6 +3,7 @@ function init() {
 	canvas.segmente = [];
 	canvas.points = [];
 	canvas.addEventListener("click", firstClick);
+	loadButton.addEventListener("click", loadSegments);
 }
 
 function firstClick(event) {
@@ -64,6 +65,23 @@ function secondClick(event) {
 	draw(drawing);
 }
 
+function loadSegments() {
+	for (var idx in Intersection) {
+		var segm = Intersection[idx];
+		var ev1 = {
+			"clientX": segm.p1.x,
+			"clientY": segm.p1.y
+		};
+		firstClick(ev1);
+
+		var ev2 = {
+			"clientX": segm.p2.x,
+			"clientY": segm.p2.y
+		};
+		secondClick(ev2);
+	}
+}
+
 function mouseMove(event) {
 	redraw();
 	var punct = {
@@ -115,6 +133,15 @@ function insertSegm(array, point) {
 	return idx;
 }
 
+function equalInters(p1, p2) {
+	if (_.isEqual(p1, p2)) {
+		return true;
+	}
+
+	return _.isEqual(p1.leftSeg, p2.rightSeg) &&
+		_.isEqual(p2.leftSeg, p1.rightSeg)
+}
+
 function addIntersection(points, seg1, seg2, sweep) {
 	if (typeof seg1 == "undefined" || typeof seg2 == "undefined") {
 		return;
@@ -128,11 +155,14 @@ function addIntersection(points, seg1, seg2, sweep) {
 	int.leftSeg = seg1;
 	int.rightSeg = seg2;
 
+	console.log(int);
 	for (var i in points) {
-		if(_.isEqual(points[i], int)) {
+		if(equalInters(points[i], int)) {
+			console.log("nu");
 			return;
 		}
 	}
+	console.log("da");
 
 	for (var idx in points) {
 		if (points[idx].y <= int.y)
@@ -154,7 +184,7 @@ function run() {
 			"shape": "sweep",
 			"point": point,
 			"size": 1,
-			"events": ["push"]
+			"events": ["redraw"]
 		}, {
 			"shape": "point",
 			"point": point,
