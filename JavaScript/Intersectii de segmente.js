@@ -152,7 +152,7 @@ function equalInters(p1, p2) {
 	return false;
 }
 
-function addIntersection(points, seg1, seg2, sweep) {
+function addIntersection(points, seg1, seg2) {
 	if (typeof seg1 == "undefined" || typeof seg2 == "undefined") {
 		return;
 	}
@@ -215,31 +215,55 @@ function run() {
 			"colour": "red",
 			"message": "Dreapta de baleiere a cooborat la punctul " + point.litera
 		}];
-		drawings.push(drawing);
 
 		switch (point["type"]) {
 			case "upper": {
+				drawing.push({
+					"shape": "segment",
+					"segment": point.segment,
+					"colour": "pink"
+				});
+				drawings.push(drawing);
 				var index = insertSegm(activeSegments, point);
 
-				addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index], point.y);
+				addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index]);
 				addIntersection(sortedPoints, activeSegments[index], activeSegments[index + 1]);
 
 				break;
 			}
 			case "lower": {
+				drawing.push({
+					"shape": "segment",
+					"segment": point.segment,
+					"colour": "pink"
+				});
+				drawings.push(drawing);
+
 				var index = activeSegments.indexOf(point["segment"]);
 				activeSegments.splice(index, 1);
-				addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index], point.y);
+				addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index]);
 
 				break
 			}
 			case "inter": {
+				drawing.push({
+					"shape": "segment",
+					"segment": point.leftSeg,
+					"colour": "pink"
+				});
+				drawing.push({
+					"shape": "segment",
+					"segment": point.rightSeg,
+					"colour": "pink"
+				});
+				drawings.push(drawing);
+
 				var index = activeSegments.indexOf(point["leftSeg"]);
 				var aux = activeSegments[index];
 				activeSegments[index] = activeSegments[index + 1];
 				activeSegments[index + 1] = aux;
-				addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index], point.y);
-				addIntersection(sortedPoints, activeSegments[index + 1], activeSegments[index + 2], point.y);
+				addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index]);
+				addIntersection(sortedPoints, activeSegments[index + 1], activeSegments[index + 2]);
 				break;
 			}
 			default: {
