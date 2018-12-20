@@ -205,7 +205,18 @@ function has_intersection(seg1, seg2) {
 
 	function between(seg, point) {
 		// punctul este mai decat altul daca are y mai mic
-		return seg.upperPoint.y <= point.y && point.y <= seg.lowerPoint.y;
+		if(!(seg.upperPoint.y <= point.y && point.y <= seg.lowerPoint.y)) {
+			return false;
+		}
+		var lowerX = seg.lowerPoint.x;
+		var upperX = seg.upperPoint.x;
+
+		if (lowerX > upperX) {
+			lowerX = upperX;
+			upperX = seg.lowerPoint.x;
+		}
+
+		return lowerX <= point.x && point.x <= upperX
 	}
 
 	if (between(seg1, int) && between(seg2, int)) {
@@ -231,4 +242,12 @@ function get_segment(point1, point2) {
 		"lowerPoint": lowerPoint,
 		"str": upperPoint.litera + lowerPoint.litera
 	}
+}
+
+function theSamePoint(p1, p2) {
+	return p1.x == p2.x && p1.y == p2.y;
+}
+
+function distance(point1, point2) {
+	return Math.sqrt(Math.pow((point1.x - point2.x), 2) + Math.pow((point1.y - point2.y), 2));
 }

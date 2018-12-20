@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <title>Harti trapezoidale</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="puncte.js"></script>
+    <script src="JavaScript/lodash.js"></script>
+    <script src="JavaScript/utils.js"></script>
+    <script src="JavaScript/generic.js"></script>
+    <script src="JavaScript/Harti trapezoidale.js"></script>
+  </head>
+
+<body onload="load()">
+  <canvas id = "myCanvas" width = "500" height = "500" style = "border:1px solid #000000; cursor:crosshair" >
+    Your browser does not support the canvas element.
+  </canvas>
+  <br>
+  <button id="loadButton">Incarca segmente</button>
+  <button id="startButton">Start</button>
+  <button onclick="reset()">Reset</button>
+  <br>
+  Speed:
+  <select id="speedSelector">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+  </select>
+  <button id="runButton">Run</button>
+  <br><br>
+<!--   <button id="prev">Prev</button> -->
+<!-- <button id="nextButton">Next</button> -->
+  <div id="message"></div>
+  <ol id="panel"> </ol>
+  <ul id="pointList"> </ul>
+
+</body>
