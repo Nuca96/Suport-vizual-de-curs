@@ -156,6 +156,19 @@ function addIntersection(points, seg1, seg2) {
 	if (typeof seg1 == "undefined" || typeof seg2 == "undefined") {
 		return;
 	}
+
+	drawing = [{
+		"shape": "segment",
+		"segment": seg1,
+		"colour": "purple"
+	}, {
+		"shape": "segment",
+		"segment": seg2,
+		"colour": "purple",
+		"message": "Se calculeaza intersectia dintre " + seg1.str + " si " + seg2.str
+	}];
+	drawings.push(drawing);
+
 	var int = has_intersection(seg1, seg2);
 	if (false == int) {
 		return;
@@ -212,8 +225,7 @@ function run() {
 		}, {
 			"shape": "point",
 			"point": point,
-			"colour": "red",
-			"message": "Dreapta de baleiere a cooborat la punctul " + point.litera
+			"colour": "red"
 		}];
 
 		switch (point["type"]) {
@@ -221,7 +233,8 @@ function run() {
 				drawing.push({
 					"shape": "segment",
 					"segment": point.segment,
-					"colour": "pink"
+					"colour": "pink",
+					"message": "Punctul " + point.litera + ": se introduce segmentul " + point.segment.str
 				});
 				drawings.push(drawing);
 				var index = insertSegm(activeSegments, point);
@@ -235,7 +248,8 @@ function run() {
 				drawing.push({
 					"shape": "segment",
 					"segment": point.segment,
-					"colour": "pink"
+					"colour": "pink",
+					"message": "Punctul " + point.litera + ": se elimina segmentul " + point.segment.str
 				});
 				drawings.push(drawing);
 
@@ -254,7 +268,8 @@ function run() {
 				drawing.push({
 					"shape": "segment",
 					"segment": point.rightSeg,
-					"colour": "pink"
+					"colour": "pink",
+					"message": "Punctul " + point.litera + ": se interschimba segmentele " + point.leftSeg.str + " si " + point.rightSeg.str
 				});
 				drawings.push(drawing);
 

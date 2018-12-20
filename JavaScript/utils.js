@@ -228,6 +228,7 @@ function get_segment(point1, point2) {
 
 	return {
 		"upperPoint": upperPoint,
-		"lowerPoint": lowerPoint
+		"lowerPoint": lowerPoint,
+		"str": upperPoint.litera + lowerPoint.litera
 	}
 }
