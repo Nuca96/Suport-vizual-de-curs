@@ -36,26 +36,20 @@ function secondClick(event) {
 	canvas.addEventListener("click", firstClick);
 
 	//draw new elements
-	var drawing = {
+	var permanents = [{
 		"shape": "liter",
 		"point": lowerPoint
-	};
-	canvas.permanent_drawings.push(drawing);
-
-	var drawing = {
+	}, {
 		"shape": "liter",
 		"point": upperPoint
-	};
-	canvas.permanent_drawings.push(drawing);
-
-	var drawing = {
+	}, {
 		"shape": "segment",
 		"colour": "DarkCyan",
 		"segment": segment
-	};
-	canvas.permanent_drawings.push(drawing);
+	}];
+	canvas.permanent_drawings.push.apply(canvas.permanent_drawings, permanents);
 
-	redraw(drawing);
+	redraw();
 }
 
 function loadSegments() {

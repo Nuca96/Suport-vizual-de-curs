@@ -10,18 +10,15 @@ function addPoint(event) {
 
 	pointList.append("<li>" + punct.litera + " (" + punct.x + ", " + punct.y + ")</li>");
 
-	var drawing = {
+	var permanents = [{
 		"shape":"point",
 		"point": punct
-	}
-	canvas.permanent_drawings.push(drawing);
-	draw(drawing);
-	var drawing = {
+	}, {
 		"shape":"liter",
 		"point": punct
-	}
-	canvas.permanent_drawings.push(drawing);
-	draw(drawing);
+	}]
+	canvas.permanent_drawings.push.apply(canvas.permanent_drawings, permanents);
+	redraw();
 }
 
 function loadPoints() {
