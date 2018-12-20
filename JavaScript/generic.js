@@ -21,16 +21,23 @@ function genericInit() {
 	$('#pointList').empty();
 	canvas.permanent_drawings = [];
 	this.drawings = [];
-	canvas.litera = 'A';
+	canvas.points = [];
+	canvas.liter = 'A';
 }
 
-function genericClick(event) {
+function addPointToCanvas(point) {
+	// point.litera = "P" + canvas.points.length;
+	point.litera = canvas.liter;
+	canvas.liter = nextChar(canvas.liter);
+
+	canvas.points.push(point);
+}
+
+function genericEvent(event) {
 	var punct = {
 		"x": event.clientX - canvas.offsetLeft,
-		"y": event.clientY - canvas.offsetTop,
-		"litera": getNextLiter(canvas)
+		"y": event.clientY - canvas.offsetTop
 	};
-
 	return punct;
 }
 

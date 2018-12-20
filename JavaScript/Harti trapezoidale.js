@@ -7,10 +7,10 @@ function init() {
 }
 
 function getNearPoint(event) {
-	var point = genericClick(event);
+	var point = genericEvent(event);
 
 	for (var idx in canvas.points) {
-		if (distance(canvas.points[idx], point) < 10){
+		if (distance(canvas.points[idx], point) < 15){
 			return canvas.points[idx];
 		}
 	}
@@ -22,20 +22,6 @@ function firstClick(event) {
 	var punct = getNearPoint(event);
 	canvas.firstPoint = punct;
 
-	var drawing = {
-		"shape": "liter",
-		"point": punct
-	};
-	canvas.permanent_drawings.push(drawing);
-	draw(drawing);
-
-	var drawing = {
-		"shape": "point",
-		"point": punct
-	};
-	canvas.permanent_drawings.push(drawing);
-	draw(drawing);
-
 	canvas.addEventListener("click", secondClick);
 	canvas.addEventListener("mousemove", mouseMove);
 }
@@ -43,6 +29,13 @@ function firstClick(event) {
 function segmentOk(verif) {
 	if (verif.lowerPoint.x == verif.upperPoint.x) {
 		return false;
+	}
+
+	for (var idx in canvas.points) {
+		if (theSamePoint(verif.lowerPoint, canvas.points[idx]) ||
+			theSamePoint(verif.upperPoint, canvas.points[idx])) {
+			return true;
+		}
 	}
 
 	for (var idx in canvas.segmente) {
@@ -53,15 +46,21 @@ function segmentOk(verif) {
 			continue;
 		}
 
-		if (theSamePoint(int, verif.lowerPoint) || theSamePoint(int, verif.upperPoint)) {
-			if (theSamePoint(int, segm.lowerPoint) || theSamePoint(int, segm.upperPoint)) {
-				continue;
-			}
-		}
+		// deja au fost verificate capetele segmentelor
 		return false;
 	}
 
 	return true;
+}
+
+function addPoint(point) {
+	for (var idx in canvas.points) {
+		if (theSamePoint(point, canvas.points[idx])) {
+			return;
+		}
+	}
+
+	addPointToCanvas(point);
 }
 
 function secondClick(event) {
@@ -71,27 +70,12 @@ function secondClick(event) {
 	if (!segmentOk(segment)) {
 		return;
 	}
+	addPoint(segment.upperPoint);
+	addPoint(segment.lowerPoint);
 
 	canvas.removeEventListener("click", secondClick);
 	canvas.removeEventListener("mousemove", mouseMove);
 	canvas.segmente.push(segment);
-
-	var upperPoint = {
-		"x": segment.upperPoint.x,
-		"y": segment.upperPoint.y,
-		"litera": segment.upperPoint.litera,
-		"type": "upper",
-		"segment": segment
-	};
-	var lowerPoint = {
-		"x": segment.lowerPoint.x,
-		"y": segment.lowerPoint.y,
-		"litera": segment.lowerPoint.litera,
-		"type": "lower",
-		"segment": segment
-	};
-	canvas.points.push(upperPoint);
-	canvas.points.push(lowerPoint);
 
 	canvas.firstPoint = null;
 	canvas.addEventListener("click", firstClick);
@@ -99,13 +83,23 @@ function secondClick(event) {
 	//draw new elements
 	var drawing = {
 		"shape": "liter",
-		"point": punct
+		"point": segment.upperPoint
+	};
+	canvas.permanent_drawings.push(drawing);
+	var drawing = {
+		"shape": "point",
+		"point": segment.upperPoint
 	};
 	canvas.permanent_drawings.push(drawing);
 
 	var drawing = {
+		"shape": "liter",
+		"point": segment.lowerPoint
+	};
+	canvas.permanent_drawings.push(drawing);
+	var drawing = {
 		"shape": "point",
-		"point": punct
+		"point": segment.lowerPoint
 	};
 	canvas.permanent_drawings.push(drawing);
 
@@ -120,7 +114,7 @@ function secondClick(event) {
 }
 
 function loadSegments() {
-	for (var idx in Trapeze) {
+	for (var idx in Trapez) {
 		var segm = Trapez[idx];
 		var ev1 = {
 			"clientX": segm.p1.x,
@@ -138,11 +132,7 @@ function loadSegments() {
 
 function mouseMove(event) {
 	redraw();
-	var punct = {
-		"x": event.clientX - canvas.offsetLeft,
-		"y": event.clientY - canvas.offsetTop
-	};
-
+	var punct = getNearPoint(event);
 	var segm = get_segment(canvas.firstPoint, punct);
 
 	if (!segmentOk(segm)) {

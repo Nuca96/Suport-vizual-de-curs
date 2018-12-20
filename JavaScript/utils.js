@@ -1,7 +1,5 @@
-function getNextLiter(canvas) {
-	var lit = canvas.litera;
-    canvas.litera = String.fromCharCode(canvas.litera.charCodeAt(0) + 1);
-    return lit;
+function nextChar(c) {
+    return String.fromCharCode(c.charCodeAt(0) + 1);
 }
 
 function leftmostPoint(pointList) {
@@ -240,7 +238,7 @@ function get_segment(point1, point2) {
 	return {
 		"upperPoint": upperPoint,
 		"lowerPoint": lowerPoint,
-		"str": upperPoint.litera + lowerPoint.litera
+		"str": function() {return upperPoint.litera + lowerPoint.litera}
 	}
 }
 

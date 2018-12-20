@@ -2,12 +2,11 @@ function init() {
 	genericInit();
 	canvas.addEventListener("click", addPoint);
 	loadButton.addEventListener("click", loadPoints);
-	canvas.puncte = [];
 }
 
 function addPoint(event) {
-	var punct = genericClick(event);
-	canvas.puncte.push(punct);
+	var punct = genericEvent(event);
+	addPointToCanvas(punct);
 
 	pointList.append("<li>" + punct.litera + " (" + punct.x + ", " + punct.y + ")</li>");
 
@@ -37,14 +36,14 @@ function loadPoints() {
 }
 
 function run(){
-	if(canvas.puncte.length < 2){
+	if(canvas.points.length < 2){
 		return null;
 	}
 	var k = 0;
 	var valid = true;
 	var S, to_draw;
 	var L = [];
-	L.push(leftmostPoint(canvas.puncte));
+	L.push(leftmostPoint(canvas.points));
 
 	// break point
 	to_draw = {
@@ -56,8 +55,8 @@ function run(){
 	drawings.push(to_draw)
 	while (valid == true) {
 		do {
-			var nr = Math.floor(random(0, canvas.puncte.length));
-			S = canvas.puncte[nr];
+			var nr = Math.floor(random(0, canvas.points.length));
+			S = canvas.points[nr];
 		} while(S == L[k])
 
 		// break point
@@ -75,8 +74,8 @@ function run(){
 		}];
 		drawings.push(to_draw);
 
-		for (var idx in canvas.puncte) {
-			var pct = canvas.puncte[idx];
+		for (var idx in canvas.points) {
+			var pct = canvas.points[idx];
 			var orient = orientation(L[k], S, pct);
 			var message1 = "Punctul " + pct.litera + " ";
 			var message2 = " la dreapta muchiei orientate " + L[k].litera + S.litera;

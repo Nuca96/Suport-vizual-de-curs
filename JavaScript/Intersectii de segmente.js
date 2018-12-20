@@ -8,15 +8,8 @@ function init() {
 
 function firstClick(event) {
 	canvas.removeEventListener("click", firstClick);
-	var punct = genericClick(event);
+	var punct = genericEvent(event);
 	canvas.firstPoint = punct;
-
-	var drawing = {
-		"shape": "liter",
-		"point": punct
-	};
-	canvas.permanent_drawings.push(drawing);
-	draw(drawing);
 
 	canvas.addEventListener("click", secondClick);
 	canvas.addEventListener("mousemove", mouseMove);
@@ -26,26 +19,18 @@ function secondClick(event) {
 	canvas.removeEventListener("click", secondClick);
 	canvas.removeEventListener("mousemove", mouseMove);
 
-	var punct = genericClick(event);
+	var punct = genericEvent(event);
 	var segment = get_segment(canvas.firstPoint, punct);
-	canvas.segmente.push(segment);
 
-	var upperPoint = {
-		"x": segment.upperPoint.x,
-		"y": segment.upperPoint.y,
-		"litera": segment.upperPoint.litera,
-		"type": "upper",
-		"segment": segment
-	};
-	var lowerPoint = {
-		"x": segment.lowerPoint.x,
-		"y": segment.lowerPoint.y,
-		"litera": segment.lowerPoint.litera,
-		"type": "lower",
-		"segment": segment
-	};
-	canvas.points.push(upperPoint);
-	canvas.points.push(lowerPoint);
+	var upperPoint = segment.upperPoint;
+	var lowerPoint = segment.lowerPoint;
+	upperPoint.type = "upper";
+	lowerPoint.type = "lower";
+	upperPoint.segment = segment;
+	lowerPoint.segment = segment;
+	addPointToCanvas(upperPoint);
+	addPointToCanvas(lowerPoint);
+	canvas.segmente.push(segment);
 
 	canvas.firstPoint = null;
 	canvas.addEventListener("click", firstClick);
@@ -53,10 +38,15 @@ function secondClick(event) {
 	//draw new elements
 	var drawing = {
 		"shape": "liter",
-		"point": punct
+		"point": lowerPoint
 	};
 	canvas.permanent_drawings.push(drawing);
-	draw(drawing);
+
+	var drawing = {
+		"shape": "liter",
+		"point": upperPoint
+	};
+	canvas.permanent_drawings.push(drawing);
 
 	var drawing = {
 		"shape": "segment",
@@ -64,7 +54,8 @@ function secondClick(event) {
 		"segment": segment
 	};
 	canvas.permanent_drawings.push(drawing);
-	draw(drawing);
+
+	redraw(drawing);
 }
 
 function loadSegments() {
@@ -135,7 +126,7 @@ function insertSegm(array, point) {
 	return idx;
 }
 
-function equalInters(p1, p2) {
+function theSameIntersection(p1, p2) {
 	if (p1.type != "inter" || p2.type != "inter") {
 		return false;
 	}
@@ -165,7 +156,7 @@ function addIntersection(points, seg1, seg2) {
 		"shape": "segment",
 		"segment": seg2,
 		"colour": "purple",
-		"message": "Se calculeaza intersectia dintre " + seg1.str + " si " + seg2.str
+		"message": "Se calculeaza intersectia dintre " + seg1.str() + " si " + seg2.str()
 	}];
 	drawings.push(drawing);
 
@@ -179,11 +170,11 @@ function addIntersection(points, seg1, seg2) {
 	int.rightSeg = seg2;
 
 	for (var i in points) {
-		if(equalInters(points[i], int)) {
+		if(theSameIntersection(points[i], int)) {
 			return;
 		}
 	}
-	int.litera = getNextLiter(canvas);
+	addPointToCanvas(int);
 
 	function addToDrawings(int) {
 		var drawing = [{
@@ -234,7 +225,7 @@ function run() {
 					"shape": "segment",
 					"segment": point.segment,
 					"colour": "pink",
-					"message": "Punctul " + point.litera + ": se introduce segmentul " + point.segment.str
+					"message": "Punctul " + point.litera + ": se introduce segmentul " + point.segment.str()
 				});
 				drawings.push(drawing);
 				var index = insertSegm(activeSegments, point);
@@ -249,7 +240,7 @@ function run() {
 					"shape": "segment",
 					"segment": point.segment,
 					"colour": "pink",
-					"message": "Punctul " + point.litera + ": se elimina segmentul " + point.segment.str
+					"message": "Punctul " + point.litera + ": se elimina segmentul " + point.segment.str()
 				});
 				drawings.push(drawing);
 
@@ -269,7 +260,7 @@ function run() {
 					"shape": "segment",
 					"segment": point.rightSeg,
 					"colour": "pink",
-					"message": "Punctul " + point.litera + ": se interschimba segmentele " + point.leftSeg.str + " si " + point.rightSeg.str
+					"message": "Punctul " + point.litera + ": se interschimba segmentele " + point.leftSeg.str() + " si " + point.rightSeg.str()
 				});
 				drawings.push(drawing);
 
@@ -291,7 +282,6 @@ function run() {
 
 function firstPart() {
 	if (canvas.firstPoint != null) {
-		canvas.permanent_drawings.pop();
 		canvas.removeEventListener("click", secondClick);
 		canvas.removeEventListener("mousemove", mouseMove);
 		redraw();
