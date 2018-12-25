@@ -118,6 +118,7 @@ function loadSegments() {
 		};
 		secondClick(ev2);
 	}
+	loadButton.removeEventListener("click", loadSegments);
 }
 
 function mouseMove(event) {
@@ -134,4 +135,25 @@ function mouseMove(event) {
 		"colour": "CadetBlue"
 	};
 	draw(drawing);
+}
+
+function firstPart() {
+	if (canvas.firstPoint != null) {
+		canvas.removeEventListener("click", secondClick);
+		canvas.removeEventListener("mousemove", mouseMove);
+		redraw();
+	}
+
+	var res = run();
+	if (res == null) {
+		message.innerText = "error";
+		return null;
+	}
+	canvas.removeEventListener("click", firstClick);
+	startButton.removeEventListener("click", startAlgorithm);
+	runButton.removeEventListener("click", autorun);
+	loadButton.removeEventListener("click", loadSegments);
+
+	breakPointsIdx = 0;
+	return true;
 }

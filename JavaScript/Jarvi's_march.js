@@ -49,7 +49,7 @@ function run(){
 		"point": L[0],
 		"message": "Punctul " + L[0].litera + " e cel mai din dreapta."
 	};
-	drawings.push(to_draw)
+	breakPoints.push(to_draw)
 	while (valid == true) {
 		do {
 			var nr = Math.floor(random(0, canvas.points.length));
@@ -69,7 +69,7 @@ function run(){
 			"events": ["push", "redraw"],
 			"message": "Punctul " + S.litera + " a fost ales random."
 		}];
-		drawings.push(to_draw);
+		breakPoints.push(to_draw);
 
 		for (var idx in canvas.points) {
 			var pct = canvas.points[idx];
@@ -89,12 +89,12 @@ function run(){
 			if (orient !== "dreapta") {
 				var message = message1 + "<b>NU ESTE</b>" + message2;
 				to_draw.message = message;
-				drawings.push(to_draw);
+				breakPoints.push(to_draw);
 				continue;
 			}
 			var message = message1 + "<b>ESTE</b>" + message2;
 			to_draw.message = message;
-			drawings.push(to_draw);
+			breakPoints.push(to_draw);
 
 			// break point
 			to_draw = [{
@@ -108,7 +108,7 @@ function run(){
 				"point": pct,
 				"events": ["push", "redraw"]
 			}];
-			drawings.push(to_draw);
+			breakPoints.push(to_draw);
 			S = pct;
 		}
 
@@ -119,7 +119,7 @@ function run(){
 			"events": ["pop", "pop", "push", "redraw"],
 			"message": "Muchia " + L[k].litera + S.litera + " face parte din acoperirea convexa."
 		};
-		drawings.push(to_draw);
+		breakPoints.push(to_draw);
 
 		if (S != L[0]) {
 			k = k + 1;
@@ -144,6 +144,6 @@ function firstPart() {
 	loadButton.removeEventListener("click", loadPoints);
 	runButton.removeEventListener("click", autorun);
 
-	drawingsIdx = 0;
+	breakPointsIdx = 0;
 	return true;
 }

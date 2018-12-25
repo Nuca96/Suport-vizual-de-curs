@@ -2,6 +2,50 @@ function init() {
 	genericInit();
 	canvas.segmente = [];
 	canvas.points = [];
+	canvas.eventPoints = {
+		pointArray: [],
+		idx: -1,
+		next: function() {
+			this.idx += 1;
+			return this.pointArray[this.idx];
+		},
+		overWriteEvent: function(point, type, segment) {
+			if (type == "upper") {
+				point.U.push(segment);
+				return point;
+			}
+			if (type == "lower") {
+				point.L.push(segment);
+				return point;
+			}
+
+			// check if intersection is not yet present
+			for (var idx2 in point.C) {
+				if(point.C[idx2] == segment)
+					return null;
+			}
+			point.C.push(segment);
+			return point;
+		},
+		insert: function(point, type, segment) {
+			for (var idx =0; idx < this.pointArray.length; idx++) {
+				var comp = comparePointsY(this.pointArray[idx], point);
+				if (comp == 0){
+					// exista deja un eveniment in array
+					return this.overWriteEvent(this.pointArray[idx], type, segment);
+				}
+				if (comp > 0){
+					break;
+				}
+			}
+			addPointToCanvas(point);
+			point.L = [];
+			point.U = [];
+			point.C = [];
+			this.pointArray.splice(idx, 0, point);
+			return this.overWriteEvent(point, type, segment);
+		}
+	};
 	canvas.addEventListener("click", firstClick);
 	loadButton.addEventListener("click", loadSegments);
 }
@@ -22,14 +66,8 @@ function secondClick(event) {
 	var punct = genericEvent(event);
 	var segment = get_segment(canvas.firstPoint, punct);
 
-	var upperPoint = segment.upperPoint;
-	var lowerPoint = segment.lowerPoint;
-	upperPoint.type = "upper";
-	lowerPoint.type = "lower";
-	upperPoint.segment = segment;
-	lowerPoint.segment = segment;
-	addPointToCanvas(upperPoint);
-	addPointToCanvas(lowerPoint);
+	canvas.eventPoints.insert(segment.upperPoint, "upper", segment);
+	canvas.eventPoints.insert(segment.lowerPoint, "lower", segment);
 	canvas.segmente.push(segment);
 
 	canvas.firstPoint = null;
@@ -38,10 +76,10 @@ function secondClick(event) {
 	//draw new elements
 	var permanents = [{
 		"shape": "liter",
-		"point": lowerPoint
+		"point": segment.lowerPoint
 	}, {
 		"shape": "liter",
-		"point": upperPoint
+		"point": segment.upperPoint
 	}, {
 		"shape": "segment",
 		"colour": "DarkCyan",
@@ -67,6 +105,7 @@ function loadSegments() {
 		};
 		secondClick(ev2);
 	}
+	loadButton.removeEventListener("click", loadSegments);
 }
 
 function mouseMove(event) {
@@ -83,61 +122,30 @@ function mouseMove(event) {
 	draw(drawing);
 }
 
-function run2() {
-	for (var idx1 = 0; idx1<canvas.segmente.length; idx1++) {
-		var seg1 = canvas.segmente[idx1];
-		for (var idx2 = idx1 + 1; idx2<canvas.segmente.length; idx2++) {
-			var seg2 = canvas.segmente[idx2];
+function insertSegm(array, point, segm, lit) {
+	for (var idx=0; idx<array.length; idx++) {
+		// pentru a fi mai precisa, ordonarea se face dupa punctul de intersectie
+		// al dreptei de baleiere cu un pixel mai gos decat se afla acum
+		var int = intersection(array[idx], get_sweep({y:point.y + 1}));
+		var comp = comparePointsX(int, point);
 
-			var int = has_intersection(seg1, seg2);
-			if (false === int) {
-				continue;
-			}
-
-			var drawing = {
-				"shape": "point",
-				"point": int,
-				"colour": "red"
-			};
-			draw(drawing);
-			canvas.permanent_drawings.push(drawing);
+		if (comp > 0){
+			break;
 		}
-	}
-	return true;
-}
-
-function insertSegm(array, point) {
-	var idx = 0;
-	for (; idx < array.length; idx++) {
-		var int = intersection(array[idx], get_sweep(point));
-
-		if (int.x < point.x)
+		if (comp < 0){
 			continue;
-		array.splice(idx, 0, point.segment);
-		return idx;
+		}
+
+		if (array[idx].lowerPoint.x < segm.lowerPoint.x){
+			break;
+		}
+
 	}
-	array.push(point.segment);
+	array.splice(idx, 0, segm);
 	return idx;
 }
 
-function theSameIntersection(p1, p2) {
-	if (p1.type != "inter" || p2.type != "inter") {
-		return false;
-	}
-
-	if ( _.isEqual(p1.leftSeg, p2.rightSeg) &&
-		_.isEqual(p2.leftSeg, p1.rightSeg) ) {
-		return true;
-	}
-
-	if ( _.isEqual(p1.leftSeg, p2.leftSeg) &&
-		_.isEqual(p2.rightSeg, p1.rightSeg) ) {
-		return true;
-	}
-	return false;
-}
-
-function addIntersection(points, seg1, seg2) {
+function findNewEvent(seg1, seg2) {
 	if (typeof seg1 == "undefined" || typeof seg2 == "undefined") {
 		return;
 	}
@@ -152,125 +160,106 @@ function addIntersection(points, seg1, seg2) {
 		"colour": "purple",
 		"message": "Se calculeaza intersectia dintre " + seg1.str() + " si " + seg2.str()
 	}];
-	drawings.push(drawing);
+	breakPoints.push(drawing);
 
 	var int = has_intersection(seg1, seg2);
 	if (false == int) {
 		return;
 	}
 
-	int.type = "inter";
-	int.leftSeg = seg1;
-	int.rightSeg = seg2;
-
-	for (var i in points) {
-		if(theSameIntersection(points[i], int)) {
-			return;
-		}
+	if (canvas.eventPoints.insert(int, "inter", seg1) == null) {
+		return;
 	}
-	addPointToCanvas(int);
+	canvas.eventPoints.insert(int, "inter", seg2);
 
-	function addToDrawings(int) {
-		var drawing = [{
-			"shape": "point",
-			"point": int,
-			"events": ["push"],
-			"size": 4
-		}, {
-			"shape": "liter",
-			"point": int,
-			"events": ["push"]
-		}];
-		drawings.push(drawing);
-	}
-
-	for (var idx in points) {
-		if (points[idx].y <= int.y)
-			continue;
-		points.splice(idx, 0, int);
-		addToDrawings(int)
-		return int;
-	}
-	points.push(int);
-	addToDrawings(int)
+	var drawing = [{
+		"shape": "point",
+		"point": int,
+		"events": ["push"],
+		"size": 4
+	}, {
+		"shape": "liter",
+		"point": int,
+		"events": ["push"]
+	}];
+	breakPoints.push(drawing);
 	return int;
 }
 
-function run() {
-	var sortedPoints = sort(canvas.points, comparePointsY);
-	var activeSegments = [];
-	for (var idx=0; idx<sortedPoints.length; idx++) {
-		var point = sortedPoints[idx];
+function handleEvent(activeSegments, point) {
+	var leftMost = activeSegments.length;
 
-		var drawing = [{
+	var toDelete = point.L.concat(point.C);
+	if (toDelete.length > 0) {
+		var drawing = [];
+		var message = "Delete segments: ";
+		for (var idx in toDelete) {
+			drawing.push({
+				"shape": "segment",
+				"segment": toDelete[idx],
+				"colour": "pink"
+			});
+			message += toDelete[idx].str() + " ";
+
+			var index = activeSegments.indexOf(toDelete[idx]);
+			activeSegments.splice(index, 1);
+
+			if (index < leftMost)
+				leftMost = index;
+		}
+		drawing[0].message = message;
+		breakPoints.push(drawing);
+	}
+	if (point.litera == 'Q') {
+		afis(activeSegments);
+	}
+
+	var toAdd = point.U.concat(point.C);
+	if (toAdd.length > 0) {
+		var drawing = [];
+		var message = "Add segments: ";
+		for (var idx in toAdd) {
+			drawing.push({
+				"shape": "segment",
+				"segment": toAdd[idx],
+				"colour": "chocolate"
+			});
+			message += toAdd[idx].str() + " ";
+
+			var index = insertSegm(activeSegments, point, toAdd[idx], point.litera);
+
+			if (index < leftMost)
+				leftMost = index;
+		}
+		drawing[0].message = message;
+		breakPoints.push(drawing);
+
+		var rightMost = leftMost + toAdd.length - 1;
+		findNewEvent(activeSegments[rightMost], activeSegments[rightMost +1]);
+	}
+	if (point.litera == 'Q') {
+		afis(activeSegments);
+	}
+
+	findNewEvent(activeSegments[leftMost-1], activeSegments[leftMost]);
+}
+
+function run() {
+	var activeSegments = [];
+
+	while(true) {
+		var point = canvas.eventPoints.next();
+		if (typeof point === "undefined")
+			break;
+		var drawing = {
 			"shape": "sweep",
 			"point": point,
-			"size": 1,
+			"colour": "red",
 			"events": ["redraw"]
-		}, {
-			"shape": "point",
-			"point": point,
-			"colour": "red"
-		}];
+		};
+		breakPoints.push(drawing)
 
-		switch (point["type"]) {
-			case "upper": {
-				drawing.push({
-					"shape": "segment",
-					"segment": point.segment,
-					"colour": "pink",
-					"message": "Punctul " + point.litera + ": se introduce segmentul " + point.segment.str()
-				});
-				drawings.push(drawing);
-				var index = insertSegm(activeSegments, point);
-
-				addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index]);
-				addIntersection(sortedPoints, activeSegments[index], activeSegments[index + 1]);
-
-				break;
-			}
-			case "lower": {
-				drawing.push({
-					"shape": "segment",
-					"segment": point.segment,
-					"colour": "pink",
-					"message": "Punctul " + point.litera + ": se elimina segmentul " + point.segment.str()
-				});
-				drawings.push(drawing);
-
-				var index = activeSegments.indexOf(point["segment"]);
-				activeSegments.splice(index, 1);
-				addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index]);
-
-				break
-			}
-			case "inter": {
-				drawing.push({
-					"shape": "segment",
-					"segment": point.leftSeg,
-					"colour": "pink"
-				});
-				drawing.push({
-					"shape": "segment",
-					"segment": point.rightSeg,
-					"colour": "pink",
-					"message": "Punctul " + point.litera + ": se interschimba segmentele " + point.leftSeg.str() + " si " + point.rightSeg.str()
-				});
-				drawings.push(drawing);
-
-				var index = activeSegments.indexOf(point["leftSeg"]);
-				var aux = activeSegments[index];
-				activeSegments[index] = activeSegments[index + 1];
-				activeSegments[index + 1] = aux;
-				addIntersection(sortedPoints, activeSegments[index - 1], activeSegments[index]);
-				addIntersection(sortedPoints, activeSegments[index + 1], activeSegments[index + 2]);
-				break;
-			}
-			default: {
-				break;
-			}
-		}
-	}
+		handleEvent(activeSegments, point);	}
 	return true;
 }
 
@@ -289,7 +278,8 @@ function firstPart() {
 	canvas.removeEventListener("click", firstClick);
 	startButton.removeEventListener("click", startAlgorithm);
 	runButton.removeEventListener("click", autorun);
+	loadButton.removeEventListener("click", loadSegments);
 
-	drawingsIdx = 0;
+	breakPointsIdx = 0;
 	return true;
 }

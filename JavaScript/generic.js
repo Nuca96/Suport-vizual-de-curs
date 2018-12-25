@@ -10,7 +10,7 @@ function load() {
 	this.panel = $("#panel");
 	this.pointList = $("#pointList");
 	this.ctx = canvas.getContext("2d");
-	this.drawingsIdx = null;
+	this.breakPointsIdx = null;
 	init();
 }
 
@@ -20,7 +20,7 @@ function genericInit() {
 	$('#panel').empty();
 	$('#pointList').empty();
 	canvas.permanent_drawings = [];
-	this.drawings = [];
+	this.breakPoints = [];
 	canvas.points = [];
 	canvas.liter = 'A';
 }
@@ -42,15 +42,15 @@ function genericEvent(event) {
 }
 
 function nextStep() {
-	if (drawingsIdx > drawings.length - 1) {
+	if (breakPointsIdx > breakPoints.length - 1) {
 		redraw();
 		message.innerText = "Algoritmul s-a sfarsit";
 		startButton.removeEventListener("click", nextStep);
 		return null;
 	}
 
-	to_draw = drawings[drawingsIdx];
-	drawingsIdx += 1;
+	to_draw = breakPoints[breakPointsIdx];
+	breakPointsIdx += 1;
 
 	function action(drawing) {
 		if (typeof drawing.message !== "undefined") {
@@ -155,7 +155,8 @@ function draw(drawing) {
 		break;
 	}
 	case "sweep": {
-		drawLine(ctx, get_sweep(drawing.point), drawing.colour, drawing.size);
+		drawLine(ctx, get_sweep(drawing.point), "black", 1);
+		drawPoint(ctx, drawing.point, drawing.colour, drawing.size);
 		break;
 	}
 	default: {
