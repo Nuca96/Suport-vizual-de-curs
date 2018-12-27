@@ -6,11 +6,13 @@ function init() {
 	loadButton.addEventListener("click", loadSegments);
 }
 
+near = 10;
+
 function getNearPoint(event) {
 	var point = genericEvent(event);
 
 	for (var idx in canvas.points) {
-		if (distance(canvas.points[idx], point) < 15){
+		if (pointDistance(canvas.points[idx], point) < near){
 			return canvas.points[idx];
 		}
 	}
@@ -18,12 +20,41 @@ function getNearPoint(event) {
 }
 
 function firstClick(event) {
-	canvas.removeEventListener("click", firstClick);
 	var punct = getNearPoint(event);
+	if (!pointOk(punct)) {
+		return;
+	}
+	canvas.removeEventListener("click", firstClick);
 	canvas.firstPoint = punct;
 
 	canvas.addEventListener("click", secondClick);
 	canvas.addEventListener("mousemove", mouseMove);
+}
+
+function tooNear(point, segm) {
+	var picior = piciorulPerpendicularei(point, segm);
+	return between(picior, segm) && pointDistance(picior, point) < near;
+}
+
+function pointOk(verif) {
+	for (var idx in canvas.points) {
+		var point = canvas.points[idx];
+		if (theSamePoint(verif, point)) {
+			return true;
+		}
+
+		if (point.x == verif.x) {
+			return false;
+		}
+	}
+
+	for (var idx in canvas.segmente) {
+		if (tooNear(verif, canvas.segmente[idx])) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 function segmentOk(verif) {
@@ -31,25 +62,32 @@ function segmentOk(verif) {
 		return false;
 	}
 
-	for (var idx in canvas.points) {
-		if (theSamePoint(verif.lowerPoint, canvas.points[idx]) ||
-			theSamePoint(verif.upperPoint, canvas.points[idx])) {
-			return true;
-		}
-	}
-
 	for (var idx in canvas.segmente) {
 		var segm = canvas.segmente[idx];
-		var int = has_intersection(verif, segm);
 
+		if (!theSamePoint(segm.lowerPoint, verif.lowerPoint) &&
+			!theSamePoint(segm.lowerPoint, verif.upperPoint) &&
+			tooNear(segm.lowerPoint, verif)) {
+			return false;
+		}
+		if (!theSamePoint(segm.upperPoint, verif.lowerPoint) &&
+			!theSamePoint(segm.upperPoint, verif.upperPoint) &&
+			tooNear(segm.upperPoint, verif)) {
+			return false;
+		}
+
+		var int = has_intersection(verif, segm);
 		if (false === int) {
 			continue;
 		}
 
-		// deja au fost verificate capetele segmentelor
+		if ((theSamePoint(int, verif.lowerPoint) ||	theSamePoint(int, verif.upperPoint)) &&
+			(theSamePoint(int, segm.lowerPoint) || theSamePoint(int, segm.upperPoint))) {
+			return true;
+		}
+
 		return false;
 	}
-
 	return true;
 }
 
@@ -65,11 +103,15 @@ function addPoint(point) {
 
 function secondClick(event) {
 	var punct = getNearPoint(event);
-	var segment = get_segment(canvas.firstPoint, punct);
+	if (!pointOk(punct)) {
+		return;
+	}
 
+	var segment = get_segment(canvas.firstPoint, punct);
 	if (!segmentOk(segment)) {
 		return;
 	}
+
 	addPoint(segment.upperPoint);
 	addPoint(segment.lowerPoint);
 
@@ -123,12 +165,17 @@ function loadSegments() {
 
 function mouseMove(event) {
 	redraw();
-	var punct = getNearPoint(event);
-	var segm = get_segment(canvas.firstPoint, punct);
 
+	var punct = getNearPoint(event);
+	if (!pointOk(punct)) {
+		return;
+	}
+
+	var segm = get_segment(canvas.firstPoint, punct);
 	if (!segmentOk(segm)) {
 		return;
 	}
+
 	var drawing = {
 		"shape": "segment",
 		"segment": segm,

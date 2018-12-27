@@ -162,8 +162,10 @@ function compareSegmentsX(s1, s2) {
 	return comparePointsX(s1.lowerPoint, s2.lowerPoint);
 }
 
-function ecuatia_dreptei(A, B) {
+function ecuatia_dreptei(segm) {
 	// x * x_coef + y * y_coef = termen_liber
+	var A = segm.upperPoint;
+	var B = segm.lowerPoint;
 	return {
 		"x_coef": A.y - B.y,
 		"y_coef": B.x - A.x,
@@ -172,8 +174,8 @@ function ecuatia_dreptei(A, B) {
 }
 
 function intersection(seg1, seg2) {
-	var dr1 = ecuatia_dreptei(seg1.upperPoint, seg1.lowerPoint);
-	var dr2 = ecuatia_dreptei(seg2.upperPoint, seg2.lowerPoint);
+	var dr1 = ecuatia_dreptei(seg1);
+	var dr2 = ecuatia_dreptei(seg2);
 	var matrice = [[dr1.x_coef, dr1.y_coef],
 				   [dr2.x_coef, dr2.y_coef]];
 	var delta = determinant2(matrice);
@@ -195,29 +197,30 @@ function intersection(seg1, seg2) {
 	}
 }
 
+function between(point, seg) {
+	if(!(seg.upperPoint.y <= point.y && point.y <= seg.lowerPoint.y)) {
+		return false;
+	}
+	var lowerX = seg.lowerPoint.x;
+	var upperX = seg.upperPoint.x;
+
+	if (lowerX > upperX) {
+		lowerX = upperX;
+		upperX = seg.lowerPoint.x;
+	}
+
+	return lowerX <= point.x && point.x <= upperX
+}
+
 function has_intersection(seg1, seg2) {
 	var int = intersection(seg1, seg2);
 
 	if (false === int)
 		return false;
 
-	function between(seg, point) {
-		// punctul este mai decat altul daca are y mai mic
-		if(!(seg.upperPoint.y <= point.y && point.y <= seg.lowerPoint.y)) {
-			return false;
-		}
-		var lowerX = seg.lowerPoint.x;
-		var upperX = seg.upperPoint.x;
 
-		if (lowerX > upperX) {
-			lowerX = upperX;
-			upperX = seg.lowerPoint.x;
-		}
 
-		return lowerX <= point.x && point.x <= upperX
-	}
-
-	if (between(seg1, int) && between(seg2, int)) {
+	if (between(int, seg1) && between(int, seg2)) {
 		return int;
 	}
 
@@ -246,6 +249,39 @@ function theSamePoint(p1, p2) {
 	return p1.x == p2.x && p1.y == p2.y;
 }
 
-function distance(point1, point2) {
+function pointDistance(point1, point2) {
 	return Math.sqrt(Math.pow((point1.x - point2.x), 2) + Math.pow((point1.y - point2.y), 2));
+}
+
+function panta(segment) {
+	return (segment.lowerPoint.y - segment.upperPoint.y) /
+		   (segment.lowerPoint.x - segment.upperPoint.x);
+}
+
+function piciorulPerpendicularei(point, segment) {
+	if (segment.lowerPoint.x == segment.upperPoint.x) {
+		return {
+			x: segment.lowerPoint.x,
+			y: point.y
+		}
+	}
+	if (segment.lowerPoint.y == segment.upperPoint.y) {
+		return {
+			x: point.x,
+			y: segment.lowerPoint.y
+		}
+	}
+
+	var m = -(1/panta(segment));
+	var another = {
+		x: 0,
+		y: point.y - m*point.x
+	};
+
+	if (theSamePoint(point, another)) {
+		another.x = 1;
+		another.y = another.y + m;
+	}
+	var perp = get_segment(point, another);
+	return intersection(perp, segment);
 }
