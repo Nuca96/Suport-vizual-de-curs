@@ -58,21 +58,21 @@ function pointOk(verif) {
 }
 
 function segmentOk(verif) {
-	if (verif.lowerPoint.x == verif.upperPoint.x) {
+	if (verif.secondPoint.x == verif.firstPoint.x) {
 		return false;
 	}
 
 	for (var idx in canvas.segmente) {
 		var segm = canvas.segmente[idx];
 
-		if (!theSamePoint(segm.lowerPoint, verif.lowerPoint) &&
-			!theSamePoint(segm.lowerPoint, verif.upperPoint) &&
-			tooNear(segm.lowerPoint, verif)) {
+		if (!theSamePoint(segm.secondPoint, verif.secondPoint) &&
+			!theSamePoint(segm.secondPoint, verif.firstPoint) &&
+			tooNear(segm.secondPoint, verif)) {
 			return false;
 		}
-		if (!theSamePoint(segm.upperPoint, verif.lowerPoint) &&
-			!theSamePoint(segm.upperPoint, verif.upperPoint) &&
-			tooNear(segm.upperPoint, verif)) {
+		if (!theSamePoint(segm.firstPoint, verif.secondPoint) &&
+			!theSamePoint(segm.firstPoint, verif.firstPoint) &&
+			tooNear(segm.firstPoint, verif)) {
 			return false;
 		}
 
@@ -81,8 +81,8 @@ function segmentOk(verif) {
 			continue;
 		}
 
-		if ((theSamePoint(int, verif.lowerPoint) ||	theSamePoint(int, verif.upperPoint)) &&
-			(theSamePoint(int, segm.lowerPoint) || theSamePoint(int, segm.upperPoint))) {
+		if ((theSamePoint(int, verif.secondPoint) ||	theSamePoint(int, verif.firstPoint)) &&
+			(theSamePoint(int, segm.secondPoint) || theSamePoint(int, segm.firstPoint))) {
 			return true;
 		}
 
@@ -107,13 +107,13 @@ function secondClick(event) {
 		return;
 	}
 
-	var segment = get_segment(canvas.firstPoint, punct);
+	var segment = getSegmentX(canvas.firstPoint, punct);
 	if (!segmentOk(segment)) {
 		return;
 	}
 
-	addPoint(segment.upperPoint);
-	addPoint(segment.lowerPoint);
+	addPoint(segment.firstPoint);
+	addPoint(segment.secondPoint);
 
 	canvas.removeEventListener("click", secondClick);
 	canvas.removeEventListener("mousemove", mouseMove);
@@ -125,16 +125,16 @@ function secondClick(event) {
 	//draw new elements
 	var permanents = [{
 		"shape": "liter",
-		"point": segment.upperPoint
+		"point": segment.firstPoint
 	}, {
 		"shape": "point",
-		"point": segment.upperPoint
+		"point": segment.firstPoint
 	}, {
 		"shape": "liter",
-		"point": segment.lowerPoint
+		"point": segment.secondPoint
 	}, {
 		"shape": "point",
-		"point": segment.lowerPoint
+		"point": segment.secondPoint
 	}, {
 		"shape": "segment",
 		"colour": "DarkCyan",
@@ -145,20 +145,23 @@ function secondClick(event) {
 	redraw();
 }
 
-function loadSegments() {
-	for (var idx in Trapez) {
-		var segm = Trapez[idx];
-		var ev1 = {
-			"clientX": segm.p1.x,
-			"clientY": segm.p1.y
-		};
-		firstClick(ev1);
+function instantInsert(pseudoSegm) {
+	var ev1 = {
+		"clientX": pseudoSegm.p1.x,
+		"clientY": pseudoSegm.p1.y
+	};
+	firstClick(ev1);
 
-		var ev2 = {
-			"clientX": segm.p2.x,
-			"clientY": segm.p2.y
-		};
-		secondClick(ev2);
+	var ev2 = {
+		"clientX": pseudoSegm.p2.x,
+		"clientY": pseudoSegm.p2.y
+	};
+	secondClick(ev2);
+}
+
+function loadSegments() {
+	for (var idx in TrapezMap) {
+		instantInsert(TrapezMap[idx]);
 	}
 	loadButton.removeEventListener("click", loadSegments);
 }
@@ -171,7 +174,7 @@ function mouseMove(event) {
 		return;
 	}
 
-	var segm = get_segment(canvas.firstPoint, punct);
+	var segm = getSegmentX(canvas.firstPoint, punct);
 	if (!segmentOk(segm)) {
 		return;
 	}

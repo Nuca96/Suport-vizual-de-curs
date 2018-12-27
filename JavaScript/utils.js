@@ -94,8 +94,8 @@ function drawLiter(ctx, point, colour) {
 
 function drawLine(ctx, segment, colour, width) {
 	ctx.beginPath();
-	ctx.moveTo(segment.upperPoint.x, segment.upperPoint.y);
-	ctx.lineTo(segment.lowerPoint.x, segment.lowerPoint.y);
+	ctx.moveTo(segment.firstPoint.x, segment.firstPoint.y);
+	ctx.lineTo(segment.secondPoint.x, segment.secondPoint.y);
 	ctx.lineWidth = width;
     ctx.strokeStyle = colour;
 	ctx.stroke();
@@ -139,11 +139,11 @@ function comparePointsY(p1, p2) {
 }
 
 function compareSegmentsY(s1, s2) {
-	var compSup = comparePointsY(s1.upperPoint, s2.upperPoint);
+	var compSup = comparePointsY(s1.firstPoint, s2.firstPoint);
 	if (compSup != 0) {
 		return compSup;
 	}
-	return comparePointsY(s1.lowerPoint, s2.lowerPoint);
+	return comparePointsY(s1.secondPoint, s2.secondPoint);
 }
 
 function comparePointsX(p1, p2) {
@@ -155,17 +155,39 @@ function comparePointsX(p1, p2) {
 }
 
 function compareSegmentsX(s1, s2) {
-	var compSup = comparePointsX(s1.upperPoint, s2.upperPoint);
+	var compSup = comparePointsX(s1.firstPoint, s2.firstPoint);
 	if (compSup != 0) {
 		return compSup;
 	}
-	return comparePointsX(s1.lowerPoint, s2.lowerPoint);
+	return comparePointsX(s1.secondPoint, s2.secondPoint);
+}
+
+function between(point, seg) {
+	var leftX = seg.firstPoint.x;
+	var rightX = seg.secondPoint.x;
+	if (leftX > rightX) {
+		leftX = rightX;
+		rightX = seg.firstPoint.x;
+	}
+	if (point.x < leftX || rightX < point.x)
+		return false;
+
+	var upperY = seg.firstPoint.y;
+	var lowerY = seg.secondPoint.y;
+	if (lowerY < upperY) {
+		lowerY = upperY;
+		upperY = seg.secondPoint.y;
+	}
+	if (point.y < upperY || lowerY < point.y)
+		return false;
+
+	return true;
 }
 
 function ecuatia_dreptei(segm) {
 	// x * x_coef + y * y_coef = termen_liber
-	var A = segm.upperPoint;
-	var B = segm.lowerPoint;
+	var A = segm.firstPoint;
+	var B = segm.secondPoint;
 	return {
 		"x_coef": A.y - B.y,
 		"y_coef": B.x - A.x,
@@ -197,21 +219,6 @@ function intersection(seg1, seg2) {
 	}
 }
 
-function between(point, seg) {
-	if(!(seg.upperPoint.y <= point.y && point.y <= seg.lowerPoint.y)) {
-		return false;
-	}
-	var lowerX = seg.lowerPoint.x;
-	var upperX = seg.upperPoint.x;
-
-	if (lowerX > upperX) {
-		lowerX = upperX;
-		upperX = seg.lowerPoint.x;
-	}
-
-	return lowerX <= point.x && point.x <= upperX
-}
-
 function has_intersection(seg1, seg2) {
 	var int = intersection(seg1, seg2);
 
@@ -227,21 +234,39 @@ function has_intersection(seg1, seg2) {
 	return false;
 }
 
-function get_segment(point1, point2) {
-	var upperPoint, lowerPoint;
+function getSegmentY(point1, point2) {
+	var firstPoint, secondPoint;
 
 	if (comparePointsY(point1, point2) <= 0) {
-		upperPoint = point1;
-		lowerPoint = point2;
+		firstPoint = point1;
+		secondPoint = point2;
 	} else {
-		upperPoint = point2;
-		lowerPoint = point1;
+		firstPoint = point2;
+		secondPoint = point1;
 	}
 
 	return {
-		"upperPoint": upperPoint,
-		"lowerPoint": lowerPoint,
-		"str": function() {return upperPoint.litera + lowerPoint.litera}
+		"firstPoint": firstPoint,
+		"secondPoint": secondPoint,
+		"str": function() {return firstPoint.litera + secondPoint.litera}
+	}
+}
+
+function getSegmentX(point1, point2) {
+	var firstPoint, secondPoint;
+
+	if (comparePointsX(point1, point2) <= 0) {
+		firstPoint = point1;
+		secondPoint = point2;
+	} else {
+		firstPoint = point2;
+		secondPoint = point1;
+	}
+
+	return {
+		"firstPoint": firstPoint,
+		"secondPoint": secondPoint,
+		"str": function() {return firstPoint.litera + secondPoint.litera}
 	}
 }
 
@@ -254,21 +279,21 @@ function pointDistance(point1, point2) {
 }
 
 function panta(segment) {
-	return (segment.lowerPoint.y - segment.upperPoint.y) /
-		   (segment.lowerPoint.x - segment.upperPoint.x);
+	return (segment.secondPoint.y - segment.firstPoint.y) /
+		   (segment.secondPoint.x - segment.firstPoint.x);
 }
 
 function piciorulPerpendicularei(point, segment) {
-	if (segment.lowerPoint.x == segment.upperPoint.x) {
+	if (segment.secondPoint.x == segment.firstPoint.x) {
 		return {
-			x: segment.lowerPoint.x,
+			x: segment.secondPoint.x,
 			y: point.y
 		}
 	}
-	if (segment.lowerPoint.y == segment.upperPoint.y) {
+	if (segment.secondPoint.y == segment.firstPoint.y) {
 		return {
 			x: point.x,
-			y: segment.lowerPoint.y
+			y: segment.secondPoint.y
 		}
 	}
 
@@ -282,6 +307,6 @@ function piciorulPerpendicularei(point, segment) {
 		another.x = 1;
 		another.y = another.y + m;
 	}
-	var perp = get_segment(point, another);
+	var perp = getSegmentY(point, another);
 	return intersection(perp, segment);
 }

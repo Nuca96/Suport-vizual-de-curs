@@ -92,7 +92,7 @@ var Intersection = [{
 	}
 ];
 
-var Trapez = [{
+var TrapezMap = [{
 		p1: {
 			x:57,
 			y:108

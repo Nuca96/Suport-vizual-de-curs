@@ -121,15 +121,15 @@ function reset() {
 	init();
 }
 
-function get_sweep(point) {
+function getSweepY(y) {
 	return {
-		"upperPoint": {
+		"firstPoint": {
 			"x": 0,
-			"y": point.y
+			"y": y
 		},
-		"lowerPoint": {
+		"secondPoint": {
 			"x": canvas.width,
-			"y": point.y
+			"y": y
 		}
 	}
 }
@@ -154,8 +154,8 @@ function draw(drawing) {
 		drawLiter(ctx, drawing.point, drawing.colour);
 		break;
 	}
-	case "sweep": {
-		drawLine(ctx, get_sweep(drawing.point), "black", 1);
+	case "sweepY": {
+		drawLine(ctx, getSweepY(drawing.point.y), "black", 1);
 		drawPoint(ctx, drawing.point, drawing.colour, drawing.size);
 		break;
 	}

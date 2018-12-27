@@ -64,10 +64,10 @@ function secondClick(event) {
 	canvas.removeEventListener("mousemove", mouseMove);
 
 	var punct = genericEvent(event);
-	var segment = get_segment(canvas.firstPoint, punct);
+	var segment = getSegmentY(canvas.firstPoint, punct);
 
-	canvas.eventPoints.insert(segment.upperPoint, "upper", segment);
-	canvas.eventPoints.insert(segment.lowerPoint, "lower", segment);
+	canvas.eventPoints.insert(segment.firstPoint, "upper", segment);
+	canvas.eventPoints.insert(segment.secondPoint, "lower", segment);
 	canvas.segmente.push(segment);
 
 	canvas.firstPoint = null;
@@ -76,10 +76,10 @@ function secondClick(event) {
 	//draw new elements
 	var permanents = [{
 		"shape": "liter",
-		"point": segment.lowerPoint
+		"point": segment.secondPoint
 	}, {
 		"shape": "liter",
-		"point": segment.upperPoint
+		"point": segment.firstPoint
 	}, {
 		"shape": "segment",
 		"colour": "DarkCyan",
@@ -116,7 +116,7 @@ function mouseMove(event) {
 	};
 	var drawing = {
 		"shape": "segment",
-		"segment": get_segment(canvas.firstPoint, punct),
+		"segment": getSegmentY(canvas.firstPoint, punct),
 		"colour": "CadetBlue"
 	};
 	draw(drawing);
@@ -125,8 +125,8 @@ function mouseMove(event) {
 function insertSegm(array, point, segm, lit) {
 	for (var idx=0; idx<array.length; idx++) {
 		// pentru a fi mai precisa, ordonarea se face dupa punctul de intersectie
-		// al dreptei de baleiere cu un pixel mai gos decat se afla acum
-		var int = intersection(array[idx], get_sweep({y:point.y + 1}));
+		// al dreptei de baleiere cu un pixel mai jos decat se afla acum
+		var int = intersection(array[idx], getSweepY(point.y + 1));
 		var comp = comparePointsX(int, point);
 
 		if (comp > 0){
@@ -136,7 +136,7 @@ function insertSegm(array, point, segm, lit) {
 			continue;
 		}
 
-		if (array[idx].lowerPoint.x < segm.lowerPoint.x){
+		if (array[idx].secondPoint.x < segm.secondPoint.x){
 			break;
 		}
 
@@ -210,9 +210,6 @@ function handleEvent(activeSegments, point) {
 		drawing[0].message = message;
 		breakPoints.push(drawing);
 	}
-	if (point.litera == 'Q') {
-		afis(activeSegments);
-	}
 
 	var toAdd = point.U.concat(point.C);
 	if (toAdd.length > 0) {
@@ -237,9 +234,6 @@ function handleEvent(activeSegments, point) {
 		var rightMost = leftMost + toAdd.length - 1;
 		findNewEvent(activeSegments[rightMost], activeSegments[rightMost +1]);
 	}
-	if (point.litera == 'Q') {
-		afis(activeSegments);
-	}
 
 	findNewEvent(activeSegments[leftMost-1], activeSegments[leftMost]);
 }
@@ -252,7 +246,7 @@ function run() {
 		if (typeof point === "undefined")
 			break;
 		var drawing = {
-			"shape": "sweep",
+			"shape": "sweepY",
 			"point": point,
 			"colour": "red",
 			"events": ["redraw"]

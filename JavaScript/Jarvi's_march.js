@@ -60,7 +60,7 @@ function run(){
 		to_draw = [{
 			"shape": "segment",
 			"colour": "CadetBlue",
-			"segment": get_segment(L[k], S),
+			"segment": getSegmentY(L[k], S),
 			"events": ["push", "redraw"]
 		},{
 			"shape": "point",
@@ -100,7 +100,7 @@ function run(){
 			to_draw = [{
 				"shape": "segment",
 				"colour": "CadetBlue",
-				"segment": get_segment(L[k], pct),
+				"segment": getSegmentY(L[k], pct),
 				"events": ["pop", "pop", "push", "redraw"]
 			},{
 				"shape": "point",
@@ -115,7 +115,7 @@ function run(){
 		// break point
 		to_draw = {
 			"shape": "segment",
-			"segment": get_segment(L[k], S),
+			"segment": getSegmentY(L[k], S),
 			"events": ["pop", "pop", "push", "redraw"],
 			"message": "Muchia " + L[k].litera + S.litera + " face parte din acoperirea convexa."
 		};
