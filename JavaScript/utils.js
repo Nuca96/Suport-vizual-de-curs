@@ -92,6 +92,19 @@ function drawLiter(ctx, point, colour) {
 	ctx.closePath();
 }
 
+function drawPolygon(ctx, points, colour) {
+	ctx.beginPath();
+	ctx.fillStyle = colour;
+	ctx.moveTo(points[0].x, points[0].y);
+
+	for (var idx=1; idx<points.length; idx++){
+		ctx.lineTo(points[idx].x, points[idx].y);
+	}
+
+	ctx.closePath();
+	ctx.fill();
+}
+
 function drawLine(ctx, segment, colour, width) {
 	ctx.beginPath();
 	ctx.moveTo(segment.firstPoint.x, segment.firstPoint.y);

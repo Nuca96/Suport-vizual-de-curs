@@ -172,6 +172,15 @@ function draw(drawing) {
 		drawPoint(ctx, drawing.point, drawing.colour, drawing.size);
 		break;
 	}
+	case "polygon": {
+		drawPolygon(ctx, drawing.points, drawing.colour);
+		break
+	}
+	case "extension": {
+		var ext = getSegmentY(drawing.point.lower, drawing.point.upper);
+		drawLine(ctx, ext, drawing.colour, 1);
+		break;
+	}
 	default: {
 		console.log("wrong shape: " + drawing.shape);
 	}
