@@ -134,6 +134,19 @@ function getSweepY(y) {
 	}
 }
 
+function getSweepX(x) {
+	return {
+		"firstPoint": {
+			"x": x,
+			"y": 0
+		},
+		"secondPoint": {
+			"x": x,
+			"y": canvas.height
+		}
+	}
+}
+
 function draw(drawing) {
 	if (typeof drawing.colour == "undefined") {
 		drawing.colour = "black";

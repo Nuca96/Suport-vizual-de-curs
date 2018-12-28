@@ -1,9 +1,44 @@
+function Trapez(bottom, top, leftp, rightp) {
+	this.bottom = bottom;
+	this.top = top;
+	this.leftp = leftp;
+	this.rightp = rightp;
+};
+
+var Node = function(type, leftn, rightn, info) {
+	this.type = type;
+	this.leftn = leftn;
+	this.rightn = rightn;
+	this.info = info;
+};
+
+var T = {
+	push: function(tr) {
+		this.array.push(tr);
+	},
+	init: function() {
+		this.array = [];
+	}
+};
+
+var D = {
+	init: function() {
+		var tr = new Trapez(null, null, null, null);
+		var nod = new Node("leaf", null, null, tr);
+		tr.node = nod;
+		this.root = nod;
+	}
+};
+
 function init() {
 	genericInit();
 	canvas.segmente = [];
 	canvas.points = [];
 	canvas.addEventListener("click", firstClick);
 	loadButton.addEventListener("click", loadSegments);
+
+	T.init();
+	D.init();
 }
 
 near = 10;
@@ -145,23 +180,24 @@ function secondClick(event) {
 	redraw();
 }
 
-function instantInsert(pseudoSegm) {
+function instantInsert(p1, p2) {
 	var ev1 = {
-		"clientX": pseudoSegm.p1.x,
-		"clientY": pseudoSegm.p1.y
+		"clientX": p1.x,
+		"clientY": p1.y
 	};
 	firstClick(ev1);
 
 	var ev2 = {
-		"clientX": pseudoSegm.p2.x,
-		"clientY": pseudoSegm.p2.y
+		"clientX": p2.x,
+		"clientY": p2.y
 	};
 	secondClick(ev2);
 }
 
 function loadSegments() {
 	for (var idx in TrapezMap) {
-		instantInsert(TrapezMap[idx]);
+		var segm =TrapezMap[idx];
+		instantInsert(segm.p1, segm.p2);
 	}
 	loadButton.removeEventListener("click", loadSegments);
 }
