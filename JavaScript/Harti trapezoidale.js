@@ -71,11 +71,17 @@ var T = {
 
 var D = {
 	init: function() {
-		var leftp = {x: 0, y:0};
-		var rightp = {x:canvas.width, y:canvas.height};
-		var top = getSegmentX(leftp, {x:canvas.width, y:0});
-		var bottom = getSegmentX({x:0, y:canvas.height}, rightp);
-		var tr = new Trapez(top, bottom, leftp, rightp);
+		var tr = {x:canvas.width, y:0};
+		var bl = {x:0, y:canvas.height};
+		var tl = {x: 0, y:0, lower: bl};
+		var br = {x:canvas.width, y:canvas.height, upper: tr};
+		var top = getSegmentX(tl, tr);
+		var bottom = getSegmentX(bl, br);
+		var tr = new Trapez(top, bottom, tl, br);
+
+		// "not null" - fot drawing the lefter and righter trapezoids
+		tr.updateNeighbors(null, "not null", "not null", null);
+		T.push(tr);
 		var nod = new Node("trapez", null, null, tr);
 		this.root = nod;
 	},
@@ -85,7 +91,7 @@ var D = {
 };
 
 function createExtension(point, trapez) {
-	if (typeof point.lower != "undefined") {
+	if (typeof point.lower !== "undefined") {
 		return;
 	}
 
@@ -96,7 +102,7 @@ function createExtension(point, trapez) {
 
 function addInner(segm, trapez) {
 	var leftTrapez = new Trapez(trapez.top, trapez.bottom, trapez.leftp, segm.firstPoint);
-	var rightTrapez = new Trapez(trapez.top, trapez.bottom, segm.seconsPoint, trapez.rightp);
+	var rightTrapez = new Trapez(trapez.top, trapez.bottom, segm.secondPoint, trapez.rightp);
 	var topTrapez = new Trapez(trapez.top, segm, segm.firstPoint, segm.secondPoint);
 	var bottomTrapez = new Trapez(segm, trapez.bottom, segm.firstPoint, segm.secondPoint);
 
@@ -110,9 +116,13 @@ function addInner(segm, trapez) {
 	var topNode = new Node("trapez", null, null, topTrapez);
 	var bottomNode = new Node("trapez", null, null, bottomTrapez);
 	var segmentNode = new Node("segment", topNode, bottomNode, segm);
-	var secondNode = new Node("point", segmentNode, leftNode, segm.secondPoint);
+	var secondNode = new Node("point", segmentNode, rightNode, segm.secondPoint);
 
 	T.delete(trapez);
+	T.push(leftTrapez);
+	T.push(rightTrapez);
+	T.push(topTrapez);
+	T.push(bottomTrapez);
 	var oldNode = trapez.node;
 	oldNode.type = "point";
 	oldNode.leftn = leftNode;
@@ -173,6 +183,7 @@ function init() {
 	canvas.points = [];
 	canvas.addEventListener("click", firstClick);
 	loadButton.addEventListener("click", loadSegments);
+	canvas.removeEventListener("click", find);
 
 	T.init();
 	D.init();
@@ -348,6 +359,46 @@ function mouseMove(event) {
 	draw(drawing);
 }
 
+function getPolygon(tr) {
+	var polygon = [];
+	if (tr.bottomLeft != null) {
+		polygon.push(tr.leftp.lower);
+	}
+	polygon.push(tr.leftp);
+	if (tr.topLeft != null) {
+		polygon.push(tr.leftp.upper);
+	}
+	if (tr.topRight != null) {
+		polygon.push(tr.rightp.upper);
+	}
+	polygon.push(tr.rightp);
+	if (tr.bottomRight != null) {
+		polygon.push(tr.rightp.lower);
+	}
+	return polygon;
+}
+
+function run() {
+	return true;
+}
+
+function find(event) {
+	redraw();
+	var point = genericEvent(event);
+
+	var where = D.search(point);
+
+	if (where.type == "trapez") {
+		draw({
+			"shape": "polygon",
+			"points": getPolygon(where.info),
+			"colour": "purple"
+		});
+	}
+}
+
+
+
 function firstPart() {
 	if (canvas.firstPoint != null) {
 		canvas.removeEventListener("click", secondClick);
@@ -364,6 +415,8 @@ function firstPart() {
 	startButton.removeEventListener("click", startAlgorithm);
 	runButton.removeEventListener("click", autorun);
 	loadButton.removeEventListener("click", loadSegments);
+
+	canvas.addEventListener("click", find);
 
 	breakPointsIdx = 0;
 	return true;
