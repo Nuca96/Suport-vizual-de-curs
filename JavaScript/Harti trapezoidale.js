@@ -1,4 +1,7 @@
+trlit = 'a';
 function Trapez(top, bottom, leftp, rightp) {
+	this.lit = trlit;
+	trlit = nextChar(trlit);
 	this.bottom = bottom;
 	this.top = top;
 	this.leftp = leftp;
@@ -12,10 +15,22 @@ function Trapez(top, bottom, leftp, rightp) {
 };
 
 Trapez.prototype.updateNeighbors = function(topLeft, topRight, bottomLeft, bottomRight) {
-	this.topLeft = topLeft;
-	this.topRight = topRight;
-	this.bottomLeft = bottomLeft;
-	this.bottomRight = bottomRight;
+	if (topLeft != null) {
+		this.topLeft = topLeft;
+		topLeft.topRight = this;
+	}
+	if (topRight != null) {
+		this.topRight = topRight;
+		topRight.topLeft = this;
+	}
+	if (bottomLeft != null) {
+		this.bottomLeft = bottomLeft;
+		bottomLeft.bottomRight = this;
+	}
+	if (bottomRight != null) {
+		this.bottomRight = bottomRight;
+		bottomRight.bottomLeft = this;
+	}
 };
 
 var Node = function(type, leftn, rightn, info) {
@@ -90,20 +105,26 @@ var D = {
 	}
 };
 
+function newPoint(point) {
+	return typeof point.lower === "undefined";
+}
+
 function createExtension(point, trapez) {
-	if (typeof point.lower !== "undefined") {
-		return;
+	if (!newPoint(point)) {
+		return false;
 	}
 
 	var sweep = getSweepX(point.x);
 	point.upper = intersection(sweep, trapez.top);
 	point.lower = intersection(sweep, trapez.bottom);
+
+	return true;
 }
 
 function addInner(segm, trapez) {
 	var leftTrapez = new Trapez(trapez.top, trapez.bottom, trapez.leftp, segm.firstPoint);
-	var rightTrapez = new Trapez(trapez.top, trapez.bottom, segm.secondPoint, trapez.rightp);
 	var topTrapez = new Trapez(trapez.top, segm, segm.firstPoint, segm.secondPoint);
+	var rightTrapez = new Trapez(trapez.top, trapez.bottom, segm.secondPoint, trapez.rightp);
 	var bottomTrapez = new Trapez(segm, trapez.bottom, segm.firstPoint, segm.secondPoint);
 
 	leftTrapez.updateNeighbors(trapez.topLeft, topTrapez, trapez.bottomLeft, bottomTrapez);
@@ -123,6 +144,7 @@ function addInner(segm, trapez) {
 	T.push(rightTrapez);
 	T.push(topTrapez);
 	T.push(bottomTrapez);
+
 	var oldNode = trapez.node;
 	oldNode.type = "point";
 	oldNode.leftn = leftNode;
@@ -131,16 +153,48 @@ function addInner(segm, trapez) {
 	segm.firstPoint.node = oldNode;
 }
 
+function getIntersectList(segm) {
+	var node = D.search(segm.firstPoint);
+
+	if (node.type !== "trapez") {
+		var int = intersection(segm, getSweepX(segm.firstPoint.x + near));
+		node = D.search(int);
+	}
+
+	var trList = [node.info];
+	var second = segm.secondPoint;
+	do {
+		var lastTr = trList[trList.length -1];
+
+		if (lastTr.rightp.x >= second.x) {
+			break;
+		}
+
+		var int = intersection(segm, getSweepX(lastTr.rightp.x));
+
+		if (int.y > lastTr.rightp.y) {
+			trList.push(lastTr.bottomRight);
+			continue;
+		}
+		if (int.y < lastTr.rightp.y) {
+			trList.push(lastTr.topRight);
+			continue;
+		}
+	} while(true);
+
+	return trList;
+}
+
 function addSegment(segm) {
 	canvas.segmente.push(segm);
 
-	var node = D.search(segm.firstPoint);
+	var trList = getIntersectList(segm);
 
-	createExtension(segm.firstPoint, node.info);
-	createExtension(segm.secondPoint, node.info);
-	if (node == D.search(segm.secondPoint)) {
-		addInner(segm, node.info);
+	if (trList.length == 1 && newPoint(segm.firstPoint) && newPoint(segm.secondPoint)) {
+		addInner(segm, trList[0]);
 	}
+	createExtension(segm.firstPoint, trList[0]);
+	createExtension(segm.secondPoint, trList[trList.length-1]);
 
 	//draw new elements
 	var permanents = [{
@@ -169,12 +223,6 @@ function addSegment(segm) {
 	canvas.permanent_drawings.push.apply(canvas.permanent_drawings, permanents);
 
 	redraw();
-
-	// draw({
-	// 	"shape": "polygon",
-	// 	"points":[segm.firstPoint, segm.secondPoint, T0.info.rightp],
-	// 	"colour": "yellow"
-	// });
 }
 
 function init() {
