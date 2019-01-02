@@ -63,6 +63,14 @@ function determinant2(matrice) {
 	return l0[0]*l1[1] - l0[1]*l1[0];
 }
 
+function lastElem(array) {
+	var len = array.length;
+	if (len == 0) {
+		return null;
+	}
+	return array[len-1];
+}
+
 function orientation(p1, p2, p3) {
 	var D = determinant3([[1, 1, 1], [p1.x, p2.x, p3.x], [p1.y, p2.y, p3.y]]);
 

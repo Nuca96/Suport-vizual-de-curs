@@ -153,9 +153,77 @@ function addInner(segm, trapez) {
 	segm.firstPoint.node = oldNode;
 }
 
+function addDiag(segm, trapez) {
+	var topTrapez = new Trapez(trapez.top, segm, trapez.leftp, trapez.rightp);
+	var bottomTrapez = new Trapez(segm, trapez.bottom, trapez.leftp, trapez.rightp);
+
+	topTrapez.updateNeighbors(trapez.topLeft, trapez.topRight, null, null);
+	bottomTrapez.updateNeighbors(null, null, trapez.bottomLeft, trapez.bottomRight);
+
+	var topNode = new Node("trapez", null, null, topTrapez);
+	var bottomNode = new Node("trapez", null, null, bottomTrapez);
+
+	var oldNode = trapez.node;
+	oldNode.type = "segment";
+	oldNode.leftn = topNode;
+	oldNode.rightn = bottomNode;
+	oldNode.info = segm;
+	segm.node = oldNode;
+}
+
+function addSemiDiagLeft(segm, trapez) {
+	var topTrapez = new Trapez(trapez.top, segm, segm.firstPoint, segm.secondPoint);
+	var bottomTrapez = new Trapez(segm, trapez.bottom, segm.firstPoint, segm.secondPoint);
+	var leftTrapez = new Trapez(trapez.top, trapez.bottom, trapez.leftp, segm.firstPoint);
+
+	topTrapez.updateNeighbors(leftTrapez, trapez.topRight, null, null);
+	bottomTrapez.updateNeighbors(null, null, leftTrapez, trapez.bottomRight);
+	leftTrapez.updateNeighbors(trapez.topLeft, topTrapez, trapez.bottomLeft, bottomTrapez);
+
+	var topNode = new Node("trapez", null, null, topTrapez);
+	var bottomNode = new Node("trapez", null, null, bottomTrapez);
+	var leftNode = new Node("trapez", null, null, leftTrapez);
+	var segmentNode = new Node("segment", topNode, bottomNode, segm);
+
+	var oldNode = trapez.node;
+	oldNode.type = "point";
+	oldNode.leftn = leftNode;
+	oldNode.rightn = segmentNode;
+	oldNode.info = segm.firstPoint;
+	segm.firstPoint.node = oldNode;
+}
+
+function addSemiDiagRight(segm, trapez) {
+	var topTrapez = new Trapez(trapez.top, segm, segm.firstPoint, segm.secondPoint);
+	var bottomTrapez = new Trapez(segm, trapez.bottom, segm.firstPoint, segm.secondPoint);
+	var rightTrapez = new Trapez(trapez.top, trapez.bottom, segm.secondPoint, trapez.rightp);
+
+	topTrapez.updateNeighbors(trapez.topRight, rightTrapez, null, null);
+	bottomTrapez.updateNeighbors(null, null, trapez.bottomLeft, rightTrapez);
+	rightTrapez.updateNeighbors(topTrapez, trapez.topRight, bottomTrapez, trapez.bottomRight);
+
+	var topNode = new Node("trapez", null, null, topTrapez);
+	var bottomNode = new Node("trapez", null, null, bottomTrapez);
+	var rightNode = new Node("trapez", null, null, rightTrapez);
+	var segmentNode = new Node("segment", topNode, bottomNode, segm);
+
+	var oldNode = trapez.node;
+	oldNode.type = "point";
+	oldNode.leftn = segmentNode;
+	oldNode.rightn = rightNode;
+	oldNode.info = segm.secondPoint;
+	segm.firstPoint.node = oldNode;
+}
+
+function nextTrapez(segm, trapez) {
+	if (orientation(segm.firstPoint, segm.secondPoint, trapez.rightp) == "dreapta") {
+		return trapez.topRight;
+	}
+	return trapez.bottomRight;
+}
+
 function getIntersectList(segm) {
 	var node = D.search(segm.firstPoint);
-
 	if (node.type !== "trapez") {
 		var int = intersection(segm, getSweepX(segm.firstPoint.x + near));
 		node = D.search(int);
@@ -164,35 +232,41 @@ function getIntersectList(segm) {
 	var trList = [node.info];
 	var second = segm.secondPoint;
 	do {
-		var lastTr = trList[trList.length -1];
-
+		var lastTr = lastElem(trList);
 		if (lastTr.rightp.x >= second.x) {
 			break;
 		}
-
-		var int = intersection(segm, getSweepX(lastTr.rightp.x));
-
-		if (int.y > lastTr.rightp.y) {
-			trList.push(lastTr.bottomRight);
-			continue;
-		}
-		if (int.y < lastTr.rightp.y) {
-			trList.push(lastTr.topRight);
-			continue;
-		}
+		trList.push(nextTrapez(segm, lastTr));
 	} while(true);
 
 	return trList;
+}
+
+function modifyTrapezoids(segm, trList) {
+	if (trList.length == 1) {
+		if (newPoint(segm.firstPoint) && newPoint(segm.secondPoint)){
+			addInner(segm, trList[0]);
+			return;
+		}
+		if (newPoint(segm.firstPoint)) {
+			addSemiDiagLeft(segm, trList[0]);
+			return;
+		}
+		if (newPoint(segm.secondPoint)) {
+			addSemiDiagRight(segm, trList[0]);
+			return;
+		}
+		addDiag(segm, trList[0]);
+		return;
+	}
 }
 
 function addSegment(segm) {
 	canvas.segmente.push(segm);
 
 	var trList = getIntersectList(segm);
+	modifyTrapezoids(segm, trList);
 
-	if (trList.length == 1 && newPoint(segm.firstPoint) && newPoint(segm.secondPoint)) {
-		addInner(segm, trList[0]);
-	}
 	createExtension(segm.firstPoint, trList[0]);
 	createExtension(segm.secondPoint, trList[trList.length-1]);
 
@@ -444,8 +518,6 @@ function find(event) {
 		});
 	}
 }
-
-
 
 function firstPart() {
 	if (canvas.firstPoint != null) {
