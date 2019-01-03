@@ -1,7 +1,7 @@
-trlit = 'a';
+tridx = 0;
 function Trapez(top, bottom, leftp, rightp) {
-	this.lit = trlit;
-	trlit = nextChar(trlit);
+	this.idx = tridx;
+	tridx++;
 	this.bottom = bottom;
 	this.top = top;
 	this.leftp = leftp;
@@ -198,7 +198,7 @@ function addSemiDiagRight(segm, trapez) {
 	var bottomTrapez = new Trapez(segm, trapez.bottom, segm.firstPoint, segm.secondPoint);
 	var rightTrapez = new Trapez(trapez.top, trapez.bottom, segm.secondPoint, trapez.rightp);
 
-	topTrapez.updateNeighbors(trapez.topRight, rightTrapez, null, null);
+	topTrapez.updateNeighbors(trapez.topLeft, rightTrapez, null, null);
 	bottomTrapez.updateNeighbors(null, null, trapez.bottomLeft, rightTrapez);
 	rightTrapez.updateNeighbors(topTrapez, trapez.topRight, bottomTrapez, trapez.bottomRight);
 
@@ -259,10 +259,8 @@ function addTrapez(segm, trapez, nodes, where) {
 	}
 	if (where == "bottom") {
 		var newTrapez = new Trapez(segm, trapez.bottom, leftp, trapez.rightp);
-		newTrapez.updateNeighbors(lastTr, null, trapez.bottomLeft, trapez.bottomRight);
 	} else {
 		var newTrapez = new Trapez(trapez.top, segm, leftp, trapez.rightp);
-		newTrapez.updateNeighbors(trapez.topLeft, trapez.topRight, lastTr, null);
 	}
 	var newNode = new Node("trapez", null, null, newTrapez);
 	nodes.push(newNode);
@@ -294,6 +292,9 @@ function addMultiDiag(segm, trList) {
 		addTrapez(segm, trapez, topNodes, "top");
 	}
 
+	var lastOne = "";
+	var lastBottom = trList[0].bottomLeft;
+	var lastTop = trList[0].topLeft;
 	for (var tidx=0, bidx=0, idx=0; idx<trList.length; idx++) {
 		var trapez = trList[idx];
 		var thisNode = trapez.node;
@@ -303,9 +304,40 @@ function addMultiDiag(segm, trList) {
 		thisNode.rightn = bottomNodes[bidx];
 		thisNode.info = segm;
 
-		if(trapez.type == "bottom") {
+		if (trapez.type != "top") {
+			var topLeft = null;
+			var topRight = null;
+			var bottomLeft = trapez.bottomLeft;
+			var bottomRight = trapez.bottomRight;
+
+			if (lastOne != "bottom") {
+				lastOne = "bottom";
+				bottomLeft = lastBottom;
+				lastTop = trapez.topLeft;
+			}
+
+			if (bidx!=0) {
+				topLeft = bottomNodes[bidx-1].info;
+			}
+			bottomNodes[bidx].info.updateNeighbors(topLeft, topRight, bottomLeft, bottomRight);
 			bidx++;
-		} else {
+
+		}
+		if (trapez.type != "bottom") {
+			var topLeft = trapez.topLeft;
+			var topRight = trapez.topRight;
+			var bottomLeft = null;
+			var bottomRight = null;
+
+			if (lastOne != "top") {
+				lastOne = "top";
+				topLeft = lastTop;
+				lastBottom = trapez.bottomLeft;
+			}
+			if (tidx!=0) {
+				bottomLeft = topNodes[tidx-1].info;
+			}
+			topNodes[tidx].info.updateNeighbors(topLeft, topRight, bottomLeft, bottomRight);
 			tidx++;
 		}
 	}
@@ -330,7 +362,9 @@ function modifyTrapezoids(segm, trList) {
 	}
 	if (!newPoint(segm.firstPoint) && !newPoint(segm.secondPoint)) {
 		addMultiDiag(segm, trList);
+		return;
 	}
+	console.log("TODO");
 }
 
 function addSegment(segm) {
@@ -463,9 +497,9 @@ function segmentOk(verif) {
 			continue;
 		}
 
-		if ((theSamePoint(int, verif.secondPoint) ||	theSamePoint(int, verif.firstPoint)) &&
+		if ((theSamePoint(int, verif.secondPoint) || theSamePoint(int, verif.firstPoint)) &&
 			(theSamePoint(int, segm.secondPoint) || theSamePoint(int, segm.firstPoint))) {
-			return true;
+			continue;
 		}
 
 		return false;
@@ -562,6 +596,7 @@ function find(event) {
 	var point = genericEvent(event);
 
 	var where = D.search(point);
+	console.log(where.info);
 
 	if (where.type == "trapez") {
 		draw({
