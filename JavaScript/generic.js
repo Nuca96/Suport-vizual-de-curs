@@ -176,6 +176,11 @@ function draw(drawing) {
 		drawPolygon(ctx, drawing.points, drawing.colour);
 		break
 	}
+	case "trapez": {
+		var points = getPolygon(drawing.trapez);
+		drawPolygon(ctx, points, drawing.colour);
+		break
+	}
 	case "extension": {
 		var ext = getSegmentY(drawing.point.lower, drawing.point.upper);
 		drawLine(ctx, ext, drawing.colour, 1);

@@ -216,10 +216,17 @@ function addSemiDiagRight(segm, trapez) {
 }
 
 function nextTrapez(segm, trapez) {
-	if (orientation(segm.firstPoint, segm.secondPoint, trapez.rightp) == "dreapta") {
+	if (segm.secondPoint === trapez.rightp) {
+		return NaN;
+	}
+	var orient = orientation(segm.firstPoint, segm.secondPoint, trapez.rightp);
+	if (orient == "dreapta") {
 		return trapez.topRight;
 	}
-	return trapez.bottomRight;
+	if (orient == "stanga") {
+		return trapez.bottomRight;
+	}
+	return NaN;
 }
 
 function getIntersectList(segm) {
@@ -242,6 +249,68 @@ function getIntersectList(segm) {
 	return trList;
 }
 
+function addTrapez(segm, trapez, nodes, where) {
+	var leftp = segm.firstPoint;
+	var lastTr = null;
+	var lastNode = lastElem(nodes);
+	if (lastNode != null) {
+		lastTr = lastNode.info;
+		leftp = lastTr.rightp;
+	}
+	if (where == "bottom") {
+		var newTrapez = new Trapez(segm, trapez.bottom, leftp, trapez.rightp);
+		newTrapez.updateNeighbors(lastTr, null, trapez.bottomLeft, trapez.bottomRight);
+	} else {
+		var newTrapez = new Trapez(trapez.top, segm, leftp, trapez.rightp);
+		newTrapez.updateNeighbors(trapez.topLeft, trapez.topRight, lastTr, null);
+	}
+	var newNode = new Node("trapez", null, null, newTrapez);
+	nodes.push(newNode);
+}
+
+function addMultiDiag(segm, trList) {
+	var bottomNodes = [];
+	var topNodes = [];
+
+	for (var idx in trList) {
+		var trapez = trList[idx];
+		var newInt = intersection(getSweepX(trapez.rightp.x), segm);
+
+		if (nextTrapez(segm, trapez) == trapez.topRight) {
+			trapez.rightp.upper = newInt;
+			trapez.type = "bottom";
+			addTrapez(segm, trapez, bottomNodes, "bottom");
+			continue;
+		}
+		if (nextTrapez(segm, trapez) == trapez.bottomRight) {
+			trapez.rightp.lower = newInt;
+			trapez.type = "top";
+			addTrapez(segm, trapez, topNodes, "top");
+			continue;
+		}
+
+		//last one
+		addTrapez(segm, trapez, bottomNodes, "bottom");
+		addTrapez(segm, trapez, topNodes, "top");
+	}
+
+	for (var tidx=0, bidx=0, idx=0; idx<trList.length; idx++) {
+		var trapez = trList[idx];
+		var thisNode = trapez.node;
+
+		thisNode.type = "segment";
+		thisNode.leftn = topNodes[tidx];
+		thisNode.rightn = bottomNodes[bidx];
+		thisNode.info = segm;
+
+		if(trapez.type == "bottom") {
+			bidx++;
+		} else {
+			tidx++;
+		}
+	}
+}
+
 function modifyTrapezoids(segm, trList) {
 	if (trList.length == 1) {
 		if (newPoint(segm.firstPoint) && newPoint(segm.secondPoint)){
@@ -259,6 +328,9 @@ function modifyTrapezoids(segm, trList) {
 		addDiag(segm, trList[0]);
 		return;
 	}
+	if (!newPoint(segm.firstPoint) && !newPoint(segm.secondPoint)) {
+		addMultiDiag(segm, trList);
+	}
 }
 
 function addSegment(segm) {
@@ -268,7 +340,7 @@ function addSegment(segm) {
 	modifyTrapezoids(segm, trList);
 
 	createExtension(segm.firstPoint, trList[0]);
-	createExtension(segm.secondPoint, trList[trList.length-1]);
+	createExtension(segm.secondPoint, lastElem(trList));
 
 	//draw new elements
 	var permanents = [{
@@ -481,25 +553,6 @@ function mouseMove(event) {
 	draw(drawing);
 }
 
-function getPolygon(tr) {
-	var polygon = [];
-	if (tr.bottomLeft != null) {
-		polygon.push(tr.leftp.lower);
-	}
-	polygon.push(tr.leftp);
-	if (tr.topLeft != null) {
-		polygon.push(tr.leftp.upper);
-	}
-	if (tr.topRight != null) {
-		polygon.push(tr.rightp.upper);
-	}
-	polygon.push(tr.rightp);
-	if (tr.bottomRight != null) {
-		polygon.push(tr.rightp.lower);
-	}
-	return polygon;
-}
-
 function run() {
 	return true;
 }
@@ -512,8 +565,8 @@ function find(event) {
 
 	if (where.type == "trapez") {
 		draw({
-			"shape": "polygon",
-			"points": getPolygon(where.info),
+			"shape": "trapez",
+			"trapez": where.info,
 			"colour": "purple"
 		});
 	}
