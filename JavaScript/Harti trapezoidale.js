@@ -212,7 +212,6 @@ function addSemiDiagRight(segm, trapez) {
 	oldNode.leftn = segmentNode;
 	oldNode.rightn = rightNode;
 	oldNode.info = segm.secondPoint;
-	segm.firstPoint.node = oldNode;
 }
 
 function nextTrapez(segm, trapez) {
@@ -343,6 +342,48 @@ function addMultiDiag(segm, trList) {
 	}
 }
 
+function addLeftInner(point, trList) {
+	var trapez = trList[0];
+
+	var leftTrapez = new Trapez(trapez.top, trapez.bottom, trapez.leftp, point);
+	var fakeTrapez = new Trapez(trapez.top, trapez.bottom, point, trapez.rightp);
+
+	leftTrapez.updateNeighbors(trapez.topLeft, null, trapez.bottomLeft, null);
+	fakeTrapez.updateNeighbors(leftTrapez, trapez.topRight, leftTrapez, trapez.bottomRight);
+
+	var leftNode = new Node("trapez", null, null, leftTrapez);
+	var fakeNode = new Node("trapez", null, null, fakeTrapez);
+
+	var oldNode = trapez.node;
+	oldNode.type = "point";
+	oldNode.leftn = leftNode;
+	oldNode.rightn = fakeNode;
+	oldNode.info = point;
+
+	trList[0] = fakeTrapez;
+}
+
+function addRightInner(point, trList) {
+	var trapez = lastElem(trList);
+
+	var rightTrapez = new Trapez(trapez.top, trapez.bottom, point, trapez.rightp);
+	var fakeTrapez = new Trapez(trapez.top, trapez.bottom, trapez.leftp, point);
+
+	rightTrapez.updateNeighbors(null, trapez.topRight, null, trapez.bottomRight);
+	fakeTrapez.updateNeighbors(trapez.topLeft, rightTrapez, trapez.bottomLeft, rightTrapez);
+
+	var rightNode = new Node("trapez", null, null, rightTrapez);
+	var fakeNode = new Node("trapez", null, null, fakeTrapez);
+
+	var oldNode = trapez.node;
+	oldNode.type = "point";
+	oldNode.leftn = fakeNode;
+	oldNode.rightn = rightNode;
+	oldNode.info = point;
+
+	trList[trList.length-1] = fakeTrapez;
+}
+
 function modifyTrapezoids(segm, trList) {
 	if (trList.length == 1) {
 		if (newPoint(segm.firstPoint) && newPoint(segm.secondPoint)){
@@ -360,11 +401,15 @@ function modifyTrapezoids(segm, trList) {
 		addDiag(segm, trList[0]);
 		return;
 	}
-	if (!newPoint(segm.firstPoint) && !newPoint(segm.secondPoint)) {
-		addMultiDiag(segm, trList);
-		return;
+
+	if (newPoint(segm.firstPoint)) {
+		addLeftInner(segm.firstPoint, trList);
 	}
-	console.log("TODO");
+	if (newPoint(segm.secondPoint)) {
+		addRightInner(segm.secondPoint, trList);
+	}
+	addMultiDiag(segm, trList);
+	return;
 }
 
 function addSegment(segm) {
