@@ -1,4 +1,3 @@
-tridx = 0;
 function Trapez(top, bottom, leftp, rightp) {
 	this.idx = tridx;
 	tridx++;
@@ -46,6 +45,11 @@ Node.prototype.search = function(point) {
 		return this;
 
 	if (this.type == "segment") {
+		breakPoints.push({
+			"shape": "segment",
+			"segment": this.info,
+			"colour": "red"
+		});
 		var orient = orientation(this.info.firstPoint, this.info.secondPoint, point);
 		if (orient == "dreapta") {
 			return this.rightn.search(point);
@@ -57,6 +61,12 @@ Node.prototype.search = function(point) {
 	}
 
 	if (this.type == "point") {
+		breakPoints.push({
+			"shape": "point",
+			"point": this.info,
+			"colour": "red",
+			"size": 5
+		});
 		if (point.x < this.info.x) {
 			return this.leftn.search(point);
 		}
@@ -322,6 +332,7 @@ function init() {
 	loadButton.addEventListener("click", loadSegments);
 	canvas.removeEventListener("click", find);
 
+	this.tridx = 0;
 	D.init();
 }
 
@@ -503,17 +514,31 @@ function run() {
 function find(event) {
 	redraw();
 	var point = genericEvent(event);
+	if (!pointOk(point)) {
+		return;
+	}
+	breakPoints = [];
 
 	var where = D.search(point);
 	console.log(where.info);
 
-	if (where.type == "trapez") {
-		draw({
-			"shape": "trapez",
-			"trapez": where.info,
-			"colour": "purple"
-		});
+	var speed = speedMap[speedSelector.value];
+
+	var idx = 0;
+	function timer() {
+		if (idx == breakPoints.length){
+			draw({
+				"shape": "trapez",
+				"trapez": where.info,
+				"colour": "purple"
+			});
+			return null;
+		}
+		draw(breakPoints[idx]);
+		idx++;
+		setTimeout(timer, speed);
 	}
+	timer();
 }
 
 function firstPart() {
@@ -535,6 +560,6 @@ function firstPart() {
 
 	canvas.addEventListener("click", find);
 
-	breakPointsIdx = 0;
+	breakPoints = [];
 	return true;
 }
