@@ -2,6 +2,14 @@ function nextChar(c) {
     return String.fromCharCode(c.charCodeAt(0) + 1);
 }
 
+function extend(array1, array2) {
+	array1.push.apply(array1, array2);
+}
+
+function copy(obj) {
+	return JSON.parse(JSON.stringify(obj));
+}
+
 function leftmostPoint(pointList) {
 	if (pointList.length == 0)
 		return null;
@@ -86,19 +94,21 @@ function orientation(p1, p2, p3) {
 
 function getPolygon(tr) {
 	var polygon = [];
-	if (tr.bottomLeft != null) {
-		polygon.push(tr.leftp.lower);
+	var leftSweep = getSweepX(tr.leftp.x);
+	var rightSweep = getSweepX(tr.rightp.x);
+	if (tr.leftp.lower === tr.bottom) {
+		polygon.push(intersection(leftSweep, tr.bottom));
 	}
 	polygon.push(tr.leftp);
-	if (tr.topLeft != null) {
-		polygon.push(tr.leftp.upper);
+	if (tr.leftp.upper === tr.top) {
+		polygon.push(intersection(leftSweep, tr.top));
 	}
-	if (tr.topRight != null) {
-		polygon.push(tr.rightp.upper);
+	if (tr.rightp.upper === tr.top) {
+		polygon.push(intersection(rightSweep, tr.top));
 	}
 	polygon.push(tr.rightp);
-	if (tr.bottomRight != null) {
-		polygon.push(tr.rightp.lower);
+	if (tr.rightp.lower === tr.bottom) {
+		polygon.push(intersection(rightSweep, tr.bottom));
 	}
 	return polygon;
 }
@@ -130,6 +140,11 @@ function drawPolygon(ctx, points, colour) {
 
 	ctx.closePath();
 	ctx.fill();
+
+	for (var idx=1; idx<points.length; idx++){
+		var segm = getSegmentY(points[idx - 1], points[idx]);
+		drawLine(ctx, segm, "black", 1);
+	}
 }
 
 function drawLine(ctx, segment, colour, width) {
@@ -264,8 +279,6 @@ function has_intersection(seg1, seg2) {
 
 	if (false === int)
 		return false;
-
-
 
 	if (between(int, seg1) && between(int, seg2)) {
 		return int;

@@ -41,11 +41,17 @@ var Node = function(type, leftn, rightn, info) {
 };
 
 Node.prototype.search = function(point) {
-	if (this.type == "trapez")
+	if (this.type == "trapez") {
+		searchBreakPoints.push({
+			"shape": "trapez",
+			"trapez": this.info,
+			"colour": "purple"
+		});
 		return this;
+	}
 
 	if (this.type == "segment") {
-		breakPoints.push({
+		searchBreakPoints.push({
 			"shape": "segment",
 			"segment": this.info,
 			"colour": "red"
@@ -61,7 +67,7 @@ Node.prototype.search = function(point) {
 	}
 
 	if (this.type == "point") {
-		breakPoints.push({
+		searchBreakPoints.push({
 			"shape": "point",
 			"point": this.info,
 			"colour": "red",
@@ -82,14 +88,17 @@ var D = {
 	init: function() {
 		var tr = {x:canvas.width, y:0};
 		var bl = {x:0, y:canvas.height};
-		var tl = {x: 0, y:0, lower: bl};
-		var br = {x:canvas.width, y:canvas.height, upper: tr};
+		var tl = {x: 0, y:0};
+		var br = {x:canvas.width, y:canvas.height};
 		var top = getSegmentX(tl, tr);
 		var bottom = getSegmentX(bl, br);
+		tl.lower = bottom;
+		tl.upper = top;
+		br.lower = bottom;
+		br.upper = top;
 		var tr = new Trapez(top, bottom, tl, br);
 
-		// "not null" - fot drawing the lefter and righter trapezoids
-		tr.updateNeighbors(null, "not null", "not null", null);
+		tr.updateNeighbors(null, null, null, null);
 		var nod = new Node("trapez", null, null, tr);
 		this.root = nod;
 	},
@@ -107,8 +116,8 @@ function createExtension(point, trapez) {
 		return false;
 	}
 	var sweep = getSweepX(point.x);
-	point.upper = intersection(sweep, trapez.top);
-	point.lower = intersection(sweep, trapez.bottom);
+	point.upper = trapez.top;
+	point.lower = trapez.bottom;
 
 	return true;
 }
@@ -128,16 +137,25 @@ function nextTrapez(segm, trapez) {
 }
 
 function getIntersectList(segm) {
-	var node = D.search(segm.firstPoint);
-	if (node.type !== "trapez") {
-		var int = intersection(segm, getSweepX(segm.firstPoint.x + near));
-		node = D.search(int);
+	var point = segm.firstPoint;
+	if (!newPoint(point)) {
+		// se ia un punct de pe segment putin mai la dreapta
+		point = intersection(segm, getSweepX(segm.firstPoint.x + near));
 	}
 
+	var node = D.search(point);
 	var trList = [node.info];
 	var second = segm.secondPoint;
 	do {
 		var lastTr = lastElem(trList);
+		breakPoints.push([{
+			"shape": "polygon",
+			"points": getPolygon(lastTr),
+			"colour": "purple"
+		}, {
+			"shape": "segment",
+			"segment": segm
+		}]);
 		if (lastTr.rightp.x >= second.x) {
 			break;
 		}
@@ -161,6 +179,7 @@ function createTrapez(segm, trapez, nodes, where) {
 		var newTrapez = new Trapez(trapez.top, segm, leftp, trapez.rightp);
 	}
 	var newNode = new Node("trapez", null, null, newTrapez);
+
 	nodes.push(newNode);
 }
 
@@ -170,16 +189,15 @@ function createMiddleTrapezoids(segm, trList) {
 
 	for (var idx in trList) {
 		var trapez = trList[idx];
-		var newInt = intersection(getSweepX(trapez.rightp.x), segm);
 
 		if (nextTrapez(segm, trapez) == trapez.topRight) {
-			trapez.rightp.upper = newInt;
+			trapez.rightp.upper = segm;
 			trapez.type = "bottom";
 			createTrapez(segm, trapez, bottomNodes, "bottom");
 			continue;
 		}
 		if (nextTrapez(segm, trapez) == trapez.bottomRight) {
-			trapez.rightp.lower = newInt;
+			trapez.rightp.lower = segm;
 			trapez.type = "top";
 			createTrapez(segm, trapez, topNodes, "top");
 			continue;
@@ -196,12 +214,27 @@ function createMiddleTrapezoids(segm, trList) {
 	var lastTop = trList[0].topLeft;
 	for (var tidx=0, bidx=0, idx=0; idx<trList.length; idx++) {
 		var trapez = trList[idx];
+		var drawings = [];
 		var thisNode = trapez.node;
 
 		thisNode.type = "segment";
 		thisNode.leftn = topNodes[tidx];
 		thisNode.rightn = bottomNodes[bidx];
 		thisNode.info = segm;
+
+		if (idx != trList.length - 1){
+			breakPoints.push({
+				"shape": "extension",
+				"point": trapez.rightp,
+				"colour": "red",
+				"events": ["update"],
+				"update": {
+					"upper": trapez.rightp.upper,
+					"lower": trapez.rightp.lower
+				}
+			});
+		}
+
 		if (trapez.type != "top") {
 			var topLeft = null;
 			var topRight = null;
@@ -213,11 +246,16 @@ function createMiddleTrapezoids(segm, trList) {
 				bottomLeft = lastBottom;
 				lastTop = trapez.topLeft;
 			}
-
 			if (bidx!=0) {
 				topLeft = bottomNodes[bidx-1].info;
 			}
+
 			bottomNodes[bidx].info.updateNeighbors(topLeft, topRight, bottomLeft, bottomRight);
+			drawings.push({
+				"shape": "polygon",
+				"points": getPolygon(bottomNodes[bidx].info),
+				"colour": "blue"
+			});
 			bidx++;
 		}
 		if (trapez.type != "bottom") {
@@ -234,9 +272,20 @@ function createMiddleTrapezoids(segm, trList) {
 			if (tidx!=0) {
 				bottomLeft = topNodes[tidx-1].info;
 			}
+
 			topNodes[tidx].info.updateNeighbors(topLeft, topRight, bottomLeft, bottomRight);
+			drawings.push({
+				"shape": "polygon",
+				"points": getPolygon(topNodes[tidx].info),
+				"colour": "green"
+			});
 			tidx++;
 		}
+		drawings.push({
+			"shape": "segment",
+			"segment": segm
+		});
+		breakPoints.push(drawings);
 	}
 }
 
@@ -259,6 +308,12 @@ function createLeftTrapez(point, trList) {
 	oldNode.info = point;
 
 	trList[0] = fakeTrapez;
+
+	breakPoints.push({
+		"shape": "polygon",
+		"points": getPolygon(leftTrapez),
+		"colour": "yellow"
+	});
 }
 
 function createRightTrapez(point, trList) {
@@ -280,46 +335,77 @@ function createRightTrapez(point, trList) {
 	oldNode.info = point;
 
 	trList[trList.length-1] = fakeTrapez;
+
+	breakPoints.push({
+		"shape": "polygon",
+		"points": getPolygon(rightTrapez),
+		"colour": "yellow"
+	});
 }
 
 function modifyTrapezoids(segm) {
+	var drawing = {
+		"shape": "segment",
+		"colour": "DarkCyan",
+		"segment": segm,
+		"events": ["push", "redraw"]
+	};
+	canvas.permanent_drawings.push(drawing);
+	breakPoints.push(drawing);
+
 	var trList = getIntersectList(segm);
 
 	if (newPoint(segm.firstPoint)) {
-		createLeftTrapez(segm.firstPoint, trList);
 		createExtension(segm.firstPoint, trList[0]);
+		var drawings = [{
+			"shape": "liter",
+			"point": segm.firstPoint,
+			"events": ["push"]
+		}, {
+			"shape": "point",
+			"point": segm.firstPoint,
+			"events": ["push"]
+		}, {
+			"shape": "extension",
+			"point": segm.firstPoint,
+			"size": 1,
+			"events": ["push", "update"],
+			"update": {
+				"lower": segm.firstPoint.lower,
+				"upper": segm.firstPoint.upper
+			}
+		}];
+		extend(canvas.permanent_drawings, drawings);
+		breakPoints.push(drawings);
+
+		createLeftTrapez(segm.firstPoint, trList);
 	}
 	if (newPoint(segm.secondPoint)) {
-		createRightTrapez(segm.secondPoint, trList);
 		createExtension(segm.secondPoint, lastElem(trList));
+		var drawings = [{
+			"shape": "liter",
+			"point": segm.secondPoint,
+			"events": ["push"]
+		}, {
+			"shape": "point",
+			"point": segm.secondPoint,
+			"events": ["push"]
+		}, {
+			"shape": "extension",
+			"point": segm.secondPoint,
+			"size": 1,
+			"events": ["push", "update"],
+			"update": {
+				"lower": segm.secondPoint.lower,
+				"upper": segm.secondPoint.upper
+			}
+		}];
+		extend(canvas.permanent_drawings, drawings);
+		breakPoints.push(drawings);
+
+		createRightTrapez(segm.secondPoint, trList);
 	}
 	createMiddleTrapezoids(segm, trList);
-
-	//draw new elements
-	var permanents = [{
-		"shape": "liter",
-		"point": segm.firstPoint
-	}, {
-		"shape": "point",
-		"point": segm.firstPoint
-	}, {
-		"shape": "extension",
-		"point": segm.firstPoint
-	}, {
-		"shape": "liter",
-		"point": segm.secondPoint
-	}, {
-		"shape": "point",
-		"point": segm.secondPoint
-	}, {
-		"shape": "extension",
-		"point": segm.secondPoint
-	}, {
-		"shape": "segment",
-		"colour": "DarkCyan",
-		"segment": segm
-	}];
-	canvas.permanent_drawings.push.apply(canvas.permanent_drawings, permanents);
 
 	redraw();
 }
@@ -333,6 +419,7 @@ function init() {
 	canvas.removeEventListener("click", find);
 
 	this.tridx = 0;
+	this.searchBreakPoints = [];
 	D.init();
 }
 
@@ -450,7 +537,6 @@ function secondClick(event) {
 	if (pointDistance(segment.firstPoint, segment.secondPoint) < near) {
 		return;
 	}
-	canvas.firstPoint = null;
 
 	addPoint(segment.firstPoint);
 	addPoint(segment.secondPoint);
@@ -517,24 +603,18 @@ function find(event) {
 	if (!pointOk(point)) {
 		return;
 	}
-	breakPoints = [];
 
+	searchBreakPoints = [];
 	var where = D.search(point);
 	console.log(where.info);
 
 	var speed = speedMap[speedSelector.value];
-
 	var idx = 0;
 	function timer() {
-		if (idx == breakPoints.length){
-			draw({
-				"shape": "trapez",
-				"trapez": where.info,
-				"colour": "purple"
-			});
+		if (idx == searchBreakPoints.length){
 			return null;
 		}
-		draw(breakPoints[idx]);
+		action(searchBreakPoints[idx]);
 		idx++;
 		setTimeout(timer, speed);
 	}
@@ -560,6 +640,7 @@ function firstPart() {
 
 	canvas.addEventListener("click", find);
 
-	breakPoints = [];
+	breakPointsIdx = 0;
+	canvas.permanent_drawings = [];
 	return true;
 }

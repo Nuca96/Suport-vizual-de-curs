@@ -41,6 +41,31 @@ function genericEvent(event) {
 	return punct;
 }
 
+function action(drawing) {
+	if (typeof drawing.message !== "undefined") {
+		panel.append( '<li>' + drawing.message + '</li>' );
+	}
+	for (idx in drawing.events) {
+		var ev = drawing.events[idx];
+		if (ev == "push") {
+			canvas.permanent_drawings.push(drawing);
+		}
+		if (ev == "pop") {
+			canvas.permanent_drawings.pop();
+		}
+		if (ev == "redraw") {
+			redraw();
+		}
+		if (ev == "update") {
+			for (var key in drawing.update) {
+				drawing.point[key] = drawing.update[key];
+			}
+		}
+	}
+
+	draw(drawing);
+}
+
 function nextStep() {
 	if (breakPointsIdx > breakPoints.length - 1) {
 		redraw();
@@ -51,26 +76,6 @@ function nextStep() {
 
 	to_draw = breakPoints[breakPointsIdx];
 	breakPointsIdx += 1;
-
-	function action(drawing) {
-		if (typeof drawing.message !== "undefined") {
-			panel.append( '<li>' + drawing.message + '</li>' );
-		}
-		for (idx in drawing.events) {
-			var ev = drawing.events[idx];
-			if (ev == "push") {
-				canvas.permanent_drawings.push(drawing);
-			}
-			if (ev == "pop") {
-				canvas.permanent_drawings.pop();
-			}
-			if (ev == "redraw") {
-				redraw();
-			}
-		}
-
-		draw(drawing);
-	}
 
 	if (false === Array.isArray(to_draw)) {
 		action(to_draw);
@@ -182,8 +187,11 @@ function draw(drawing) {
 		break
 	}
 	case "extension": {
-		var ext = getSegmentY(drawing.point.lower, drawing.point.upper);
-		drawLine(ctx, ext, drawing.colour, 1);
+		var sweep = getSweepX(drawing.point.x);
+		var lowerPoint = intersection(sweep, drawing.point.lower);
+		var upperPoint = intersection(sweep, drawing.point.upper);
+		var ext = getSegmentY(lowerPoint, upperPoint);
+		drawLine(ctx, ext, drawing.colour, drawing.size);
 		break;
 	}
 	default: {
