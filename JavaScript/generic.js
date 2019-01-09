@@ -58,7 +58,7 @@ function action(drawing) {
 		}
 		if (ev == "update") {
 			for (var key in drawing.update) {
-				drawing.point[key] = drawing.update[key];
+				drawing.data[key] = drawing.update[key];
 			}
 		}
 	}
@@ -153,6 +153,7 @@ function getSweepX(x) {
 }
 
 function draw(drawing) {
+	var data = drawing.data;
 	if (typeof drawing.colour == "undefined") {
 		drawing.colour = "black";
 	}
@@ -161,35 +162,34 @@ function draw(drawing) {
 	}
 	switch (drawing.shape) {
 	case "segment": {
-		drawLine(ctx, drawing.segment, drawing.colour, drawing.size);
+		drawLine(ctx, data, drawing.colour, drawing.size);
 		break;
 	}
 	case "point": {
-		drawPoint(ctx, drawing.point, drawing.colour, drawing.size);
+		drawPoint(ctx, data, drawing.colour, drawing.size);
 		break;
 	}
 	case "liter": {
-		drawLiter(ctx, drawing.point, drawing.colour);
+		drawLiter(ctx, data, drawing.colour);
 		break;
 	}
 	case "sweepY": {
-		drawLine(ctx, getSweepY(drawing.point.y), "black", 1);
-		drawPoint(ctx, drawing.point, drawing.colour, drawing.size);
+		drawLine(ctx, getSweepY(data.y), "black", 1);
+		drawPoint(ctx, data, drawing.colour, drawing.size);
 		break;
 	}
 	case "polygon": {
-		drawPolygon(ctx, drawing.points, drawing.colour);
+		drawPolygon(ctx, data, drawing.colour);
 		break
 	}
 	case "trapez": {
-		var points = getPolygon(drawing.trapez);
-		drawPolygon(ctx, points, drawing.colour);
+		drawPolygon(ctx, data.polygon, drawing.colour);
 		break
 	}
 	case "extension": {
-		var sweep = getSweepX(drawing.point.x);
-		var lowerPoint = intersection(sweep, drawing.point.lower);
-		var upperPoint = intersection(sweep, drawing.point.upper);
+		var sweep = getSweepX(data.x);
+		var lowerPoint = intersection(sweep, data.lower);
+		var upperPoint = intersection(sweep, data.upper);
 		var ext = getSegmentY(lowerPoint, upperPoint);
 		drawLine(ctx, ext, drawing.colour, drawing.size);
 		break;

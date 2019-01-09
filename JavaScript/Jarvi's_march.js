@@ -12,10 +12,10 @@ function addPoint(event) {
 
 	var permanents = [{
 		"shape":"point",
-		"point": punct
+		"data": punct
 	}, {
 		"shape":"liter",
-		"point": punct
+		"data": punct
 	}]
 	canvas.permanent_drawings.push.apply(canvas.permanent_drawings, permanents);
 	redraw();
@@ -45,8 +45,8 @@ function run(){
 	// break point
 	to_draw = {
 		"shape": "point",
+		"data": L[0],
 		"colour": "cyan",
-		"point": L[0],
 		"message": "Punctul " + L[0].litera + " e cel mai din dreapta."
 	};
 	breakPoints.push(to_draw)
@@ -59,13 +59,13 @@ function run(){
 		// break point
 		to_draw = [{
 			"shape": "segment",
+			"data": getSegmentY(L[k], S),
 			"colour": "CadetBlue",
-			"segment": getSegmentY(L[k], S),
 			"events": ["push", "redraw"]
 		},{
 			"shape": "point",
+			"data": S,
 			"colour": "cyan",
-			"point": S,
 			"events": ["push", "redraw"],
 			"message": "Punctul " + S.litera + " a fost ales random."
 		}];
@@ -80,8 +80,8 @@ function run(){
 			// break point
 			to_draw = {
 				"shape": "point",
+				"data": pct,
 				"colour": "red",
-				"point": pct,
 				"size": 4,
 				"events": ["redraw"]
 			};
@@ -99,13 +99,13 @@ function run(){
 			// break point
 			to_draw = [{
 				"shape": "segment",
+				"data": getSegmentY(L[k], pct),
 				"colour": "CadetBlue",
-				"segment": getSegmentY(L[k], pct),
 				"events": ["pop", "pop", "push", "redraw"]
 			},{
 				"shape": "point",
+				"data": pct,
 				"colour": "cyan",
-				"point": pct,
 				"events": ["push", "redraw"]
 			}];
 			breakPoints.push(to_draw);
@@ -115,7 +115,7 @@ function run(){
 		// break point
 		to_draw = {
 			"shape": "segment",
-			"segment": getSegmentY(L[k], S),
+			"data": getSegmentY(L[k], S),
 			"events": ["pop", "pop", "push", "redraw"],
 			"message": "Muchia " + L[k].litera + S.litera + " face parte din acoperirea convexa."
 		};

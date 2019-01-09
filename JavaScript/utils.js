@@ -92,27 +92,6 @@ function orientation(p1, p2, p3) {
 		return "stanga";
 }
 
-function getPolygon(tr) {
-	var polygon = [];
-	var leftSweep = getSweepX(tr.leftp.x);
-	var rightSweep = getSweepX(tr.rightp.x);
-	if (tr.leftp.lower === tr.bottom) {
-		polygon.push(intersection(leftSweep, tr.bottom));
-	}
-	polygon.push(tr.leftp);
-	if (tr.leftp.upper === tr.top) {
-		polygon.push(intersection(leftSweep, tr.top));
-	}
-	if (tr.rightp.upper === tr.top) {
-		polygon.push(intersection(rightSweep, tr.top));
-	}
-	polygon.push(tr.rightp);
-	if (tr.rightp.lower === tr.bottom) {
-		polygon.push(intersection(rightSweep, tr.bottom));
-	}
-	return polygon;
-}
-
 function drawPoint(ctx, point, colour, size) {
 	ctx.beginPath();
 	ctx.arc(point.x, point.y, size, 0, 2 * Math.PI);		// un punct este de fapt un cerc plin

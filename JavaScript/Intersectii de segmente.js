@@ -76,14 +76,14 @@ function secondClick(event) {
 	//draw new elements
 	var permanents = [{
 		"shape": "liter",
-		"point": segment.secondPoint
+		"data": segment.secondPoint
 	}, {
 		"shape": "liter",
-		"point": segment.firstPoint
+		"data": segment.firstPoint
 	}, {
 		"shape": "segment",
-		"colour": "DarkCyan",
-		"segment": segment
+		"data": segment,
+		"colour": "DarkCyan"
 	}];
 	canvas.permanent_drawings.push.apply(canvas.permanent_drawings, permanents);
 
@@ -116,7 +116,7 @@ function mouseMove(event) {
 	};
 	var drawing = {
 		"shape": "segment",
-		"segment": getSegmentY(canvas.firstPoint, punct),
+		"data": getSegmentY(canvas.firstPoint, punct),
 		"colour": "CadetBlue"
 	};
 	draw(drawing);
@@ -152,11 +152,11 @@ function findNewEvent(seg1, seg2) {
 
 	drawing = [{
 		"shape": "segment",
-		"segment": seg1,
+		"data": seg1,
 		"colour": "purple"
 	}, {
 		"shape": "segment",
-		"segment": seg2,
+		"data": seg2,
 		"colour": "purple",
 		"message": "Se calculeaza intersectia dintre " + seg1.str() + " si " + seg2.str()
 	}];
@@ -174,12 +174,12 @@ function findNewEvent(seg1, seg2) {
 
 	var drawing = [{
 		"shape": "point",
-		"point": int,
+		"data": int,
 		"events": ["push"],
 		"size": 4
 	}, {
 		"shape": "liter",
-		"point": int,
+		"data": int,
 		"events": ["push"]
 	}];
 	breakPoints.push(drawing);
@@ -196,7 +196,7 @@ function handleEvent(activeSegments, point) {
 		for (var idx in toDelete) {
 			drawing.push({
 				"shape": "segment",
-				"segment": toDelete[idx],
+				"data": toDelete[idx],
 				"colour": "pink"
 			});
 			message += toDelete[idx].str() + " ";
@@ -218,7 +218,7 @@ function handleEvent(activeSegments, point) {
 		for (var idx in toAdd) {
 			drawing.push({
 				"shape": "segment",
-				"segment": toAdd[idx],
+				"data": toAdd[idx],
 				"colour": "chocolate"
 			});
 			message += toAdd[idx].str() + " ";
@@ -247,7 +247,7 @@ function run() {
 			break;
 		var drawing = {
 			"shape": "sweepY",
-			"point": point,
+			"data": point,
 			"colour": "red",
 			"events": ["redraw"]
 		};
