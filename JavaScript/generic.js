@@ -42,6 +42,15 @@ function genericEvent(event) {
 	return punct;
 }
 
+function genericEventReverse(point) {
+    var rect = canvas.getBoundingClientRect();
+	var event = {
+		clientX: Math.floor(point.x + rect.left),
+		clientY: Math.floor(point.y + rect.top)
+	}
+	return event;
+}
+
 function action(drawing) {
 	if (typeof drawing.message !== "undefined") {
 		panel.append( '<li>' + drawing.message + '</li>' );

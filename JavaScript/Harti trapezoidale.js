@@ -589,16 +589,10 @@ function secondClick(event) {
 }
 
 function instantInsert(p1, p2) {
-	var ev1 = {
-		"clientX": p1.x,
-		"clientY": p1.y
-	};
+	var ev1 = genericEventReverse(p1);
 	firstClick(ev1);
 
-	var ev2 = {
-		"clientX": p2.x,
-		"clientY": p2.y
-	};
+	var ev2 = genericEventReverse(p2);
 	secondClick(ev2);
 }
 

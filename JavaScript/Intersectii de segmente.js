@@ -93,16 +93,11 @@ function secondClick(event) {
 function loadSegments() {
 	for (var idx in Intersection) {
 		var segm = Intersection[idx];
-		var ev1 = {
-			"clientX": segm.p1.x,
-			"clientY": segm.p1.y
-		};
+		var ev1 = genericEventReverse(segm.p1);
+		console.log(ev1);
 		firstClick(ev1);
 
-		var ev2 = {
-			"clientX": segm.p2.x,
-			"clientY": segm.p2.y
-		};
+		var ev2 = genericEventReverse(segm.p2);
 		secondClick(ev2);
 	}
 	loadButton.removeEventListener("click", loadSegments);
@@ -110,10 +105,7 @@ function loadSegments() {
 
 function mouseMove(event) {
 	redraw();
-	var punct = {
-		"x": event.clientX - canvas.offsetLeft,
-		"y": event.clientY - canvas.offsetTop
-	};
+	var punct = genericEvent(event);
 	var drawing = {
 		"shape": "segment",
 		"data": getSegmentY(canvas.firstPoint, punct),

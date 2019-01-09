@@ -23,10 +23,7 @@ function addPoint(event) {
 
 function loadPoints() {
 	for (var idx in Jarvis) {
-		var ev = {
-			"clientX": Jarvis[idx].x,
-			"clientY": Jarvis[idx].y
-		}
+		var ev = genericEventReverse(Jarvis[idx]);
 		addPoint(ev);
 	}
 	loadButton.removeEventListener("click", loadPoints);
