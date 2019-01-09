@@ -1,40 +1,44 @@
 <html>
 	<head>
-	
+
 		<title> Triangularea unui poligon y-monoton </title>
-		
+
 		<meta charset="UTF-8">
-	
+
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		
+		<script src="JavaScript/Triangulare poligoane y-monotone.js"></script>
+
 		<link rel="stylesheet" type="text/css" href="CSS/Triangulare poligoane y-monotone.css">
-		
+		<link rel="stylesheet" type="text/css" href="CSS/generic.css">
+
 	</head>
-	
+
 <body onload="drawGrid()">
 
-<script src="JavaScript/Triangulare poligoane y-monotone.js"></script>
 
 
 
-<div id="Titlu">
-		<h3> <b> Triangularea unui poligon y-monoton </b></h3>
-</div>
+
+	<center>
+	   <div id="TitluMare">
+			<h1><a href="Home.html"> Geometrie Computațională </a></h1>
+	   </div>
+	</center>
 
 
-
+<div id="content">
 <div id="canvas1">
 
-	<canvas id = "myCanvas" width = "500" height = "500"> 
+	<canvas id = "myCanvas" width = "500" height = "500">
 	Your browser does not support the canvas element.
-	</canvas>  
+	</canvas>
 
 	<div id="butoane">
 		<button class="buton" onclick="deseneaza_linii()">Deseneaza linii</button>
 		<button class="buton" onclick="arata_triangulare()">Arata triangularea</button>
-	</div>  
-	
-		
+	</div>
+
+
  <p id="stare_canvas1" style="position:fixed; margin-left: 15%; margin-top: -3.5%; border: 2px solid; visibility: hidden; padding: 2px;"></p>
 
 </div>
@@ -42,13 +46,13 @@
 
 <div id="canvas2">
 
-    <canvas id = "myCanvas2" width = "500" height = "500"> 
+    <canvas id = "myCanvas2" width = "500" height = "500">
 	Your browser does not support the canvas element.
-	</canvas>  
+	</canvas>
 
 	<p style="position:fixed; margin-left: 10%; margin-top: -3.5%;"> Xcoord:</p> <input id="Xcoord" type="number" style="position:fixed; margin-left: 15%; margin-top: -3.5%; border: 2px solid; padding: 2px;"></p>
 	<p style="position:fixed; margin-left: 30%; margin-top: -3.5%;"> Ycoord:</p> <input id="Ycoord" type="number" style="position:fixed; margin-left: 35%; margin-top: -3.5%; border: 2px solid; padding: 2px;"></p>
-	<button onclick="adauga()" style="position:fixed; margin-left: 50%; margin-top: -3.5%;">Adaugă</button> 
+	<button onclick="adauga()" style="position:fixed; margin-left: 50%; margin-top: -3.5%;">Adaugă</button>
 </div>
 
 
@@ -58,6 +62,6 @@ function myFunction() {
     location.reload();
 }
 </script> -->
-
+</div>
 </body>
 </html>

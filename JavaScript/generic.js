@@ -34,9 +34,10 @@ function addPointToCanvas(point) {
 }
 
 function genericEvent(event) {
+    var rect = canvas.getBoundingClientRect();
 	var punct = {
-		"x": event.clientX - canvas.offsetLeft,
-		"y": event.clientY - canvas.offsetTop
+		"x": Math.floor(event.clientX - rect.left),
+		"y": Math.floor(event.clientY - rect.top)
 	};
 	return punct;
 }

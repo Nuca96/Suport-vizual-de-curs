@@ -1,101 +1,81 @@
 <html>
 	<head>
-	
+
 		<title>Graham's Scan Descriere</title>
-		
+
 		<meta charset="UTF-8">
-	
+
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		
+
 		<link rel="stylesheet" type="text/css" href="CSS/Graham's Scan Descriere.css">
-		
-		
+		<link rel="stylesheet" type="text/css" href="CSS/generic.css">
+
+
+
 	</head>
-	
+
 <body>
 
 	<center>
 	   <div id="TitluMare">
-			<h1> Geometrie Computațională </h1>
+			<h1><a href="Home.html"> Geometrie Computațională </a></h1>
 	   </div>
 	</center>
-	
-	
-<center>
-	<div id="header">
-	
-	    <a href="Home.html"><b> Home </b></a>
-	
-		<div class="dropdown">
-			<button class="dropbtn"><b>Algoritmi</b></button>
-			<div class="dropdown-content"> 
-				<a href="Graham's Scan Descriere.html" target="_self">Graham's Scan</a>
-				<a href="Triangulare Poligoane y-monotone Descriere.html" target="_self">Triangulare Poligoane y-monotone</a>
-			    <a href="PlanPrimal_PlanDual.html" target="_blank">Plan primal/Plan dual</a>
-				<a href="Diagrama Voronoi.html" target="_blank">Diagrama Voronoi</a>
-			</div>
-		</div>
-		
-		<a href="http://gta.math.unibuc.ro/stup/geom_comp.pdf" target="_blank"><b> Curs </b></a>
-		<a href="http://gta.math.unibuc.ro/stup/geom_comp.html#evaluare" target="_blank"><b> Evaluare </b></a>
-		<a href="http://gta.math.unibuc.ro/stup/geom_comp.html#prezentare" target="_blank"><b> Site </b></a>
-	
-	</div>
-</center>
 
-<div class="HomePage">	
-	
+<div id="content">
+<div class="HomePage">
+
 <div id ="wall">
 	<div class="HomePage">
-	
+
 	<center>
 		<p class = "subliniat">
-			<b style = "font-size: 160%;">“Graham’s Scan” – Varianta Andrew </b> 
+			<b style = "font-size: 160%;">“Graham’s Scan” – Varianta Andrew </b>
 						</br>
 						</br>
 		</p>
 	</center>
-		
+
 		<p class = "subliniat">
 			<b> Prezentarea in pseudocod a algoritmului : </b>
 						</br>
 					    </br>
 		</p>
-		
+
 <p> <b>Input:</b>  O mulțime de puncte P din R^2. </p>
 <p> <b>Output:</b> O lista L care conține vârfurile ce determină frontiera acoperirii convexe </p>
 <p> <b>Pași:</b> </p>
 <p>                  <b>1. Sortarea punctelor lexicografic</b>, după coordonata x (în caz că două puncte au aceeasi coordonată x, sortarea se face după coordonata y).</p>
-	  
+
 <p style="margin-left:2%"> Se obtine o listă de puncte <b>P = (P_1, P_n)</b>  </p>
-		
+
                  <p> <b>2. Se inițializează o listă nouă</b>, care la final va conține frontiera <b>inferioara</b> a acoperirii convexe, </p>
 <p style="margin-left:2%"> cu primele două elemente din lista sortată de puncte : <b>L_inf = (P_1, P_2 )</b> </p>
-	  
+
                  <p> <b>3. for</b> i ←  <b>3</b> to <b>n</b> </p>
 
 <p style="margin-left:5%"> <b>4. do</b> adaugă P_i la sfarșitul lui <b>L_inf</b> </p>
 
 <p style="margin-left:5%"> <b>5. while  L_inf</b> are mai mult de două puncte <b>and</b> ultimele trei determină un viraj la stânga </p>
-				 
+
          <p style="margin-left:10%"><b>6. do</b> șterge penultimul punct </p>
 
                   <p> <b>7. Se inițializează o listă nouă</b>, care la final va conține frontiera <b>superioara</b> a acoperirii convexe, </p>
  <p style="margin-left:2%"> cu primele două elemente din lista sortată de puncte, citită de la dreapta la stânga : <b>L_sup = (P_n, P_(n-1))</b> </p>
-	 
+
                   <p> <b>8. for</b> i ←  <b>n-2</b> to <b>0</b> </p>
 
                        <p> <b>9. do</b> adaugă P_i la sfarșitul lui <b>L_sup</b> </p>
 
 <p style="margin-left:5%"> <b>10. while  L_sup</b>  are mai mult de două puncte <b>and</b> ultimele trei determină un viraj la stânga </p>
-				 
+
         <p style="margin-left:10%"> <b>11. do</b> șterge penultimul punct </p>
 
                        <p> <b>12.</b> Se șterg primul si ultimul element din lista cu frontiera superioaraă, <b>L_sup</b>, pentru a nu aparea dubluri atunci când le concatenăm .</p>
-   
+
                        <p> <b>13. P = L_inf concatenat cu L_sup .</b> </p>
 	</div>
-	
+
 	<div style = "display: inline;">
 <p>
 	<b>	Aici puteti vedea prezentarea grafica a functionarii algoritmului: </b>
@@ -118,7 +98,8 @@ function myFunction() {
 </br>
 </br>
 </br>
-	
+
+</div>
 </div>
 </body>
 </html>

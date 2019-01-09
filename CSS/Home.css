@@ -1,55 +1,7 @@
-body
-	{ 
-		background-image: url("../Images/Geometrie.jpg");
-		background-repeat: repeat;
-		background-position: center;
-		background-attachment: fixed;
-	}
-	
-#TitluMare 
-		  {
-			font-size: 120%;
-			width: 60%;
-			color: white;
-			background-color: #003366;
-			letter-spacing: 3px; 
-			font-family: Comic Sans MS, Helvetica, sans-serif;
-		  }
-	 	   
-#header 
-	   {
-			font-size: 120%;
-			margin-top: 5px;
-			background-color:white;
-			color:black;
-			text-align:center;
-			padding:5px;
-			width: 850px;
-			height: 40px;
-			border: 3px solid #003366;
-			word-spacing: 130px; 
-			font-family: Comic Sans MS, Helvetica, sans-serif;
-	   }
-
-	   
-#header a  
-		 {  
-			text-decoration: none;
-			color: #003366; 
-			font-family: Comic Sans MS, Helvetica, sans-serif;
-		 }
-
-		 
-#header a:hover   
-			   {	
-					color:  #003366;
-				    font-family: Book Antiqua;
-			   }
-
-.dropbtn 
+.dropbtn
 		{
-			background-color: white; 
-			color: #003366; 
+			background-color: white;
+			color: #003366;
 			padding: 1px;
 			border: none;
 			cursor: pointer;
@@ -57,13 +9,13 @@ body
 			font-family: Comic Sans MS, Helvetica, sans-serif;
 		}
 
-.dropdown 
+.dropdown
 		 {
 			position: relative;
 			display: inline-block;
 		 }
 
-.dropdown-content 
+.dropdown-content
 				 {
 					display: none;
 					position: absolute;
@@ -74,64 +26,83 @@ body
 					font-family: Comic Sans MS, Helvetica, sans-serif;
 				 }
 
-.dropdown-content a 
+.dropdown-content a
 					{
 						color: black;
 						padding: 12px 16px;
 						text-decoration: none;
 						display: block;
 						word-spacing: 3px;
-						
+
 					}
 
 .dropdown-content a:hover {	background-color: #cce0ff	}
 
 .dropdown:hover .dropdown-content {	display: block;	}
 
-.dropdown:hover .dropbtn {	background-color: #99c2ff;	} 
+.dropdown:hover .dropbtn {	background-color: #99c2ff;	}
 
-#wall 
-	 {  
-		border: 3px ;
-	    border-style: solid;
-		border-color: #003366;
-		margin-top: 3%;
-		margin-bottom: 5%;
-		margin-right: 7%;
-		margin-left: 7%;
-		background-color: white;
-		padding:20px;
-     }
+
+
+#header
+	   {
+			font-size: 120%;
+			margin-top: 5px;
+			background-color:white;
+			color:black;
+			text-align:center;
+			padding:5px;
+			width: 850px;
+			height: 40px;
+			border: 3px solid #003366;
+			word-spacing: 130px;
+			font-family: Comic Sans MS, Helvetica, sans-serif;
+	   }
+
+
+#header a
+		 {
+			text-decoration: none;
+			color: #003366;
+			font-family: Comic Sans MS, Helvetica, sans-serif;
+		 }
+
+
+#header a:hover
+   {
+		color:  #003366;
+	    font-family: Book Antiqua;
+   }
 
 .HomePage
-		 { 
+		 {
 			padding:2px;
 			text-align:justify;
 		 }
 
-		 
-.HomePage p 
+
+.HomePage p
 		   {
 				text-indent: 50px;
 				color: #003366;
 				font-family: Arial, Helvetica, sans-serif;
 				font-size:120%;
-		   }	
+		   }
 
 .subliniat
           {
 			  text-decoration: underline;
-		  }			  
-		   
-@media screen and (max-width: 800px) 
-{	
-	 #TitluMare 
+		  }
+
+@media screen and (max-width: 800px)
+{
+	 #TitluMare
 			   {
 					font-size: 60%;
 					width: 65%;
 					color: white;
 					background-color: #003366;
-					letter-spacing: 3px; 
+					letter-spacing: 3px;
 					font-family: Comic Sans MS, Helvetica, sans-serif;
 			   }
 
@@ -140,9 +111,9 @@ body
 				  font-size: 80%;
 				  width: 360px;
 				  font-family: Book Antiqua;
-				  word-spacing: 30px; 
-			  } 
-    
+				  word-spacing: 30px;
+			  }
+
 	   #wall
 			{
 				width: 360px;
@@ -155,14 +126,14 @@ body
 				margin-left: 8%;
 				background-color: white;
 				padding:20px;
-			} 
-			
-.HomePage p 
+			}
+
+.HomePage p
 		   {
 				text-indent: 50px;
 				color: #003366;
 				font-family: Arial, Helvetica, sans-serif;
 				font-size:80%;
-		   }	
-	
+		   }
+
 }

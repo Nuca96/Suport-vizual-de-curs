@@ -1,0 +1,39 @@
+body
+{
+	background-image: url("../Images/Geometrie.jpg");
+	background-repeat: repeat;
+	background-position: center;
+	background-attachment: fixed;
+}
+
+a {
+	color: white;
+	text-decoration: none;
+}
+
+a:hover {
+	color: black;
+}
+
+#TitluMare
+{
+	font-size: 120%;
+	width: 60%;
+	color: white;
+	background-color: #003366;
+	letter-spacing: 3px;
+	font-family: Comic Sans MS, Helvetica, sans-serif;
+}
+
+#content
+{
+	border: 3px ;
+	border-style: solid;
+	border-color: #003366;
+	margin-top: 3%;
+	margin-bottom: 5%;
+	margin-right: 7%;
+	margin-left: 7%;
+	background-color: white;
+	padding:20px;
+}
