@@ -91,10 +91,10 @@ function secondClick(event) {
 }
 
 function loadSegments() {
+	loadButton.style.visibility = "hidden";
 	for (var idx in Intersection) {
 		var segm = Intersection[idx];
 		var ev1 = genericEventReverse(segm.p1);
-		console.log(ev1);
 		firstClick(ev1);
 
 		var ev2 = genericEventReverse(segm.p2);

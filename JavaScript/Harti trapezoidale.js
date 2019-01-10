@@ -597,6 +597,7 @@ function instantInsert(p1, p2) {
 }
 
 function loadSegments() {
+	loadButton.style.visibility = "hidden";
 	for (var idx in TrapezMap) {
 		var segm =TrapezMap[idx];
 		instantInsert(segm.p1, segm.p2);

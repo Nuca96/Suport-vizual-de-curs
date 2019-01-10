@@ -19,28 +19,41 @@
   </center>
 
   <div id="content">
+  <div id="Titlu">
+      <h3> <b> Jarvi's march </b></h3>
+  </div>
+
+  <p style="color: #003366;"> Adaugati punctele. </p>
+  <div class="row">
+  <div class="column" id="left">
   <canvas id = "myCanvas" width = "500" height = "500" style = "border:1px solid #000000; cursor:crosshair" >
     Your browser does not support the canvas element.
   </canvas>
   <br>
-  <button id="loadButton">Incarca puncte</button>
-  <button id="startButton">Start</button>
-  <button onclick="reset()">Reset</button>
+  <button class="buton" onclick="reset()">Reset</button>
+  <button class="buton" id="loadButton">Incarca puncte</button>
   <br>
+  <br>
+  <button class="buton" id="startButton">Start</button>
+  <button class="buton" id="runButton">Run</button>
   Speed:
   <select id="speedSelector">
-	  <option value="1">1</option>
-	  <option value="2">2</option>
-	  <option value="3">3</option>
-	  <option value="4">4</option>
-	</select>
-  <button id="runButton">Run</button>
+    <option value="0">Instant</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+  </select>
   <br><br>
 <!--   <button id="prev">Prev</button> -->
 <!-- <button id="nextButton">Next</button> -->
   <div id="message"></div>
-  <ol id="panel"> </ol>
-  <ul id="pointList"> </ul>
+</div>
+<div class="column" id="right">
+  <div id="flip">Click pentru a vedea pașii efectuați de algoritm. </div>
+  <div id="panel"> <ol id="messList"> </ol> </div>
 
  </div>
+<div id="errorMessage" style="display:none"> Dimensiunea ferestrei este prea mica.</div>
+</div>
 </body>

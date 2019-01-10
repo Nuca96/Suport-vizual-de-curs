@@ -8,8 +8,6 @@ function addPoint(event) {
 	var punct = genericEvent(event);
 	addPointToCanvas(punct);
 
-	pointList.append("<li>" + punct.litera + " (" + punct.x + ", " + punct.y + ")</li>");
-
 	var permanents = [{
 		"shape":"point",
 		"data": punct
@@ -22,6 +20,7 @@ function addPoint(event) {
 }
 
 function loadPoints() {
+	loadButton.style.visibility = "hidden";
 	for (var idx in Jarvis) {
 		var ev = genericEventReverse(Jarvis[idx]);
 		addPoint(ev);

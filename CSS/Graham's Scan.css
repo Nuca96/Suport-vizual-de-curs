@@ -1,46 +1,5 @@
-#Titlu
-	  {
-		margin-left: 12%;
-		color: #003366;
-		text-decoration: underline;
-		letter-spacing: 2px; 
-		font-family: Comic Sans MS, Helvetica, sans-serif;
-	  }
-	  
-.buton
-      {
-		 background-color: #003366;
-		 border: none;
-		 color: white;
-		 text-align: center;
-		 text-decoration: none;
-		 display: inline-block;
-         font-size: 16px;
-      }
-	  
-#panel, #flip 
-	  {
-		 padding: 5px;
-		 text-align: center;
-		 background-color: #003366;
-		 color: white;
-		 border: solid 3px #003366;
-		 position: relative;
-		 top: -665px;
-		 left: 600px;
-		 width: 400px;
-	  }
-
-#panel{
-		 
-		 display: none;
-		 width: 400px;
-		 background-color: white;
-		 color: #003366;
-	  }
-	  
 #legenda1{
-		
+
 		 border: 1px solid black;
 		 position: absolute;
 		 top: 700px;
@@ -48,11 +7,11 @@
 		 width: 10px;
 		 height: 10px;
 		 background-color: #FF0000;
-			
+
 		}
-			  
+
 #legenda2{
-		
+
 		 border: 1px solid black;
 		 position: absolute;
 		 top: 700px;
@@ -60,11 +19,11 @@
 		 width: 10px;
 		 height: 10px;
 		 background-color: #000099;
-			
+
 		}
-			  
+
 #legenda3{
-		
+
 		 border: 1px solid black;
 		 position: absolute;
 		 top: 790px;
@@ -72,11 +31,11 @@
 		 width: 10px;
 		 height: 10px;
 		 background-color: #f213f2;
-			
+
 		}
-			  
+
 #legenda4{
-		
+
 		 border: 1px solid  black;
 		 position: absolute;
 		 top: 790px;
@@ -84,10 +43,10 @@
 		 width: 10px;
 		 height: 10px;
 		 background-color: #00ff00;
-			
+
 		}
-		
-	#p1{    
+
+	#p1{
 		 position: absolute;
 		 top: 670px;
 		 left: 60px;
@@ -95,8 +54,8 @@
 		 height: 10px;
 	     color: #003366;
 		}
-			  
-	#p2{     
+
+	#p2{
 		 position: absolute;
 		 top: 670px;
 		 left: 330px;
@@ -104,7 +63,7 @@
 		 height: 10px;
 		 color: #003366;
 		}
-			  
+
 	#p3{
 		 position: absolute;
 		 top: 750px;
@@ -113,8 +72,8 @@
 		 height: 10px;
 		 color: #003366;
 		}
-			  
-	#p4{ 
+
+	#p4{
 		 position: absolute;
 		 top: 750px;
 		 left: 330px;

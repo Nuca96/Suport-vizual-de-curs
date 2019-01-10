@@ -7,7 +7,11 @@ function load() {
 	this.loadButton = document.getElementById("loadButton");
 	this.runButton = document.getElementById("runButton");
 	this.speedSelector = document.getElementById("speedSelector");
-	this.panel = $("#panel");
+
+    $("#flip").click(function(){
+        $("#panel").slideToggle("slow");
+    });
+	this.messList = $("#messList");
 	this.pointList = $("#pointList");
 	this.ctx = canvas.getContext("2d");
 	this.breakPointsIdx = null;
@@ -17,7 +21,13 @@ function load() {
 function genericInit() {
 	startButton.addEventListener("click", startAlgorithm);
 	runButton.addEventListener("click", autorun);
-	$('#panel').empty();
+
+	loadButton.style.visibility = "visible";
+	startButton.style.visibility = "visible";
+	speedSelector.style.visibility = "visible";
+	runButton.style.visibility = "visible";
+
+	$('#messList').empty();
 	$('#pointList').empty();
 	canvas.permanent_drawings = [];
 	this.breakPoints = [];
@@ -53,7 +63,7 @@ function genericEventReverse(point) {
 
 function action(drawing) {
 	if (typeof drawing.message !== "undefined") {
-		panel.append( '<li>' + drawing.message + '</li>' );
+		messList.append( '<li>' + drawing.message + '</li>' );
 	}
 	for (idx in drawing.events) {
 		var ev = drawing.events[idx];
@@ -100,6 +110,8 @@ function nextStep() {
 function startAlgorithm() {
 	if (null === firstPart())
 		return null;
+	loadButton.style.visibility = "hidden";
+	runButton.style.visibility = "hidden";
 
 	startButton.addEventListener("click", nextStep);
 	startButton.innerText = "Next";
@@ -110,6 +122,9 @@ function startAlgorithm() {
 function autorun() {
 	if (!firstPart())
 		return null;
+	loadButton.style.visibility = "hidden";
+	startButton.style.visibility = "hidden";
+	runButton.style.visibility = "hidden";
 	var speed = speedMap[speedSelector.value];
 
 	function timer() {
