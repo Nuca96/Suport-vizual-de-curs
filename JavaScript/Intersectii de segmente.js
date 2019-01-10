@@ -263,8 +263,8 @@ function firstPart() {
 	}
 	canvas.removeEventListener("click", firstClick);
 	startButton.removeEventListener("click", startAlgorithm);
-	runButton.removeEventListener("click", autorun);
 	loadButton.removeEventListener("click", loadSegments);
+	runButton.style.visibility = "hidden";
 
 	breakPointsIdx = 0;
 	return true;

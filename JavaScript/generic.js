@@ -12,7 +12,6 @@ function load() {
         $("#panel").slideToggle("slow");
     });
 	this.messList = $("#messList");
-	this.pointList = $("#pointList");
 	this.ctx = canvas.getContext("2d");
 	this.breakPointsIdx = null;
 	init();
@@ -28,7 +27,6 @@ function genericInit() {
 	runButton.style.visibility = "visible";
 
 	$('#messList').empty();
-	$('#pointList').empty();
 	canvas.permanent_drawings = [];
 	this.breakPoints = [];
 	canvas.points = [];
@@ -124,7 +122,6 @@ function autorun() {
 		return null;
 	loadButton.style.visibility = "hidden";
 	startButton.style.visibility = "hidden";
-	runButton.style.visibility = "hidden";
 	var speed = speedMap[speedSelector.value];
 
 	function timer() {

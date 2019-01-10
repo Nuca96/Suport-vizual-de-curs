@@ -668,8 +668,8 @@ function firstPart() {
 	}
 	canvas.removeEventListener("click", firstClick);
 	startButton.removeEventListener("click", startAlgorithm);
-	runButton.removeEventListener("click", autorun);
 	loadButton.removeEventListener("click", loadSegments);
+	$('#messList').empty();
 
 	canvas.addEventListener("click", find);
 

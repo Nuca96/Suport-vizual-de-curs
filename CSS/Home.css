@@ -6,7 +6,6 @@
 			border: none;
 			cursor: pointer;
 			font-size: 80%;
-			font-family: Comic Sans MS, Helvetica, sans-serif;
 		}
 
 .dropdown
@@ -23,7 +22,6 @@
 					min-width: 180px;
 					box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 					font-size: 70%;
-					font-family: Comic Sans MS, Helvetica, sans-serif;
 				 }
 
 .dropdown-content a
@@ -56,7 +54,6 @@
 			height: 40px;
 			border: 3px solid #003366;
 			word-spacing: 130px;
-			font-family: Comic Sans MS, Helvetica, sans-serif;
 	   }
 
 
@@ -64,14 +61,12 @@
 		 {
 			text-decoration: none;
 			color: #003366;
-			font-family: Comic Sans MS, Helvetica, sans-serif;
 		 }
 
 
 #header a:hover
    {
 		color:  #003366;
-	    font-family: Book Antiqua;
    }
 
 .HomePage
@@ -85,7 +80,6 @@
 		   {
 				text-indent: 50px;
 				color: #003366;
-				font-family: Arial, Helvetica, sans-serif;
 				font-size:120%;
 		   }
 
@@ -103,14 +97,12 @@
 					color: white;
 					background-color: #003366;
 					letter-spacing: 3px;
-					font-family: Comic Sans MS, Helvetica, sans-serif;
 			   }
 
 	  #header
 			  {
 				  font-size: 80%;
 				  width: 360px;
-				  font-family: Book Antiqua;
 				  word-spacing: 30px;
 			  }
 
@@ -132,7 +124,6 @@
 		   {
 				text-indent: 50px;
 				color: #003366;
-				font-family: Arial, Helvetica, sans-serif;
 				font-size:80%;
 		   }
 

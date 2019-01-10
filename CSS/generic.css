@@ -4,6 +4,7 @@ body
 	background-repeat: repeat;
 	background-position: center;
 	background-attachment: fixed;
+	font-family: Comic Sans MS, Helvetica, sans-serif;
 }
 
 a {
@@ -14,6 +15,15 @@ a {
 a:hover {
 	color: black;
 }
+button {
+	font-family: inherit;
+}
+select {
+	font-family: inherit;
+}
+ol {
+	font-family: "Times New Roman", Times, serif;
+}
 
 #TitluMare
 {
@@ -22,7 +32,6 @@ a:hover {
 	color: white;
 	background-color: #003366;
 	letter-spacing: 3px;
-	font-family: Comic Sans MS, Helvetica, sans-serif;
 }
 
 #content
@@ -37,7 +46,6 @@ a:hover {
 	background-color: white;
 	padding:20px;
 }
-
 .buton
 {
 	background-color: #003366;
@@ -56,7 +64,6 @@ a:hover {
 	color: #003366;
 	text-decoration: underline;
 	letter-spacing: 2px;
-	font-family: Comic Sans MS, Helvetica, sans-serif;
 }
 
 #panel, #flip

@@ -134,6 +134,7 @@ function firstPart() {
 		message.innerText = "at least 2 points";
 		return null;
 	}
+	runButton.style.visibility = "hidden";
 
 	startButton.removeEventListener("click", startAlgorithm);
 	canvas.removeEventListener("click", addPoint);
