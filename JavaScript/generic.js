@@ -33,6 +33,16 @@ function genericInit() {
 	canvas.liter = 'A';
 }
 
+function getNearPoint(point) {
+	for (var idx in canvas.points) {
+		if (areNear(canvas.points[idx], point)) {
+			return canvas.points[idx];
+		}
+	}
+	return point;
+}
+
+
 function addPointToCanvas(point) {
 	// point.litera = "P" + canvas.points.length;
 	point.litera = canvas.liter;
@@ -44,10 +54,10 @@ function addPointToCanvas(point) {
 function genericEvent(event) {
     var rect = canvas.getBoundingClientRect();
 	var punct = {
-		"x": Math.floor(event.clientX - rect.left),
-		"y": Math.floor(event.clientY - rect.top)
+		"x": event.clientX - rect.left,
+		"y": event.clientY - rect.top
 	};
-	return punct;
+	return getNearPoint(punct);
 }
 
 function genericEventReverse(point) {

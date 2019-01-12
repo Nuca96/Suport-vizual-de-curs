@@ -1,3 +1,5 @@
+var near = 10;
+
 function nextChar(c) {
     return String.fromCharCode(c.charCodeAt(0) + 1);
 }
@@ -197,12 +199,17 @@ function compareSegmentsX(s1, s2) {
 }
 
 function between(point, seg) {
+	if (areNear(point, seg.firstPoint) ||
+		areNear(point, seg.secondPoint)) {
+		return true;
+	}
 	var leftX = seg.firstPoint.x;
 	var rightX = seg.secondPoint.x;
 	if (leftX > rightX) {
 		leftX = rightX;
 		rightX = seg.firstPoint.x;
 	}
+
 	if (point.x < leftX || rightX < point.x)
 		return false;
 
@@ -216,6 +223,10 @@ function between(point, seg) {
 		return false;
 
 	return true;
+}
+
+function areNear(p1, p2) {
+	return pointDistance(p1, p2) < near;
 }
 
 function ecuatia_dreptei(segm) {
@@ -248,8 +259,8 @@ function intersection(seg1, seg2) {
 	var y = - determinant2(matrice) / delta;
 
 	return {
-		"x": Math.floor(x),
-		"y": Math.floor(y)
+		"x": x,
+		"y": y
 	}
 }
 

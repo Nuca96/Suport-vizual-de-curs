@@ -461,21 +461,9 @@ function init() {
 	D.init();
 }
 
-near = 10;
-
-function getNearPoint(event) {
-	var point = genericEvent(event);
-
-	for (var idx in canvas.points) {
-		if (pointDistance(canvas.points[idx], point) < near){
-			return canvas.points[idx];
-		}
-	}
-	return point;
-}
 
 function firstClick(event) {
-	var punct = getNearPoint(event);
+	var punct = genericEvent(event);
 	if (!pointOk(punct)) {
 		return;
 	}
@@ -562,7 +550,7 @@ function addPoint(point) {
 }
 
 function secondClick(event) {
-	var punct = getNearPoint(event);
+	var punct = genericEvent(event);
 	if (!pointOk(punct)) {
 		return;
 	}
@@ -608,7 +596,7 @@ function loadSegments() {
 function mouseMove(event) {
 	redraw();
 
-	var punct = getNearPoint(event);
+	var punct = genericEvent(event);
 	if (!pointOk(punct)) {
 		return;
 	}
