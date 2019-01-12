@@ -12,6 +12,9 @@ segmentsStructure.prototype.rightNeigh = function(point) {
 	}
 	return null;
 }
+segmentsStructure.prototype.SRD = function() {
+	return this.segmente.map(x => x.str());
+}
 
 segmentsStructure.prototype.leftNeigh = function(point) {
 	var neigh = null;
@@ -29,25 +32,35 @@ segmentsStructure.prototype.delete = function(segm) {
 	this.segmente.splice(idx, 1);
 }
 
-segmentsStructure.prototype.insert = function(segm, point) {
+segmentsStructure.prototype.insert = function(segm) {
 	var array = this.segmente;
 	for (var idx=0; idx<array.length; idx++) {
-		if (this.compareSS(array[idx], segm, point) > 0){
+		if (this.compareSS(array[idx], segm) > 0){
 			break;
 		}
 	}
 	array.splice(idx, 0, segm);
 }
 
-function compareSS(segm1, segm2, point) {
-	// pentru a fi mai precisa, ordonarea se face dupa punctul de intersectie
-	// al dreptei de baleiere cu un pixel mai jos decat se afla acum
+var globalPoint;
 
-	// ^^^ nu stiu daca mai e corect
-	var int1 = intersection(segm1, getSweepY(point.y + 1));
-	var int2 = intersection(segm2, getSweepY(point.y + 1));
-	var comp = comparePointsX(int1, int2);
+function compareSS(segm1, segm2, purpose) {
+	function compfct(y) {
+		var int1 = intersection(segm1, getSweepY(y));
+		var int2 = intersection(segm2, getSweepY(y));
+		return comparePointsX(int1, int2);
+	}
 
+	var comp = compfct(globalPoint.y);
+	if (comp != 0) {
+		return comp;
+	}
+	if (purpose === "insert") {
+		comp = compfct(globalPoint.y + 5);
+	}
+	if (purpose === "delete") {
+		comp = compfct(globalPoint.y - 5);
+	}
 	if (comp != 0) {
 		return comp;
 	}
@@ -55,7 +68,8 @@ function compareSS(segm1, segm2, point) {
 	return comparePointsX(segm1.secondPoint, segm2.secondPoint);
 }
 
-function compareSP(segm, point) {
+function compareSP(segm) {
+	point = globalPoint;
 	var int = intersection(segm, getSweepY(point.y));
 	if (areNear(point, int)) {
 		return 0;
@@ -241,9 +255,8 @@ function findNewEvent(seg1, seg2) {
 	return point;
 }
 
-function deleteSegmentsFromTree(activeSegments, point) {
+function deleteSegmentsFromTree(activeSegments, toDelete) {
 	// se sterg segmentele din arbore
-	var toDelete = point.L.concat(point.C);
 	if (toDelete.length == 0) {
 		return;
 	}
@@ -264,9 +277,8 @@ function deleteSegmentsFromTree(activeSegments, point) {
 	breakPoints.push(drawing);
 }
 
-function insertSegmentsIntoTree(activeSegments, point) {
+function insertSegmentsIntoTree(activeSegments, toAdd) {
 	// se adauga segmente in arbore
-	var toAdd = point.U.concat(point.C);
 	if (toAdd.length == 0) {
 		return;
 	}
@@ -281,7 +293,7 @@ function insertSegmentsIntoTree(activeSegments, point) {
 			"colour": "chocolate"
 		});
 		message += segm.str() + " ";
-		activeSegments.insert(segm, point);
+		activeSegments.insert(segm);
 	}
 	drawing[0].message = message;
 	breakPoints.push(drawing);
@@ -289,25 +301,29 @@ function insertSegmentsIntoTree(activeSegments, point) {
 
 
 function handleEvent(activeSegments, point) {
-	if (point.U.concat(point.C).concat(point.L).length > 1) {
+	globalPoint = point;
+	var toAdd = point.U.concat(point.C);
+	var toDelete = point.L.concat(point.C);
+	if (toAdd.concat(point.L).length > 1) {
 		canvas.eventPoints.addIntersection(point);
 	}
-	deleteSegmentsFromTree(activeSegments, point);
-	insertSegmentsIntoTree(activeSegments, point);
+	deleteSegmentsFromTree(activeSegments, toDelete);
+	insertSegmentsIntoTree(activeSegments, toAdd);
 
 	// se determina noi evenimente
 	var leftNeigh = activeSegments.leftNeigh(point);
 	var rightNeigh = activeSegments.rightNeigh(point);
-	var inserted = point.U.concat(point.C);
-	if (inserted.length == 0) {
+	console.log(point.litera, activeSegments.SRD());
+
+	if (toAdd.length == 0) {
 		findNewEvent(leftNeigh, rightNeigh);
 		return;
 	}
 
-	var leftMost = inserted[0];
-	var rightMost = inserted[0];
-	for (var idx in inserted) {
-		var segm = inserted[idx];
+	var leftMost = toAdd[0];
+	var rightMost = toAdd[0];
+	for (var idx in toAdd) {
+		var segm = toAdd[idx];
 		if (compareSS(rightMost, segm, point) < 0) {
 			rightMost = segm;
 		}
@@ -320,7 +336,8 @@ function handleEvent(activeSegments, point) {
 }
 
 function run() {
-	var activeSegments = new segmentsStructure(compareSS, compareSP);
+	var activeSegments = new AvlTree(compareSS, compareSP);
+	// var activeSegments = new segmentsStructure(compareSS, compareSP);
 
 	while(true) {
 		var point = canvas.eventPoints.next();
@@ -335,7 +352,8 @@ function run() {
 		};
 		breakPoints.push(drawing)
 
-		handleEvent(activeSegments, point);	}
+		handleEvent(activeSegments, point);
+	}
 	return true;
 }
 

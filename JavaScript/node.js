@@ -85,5 +85,3 @@ Node.prototype.rightHeight = function () {
   }
   return this.right.height;
 };
-
-module.exports = Node;

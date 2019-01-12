@@ -12,14 +12,43 @@
  *
  * @param {function} customCompare An optional custom compare function.
  */
-var AvlTree = function (customCompare) {
+var AvlTree = function (customCompare, secondCompare) {
   this._root = null;
   this._size = 0;
 
   if (customCompare) {
     this._compare = customCompare;
   }
+  if (secondCompare) {
+    this._compareSP = secondCompare;
+  }
 };
+
+AvlTree.prototype.rightNeigh = function(point) {
+  var keys = this._SRD(this._root);
+  for (var idx in keys) {
+    if (this._compareSP(keys[idx], point) > 0) {
+      return keys[idx];
+    }
+  }
+  return null;
+}
+
+AvlTree.prototype.leftNeigh = function(point) {
+  var keys = this._SRD(this._root);
+  var neigh = null;
+  for (var idx in keys) {
+    if (this._compareSP(keys[idx], point) >= 0) {
+      break;
+    }
+    neigh = keys[idx];
+  }
+  return neigh;
+}
+
+AvlTree.prototype.SRD = function(){
+  return this._SRD(this._root).map(x => x.str());
+}
 
 /**
  * Compares two keys with each other.
@@ -46,6 +75,7 @@ AvlTree.prototype._compare = function (a, b) {
  * @param {Object} value The value being inserted.
  */
 AvlTree.prototype.insert = function (key, value) {
+  this.purpose = "insert";
   this._root = this._insert(key, value, this._root);
   this._size++;
 };
@@ -65,9 +95,9 @@ AvlTree.prototype._insert = function (key, value, root) {
     return new Node(key, value);
   }
 
-  if (this._compare(key, root.key) < 0) {
+  if (this._compare(key, root.key, this.purpose) < 0) {
     root.left = this._insert(key, value, root.left);
-  } else if (this._compare(key, root.key) > 0) {
+  } else if (this._compare(key, root.key, this.purpose) > 0) {
     root.right = this._insert(key, value, root.right);
   } else {
     // It's a duplicate so insertion failed, decrement size to make up for it
@@ -80,7 +110,7 @@ AvlTree.prototype._insert = function (key, value, root) {
   var balanceState = getBalanceState(root);
 
   if (balanceState === BalanceState.UNBALANCED_LEFT) {
-    if (this._compare(key, root.left.key) < 0) {
+    if (this._compare(key, root.left.key, this.purpose) < 0) {
       // Left left case
       root = root.rotateRight();
     } else {
@@ -91,7 +121,7 @@ AvlTree.prototype._insert = function (key, value, root) {
   }
 
   if (balanceState === BalanceState.UNBALANCED_RIGHT) {
-    if (this._compare(key, root.right.key) > 0) {
+    if (this._compare(key, root.right.key, this.purpose) > 0) {
       // Right right case
       root = root.rotateLeft();
     } else {
@@ -110,6 +140,7 @@ AvlTree.prototype._insert = function (key, value, root) {
  * @param {Object} key The key being deleted.
  */
 AvlTree.prototype.delete = function (key) {
+  this.purpose = "delete";
   this._root = this._delete(key, this._root);
   this._size--;
 };
@@ -129,10 +160,10 @@ AvlTree.prototype._delete = function (key, root) {
     return root;
   }
 
-  if (this._compare(key, root.key) < 0) {
+  if (this._compare(key, root.key, this.purpose) < 0) {
     // The key to be deleted is in the left sub-tree
     root.left = this._delete(key, root.left);
-  } else if (this._compare(key, root.key) > 0) {
+  } else if (this._compare(key, root.key, this.purpose) > 0) {
     // The key to be deleted is in the right sub-tree
     root.right = this._delete(key, root.right);
   } else {
@@ -230,6 +261,17 @@ AvlTree.prototype._get = function (key, root) {
   }
   return this._get(key, root.right);
 };
+
+AvlTree.prototype._SRD = function (root) {
+  if (!root) {
+    return [];
+  }
+  var left = this._SRD(root.left);
+  var right = this._SRD(root.right);
+
+  left.push(root.key);
+  return left.concat(right);
+}
 
 /**
  * Gets whether a node with a specific key is within the tree.
@@ -334,5 +376,3 @@ function getBalanceState(node) {
     default: return BalanceState.BALANCED;
   }
 }
-
-module.exports = AvlTree;
