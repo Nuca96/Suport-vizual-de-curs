@@ -353,3 +353,16 @@ function piciorulPerpendicularei(point, segment) {
 	var perp = getSegmentY(point, another);
 	return intersection(perp, segment);
 }
+
+function getCenter(polygon) {
+	var X = 0;
+	var Y = 0;
+	for (var idx in polygon) {
+		X += polygon[idx].x;
+		Y += polygon[idx].y;
+	}
+	return {
+		x: X/polygon.length,
+		y: Y/polygon.length
+	}
+}

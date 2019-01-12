@@ -196,28 +196,29 @@ function draw(drawing) {
 	case "segment": {
 		drawLine(ctx, data, drawing.colour, drawing.size);
 		break;
-	}
+	};
 	case "point": {
 		drawPoint(ctx, data, drawing.colour, drawing.size);
 		break;
-	}
+	};
 	case "liter": {
 		drawLiter(ctx, data, drawing.colour);
 		break;
-	}
+	};
 	case "sweepY": {
 		drawLine(ctx, getSweepY(data.y), "black", 1);
 		drawPoint(ctx, data, drawing.colour, drawing.size);
 		break;
-	}
+	};
 	case "polygon": {
 		drawPolygon(ctx, data, drawing.colour);
 		break
-	}
+	};
 	case "trapez": {
 		drawPolygon(ctx, data.polygon, drawing.colour);
+		drawLiter(ctx, data.center, "black");
 		break
-	}
+	};
 	case "extension": {
 		var sweep = getSweepX(data.x);
 		var lowerPoint = intersection(sweep, data.lower);
@@ -225,7 +226,7 @@ function draw(drawing) {
 		var ext = getSegmentY(lowerPoint, upperPoint);
 		drawLine(ctx, ext, drawing.colour, drawing.size);
 		break;
-	}
+	};
 	default: {
 		console.log("wrong shape: " + drawing.shape);
 	}
