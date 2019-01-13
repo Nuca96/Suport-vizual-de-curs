@@ -73,6 +73,19 @@ var Node = function(type, leftn, rightn, info) {
 	info.node = this;
 };
 
+Node.prototype.getLeafs = function() {
+	if (this.leftn && this.rightn) {
+		return this.leftn.getLeafs().concat(this.rightn.getLeafs());
+	}
+	if (this.leftn) {
+		return this.leftn.getLeafs();
+	}
+	if (this.rightn) {
+		return this.rightn.getLeafs();
+	}
+	return [this.info];
+};
+
 Node.prototype.search = function(point) {
 	if (this.type == "trapez") {
 		searchBreakPoints.push({
@@ -179,11 +192,19 @@ var D = {
 			chart: generalChart,
 			nodeStructure: this.root.chart()
 		};
+	},
+	getLeafs: function() {
+		return this.root.getLeafs();
 	}
 }
 
 function newPoint(point) {
-	return typeof point.lower === "undefined";
+	for (var idx in canvas.points) {
+		if (theSamePoint(point, canvas.points[idx])) {
+			return false;
+		}
+	}
+	return true;
 }
 
 function createExtension(point, trapez) {
@@ -193,6 +214,7 @@ function createExtension(point, trapez) {
 	var sweep = getSweepX(point.x);
 	point.upper = trapez.top;
 	point.lower = trapez.bottom;
+	addPointToCanvas(point);
 
 	return true;
 }
@@ -292,7 +314,7 @@ function createMiddleTrapezoids(segm, trList) {
 			"shape": "trapez",
 			"data": trapez,
 			"colour": "DeepSkyBlue",
-			"message": "Se analizeaza trapezul dintre punctele " + trapez.leftp.litera + " si " + trapez.rightp.litera
+			"message": "Se analizeaza trapezul " + trapez.str
 		}, {
 			"shape": "segment",
 			"data": segm
@@ -319,7 +341,7 @@ function createMiddleTrapezoids(segm, trList) {
 				"shape": "trapez",
 				"data": bottomNodes[bidx].info,
 				"colour": "SteelBlue",
-				"message": "Se creeaza un nou trapez DEDESUBTUL segmentului."
+				"message": "Se creeaza trapezul " + bottomNodes[bidx].info.str
 			});
 			bidx++;
 		}
@@ -344,7 +366,7 @@ function createMiddleTrapezoids(segm, trList) {
 				"shape": "trapez",
 				"data": topNodes[tidx].info,
 				"colour": "RoyalBlue",
-				"message": "Se creeaza un nou trapez DEASUPRA segmentului."
+				"message": "Se creeaza trapezul " + topNodes[tidx].info.str
 			});
 			tidx++;
 		}
@@ -368,6 +390,15 @@ function createMiddleTrapezoids(segm, trList) {
 			"shape": "segment",
 			"data": segm
 		});
+		drawings.push({
+			"shape": "graph",
+			"data": D.get_chart()
+		});
+		drawings.push({
+			"shape": "markers",
+			"data": D.getLeafs()
+		});
+
 		breakPoints.push(drawings);
 	}
 }
@@ -392,12 +423,18 @@ function createLeftTrapez(point, trList) {
 
 	trList[0] = fakeTrapez;
 
-	breakPoints.push({
+	breakPoints.push([{
 		"shape": "trapez",
 		"data": leftTrapez,
 		"colour": "Teal",
-		"message": "... si trapezul din stanga acestuia."
-	});
+		"message": "Se creeaza trapezul " + leftTrapez.str
+	},{
+		"shape": "graph",
+		"data": D.get_chart()
+	},{
+		"shape": "markers",
+		"data": D.getLeafs()
+	}]);
 }
 
 function createRightTrapez(point, trList) {
@@ -420,24 +457,33 @@ function createRightTrapez(point, trList) {
 
 	trList[trList.length-1] = fakeTrapez;
 
-	breakPoints.push({
+	breakPoints.push([{
 		"shape": "trapez",
 		"data": rightTrapez,
 		"colour": "Teal",
-		"message": "... si trapezul din dreapta acestuia."
-	});
+		"message": "Se creeaza trapezul " + rightTrapez.str
+	},{
+		"shape": "graph",
+		"data": D.get_chart()
+	},{
+		"shape": "markers",
+		"data": D.getLeafs()
+	}]);
 }
 
 function modifyTrapezoids(segm) {
-	var drawing = {
+	canvas.permanent_drawings.push({
+		"shape": "segment",
+		"data": segm,
+		"colour": "DarkCyan"
+	});
+	breakPoints.push([{
 		"shape": "segment",
 		"data": segm,
 		"colour": "DarkCyan",
 		"events": ["push", "redraw"],
 		"message": "S-a introdus un nou segment."
-	};
-	canvas.permanent_drawings.push(drawing);
-	breakPoints.push(drawing);
+	}]);
 
 	var trList = getIntersectList(segm);
 
@@ -461,7 +507,7 @@ function modifyTrapezoids(segm) {
 				"lower": point.lower,
 				"upper": point.upper
 			},
-			"message": "Se creeaza extensia punctului " + point.litera
+			"message": "Se creeaza punctul " + point.litera + " si extensia acestuia"
 		}];
 		extend(canvas.permanent_drawings, drawings);
 		breakPoints.push(drawings);
@@ -488,7 +534,7 @@ function modifyTrapezoids(segm) {
 				"lower": point.lower,
 				"upper": point.upper
 			},
-			"message": "Se creeaza extensia punctului " + point.litera
+			"message": "Se creeaza punctul " + point.litera + " si extensia acestuia"
 		}];
 		extend(canvas.permanent_drawings, drawings);
 		breakPoints.push(drawings);
@@ -498,7 +544,14 @@ function modifyTrapezoids(segm) {
 	createMiddleTrapezoids(segm, trList);
 
 	redraw();
-	var my_chart = new Treant(D.get_chart());
+	draw({
+		"shape": "graph",
+		"data": D.get_chart()
+	});
+	draw({
+		"shape": "markers",
+		"data":  D.getLeafs()
+	});
 }
 
 function init() {
@@ -508,10 +561,18 @@ function init() {
 	canvas.addEventListener("click", firstClick);
 	loadButton.addEventListener("click", loadSegments);
 	canvas.removeEventListener("click", find);
+	document.getElementById("shuffleButton").addEventListener("click", shuffle);
 
 	this.tridx = 0;
 	this.searchBreakPoints = [];
 	D.init();
+	draw({
+		"shape": "graph",
+		"data":{
+			chart: generalChart,
+			nodeStructure: {}
+		}
+	});
 }
 
 
@@ -592,16 +653,6 @@ function segmentOk(verif) {
 	return true;
 }
 
-function addPoint(point) {
-	for (var idx in canvas.points) {
-		if (theSamePoint(point, canvas.points[idx])) {
-			return;
-		}
-	}
-
-	addPointToCanvas(point);
-}
-
 function secondClick(event) {
 	var punct = genericEvent(event);
 	if (!pointOk(punct)) {
@@ -616,9 +667,6 @@ function secondClick(event) {
 	if (pointDistance(segment.firstPoint, segment.secondPoint) < near) {
 		return;
 	}
-
-	addPoint(segment.firstPoint);
-	addPoint(segment.secondPoint);
 
 	canvas.removeEventListener("click", secondClick);
 	canvas.removeEventListener("mousemove", mouseMove);
@@ -667,15 +715,9 @@ function mouseMove(event) {
 	draw(drawing);
 }
 
-function run() {
-	return true;
-	this.tridx = 0;
-	this.searchBreakPoints = [];
-	D.init();
-	breakPoints = [];
-	for (var idx in canvas.segmente) {
-		modifyTrapezoids(canvas.segmente[idx]);
-	}
+function shuffle() {
+	permute(canvas.segmente);
+
 }
 
 function find(event) {
@@ -702,6 +744,28 @@ function find(event) {
 	timer();
 }
 
+function run() {
+	canvas.liter = 'A';
+	canvas.points = [];
+	this.tridx = 0;
+	this.searchBreakPoints = [];
+	D.init();
+	breakPoints = [];
+	$('#messList').empty();
+	breakPointsIdx = 0;
+	canvas.permanent_drawings = [];
+	for (var idx in canvas.segmente) {
+		modifyTrapezoids(canvas.segmente[idx]);
+	}
+	breakPoints.push({
+		"shape": "markers",
+		"data": D.getLeafs(),
+		"events": ["push", "redraw"],
+		"message": "Algoritmul s-a sfarsit"
+	});
+	return true;
+}
+
 function firstPart() {
 	if (canvas.firstPoint != null) {
 		canvas.removeEventListener("click", secondClick);
@@ -717,11 +781,17 @@ function firstPart() {
 	canvas.removeEventListener("click", firstClick);
 	startButton.removeEventListener("click", startAlgorithm);
 	loadButton.removeEventListener("click", loadSegments);
-	$('#messList').empty();
 
 	canvas.addEventListener("click", find);
 
 	breakPointsIdx = 0;
 	canvas.permanent_drawings = [];
+	draw({
+		"shape": "graph",
+		"data": {
+			chart: generalChart,
+			nodeStructure: {}
+		}
+	});
 	return true;
 }

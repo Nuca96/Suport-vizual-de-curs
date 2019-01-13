@@ -39,6 +39,16 @@ function random(min, max) {
 	return nr;
 }
 
+function permute(array) {
+	var len = array.length;
+	for (var idx=0; idx<len; idx++) {
+		var perm = Math.floor(random(0, len-1));
+		var aux = array[perm];
+		array[perm] = array[idx];
+		array[idx] = aux;
+	}
+}
+
 function determinant3(matrice) {
 	if (matrice.length != 3){
 		console.log("cannot calculate delta");

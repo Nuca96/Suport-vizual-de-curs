@@ -90,7 +90,6 @@ function action(drawing) {
 			}
 		}
 	}
-
 	draw(drawing);
 }
 
@@ -225,6 +224,16 @@ function draw(drawing) {
 		var upperPoint = intersection(sweep, data.upper);
 		var ext = getSegmentY(lowerPoint, upperPoint);
 		drawLine(ctx, ext, drawing.colour, drawing.size);
+		break;
+	};
+	case "graph": {
+		var my_chart = new Treant(data);
+		break;
+	};
+	case "markers": {
+		for (var idx in data) {
+			drawLiter(ctx, data[idx].center, "black");
+		}
 		break;
 	};
 	default: {
