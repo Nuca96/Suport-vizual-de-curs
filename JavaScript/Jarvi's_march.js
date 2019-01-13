@@ -1,5 +1,4 @@
 function init() {
-	genericInit();
 	canvas.addEventListener("click", addPoint);
 	loadButton.addEventListener("click", loadPoints);
 }
@@ -143,4 +142,8 @@ function firstPart() {
 
 	breakPointsIdx = 0;
 	return true;
+}
+
+function callback(){
+	return;
 }

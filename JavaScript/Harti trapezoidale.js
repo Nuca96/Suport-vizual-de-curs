@@ -483,6 +483,9 @@ function modifyTrapezoids(segm) {
 		"colour": "DarkCyan",
 		"events": ["push", "redraw"],
 		"message": "S-a introdus un nou segment."
+	},{
+		"shape": "markers",
+		"data": D.getLeafs()
 	}]);
 
 	var trList = getIntersectList(segm);
@@ -555,37 +558,30 @@ function modifyTrapezoids(segm) {
 }
 
 function init() {
-	genericInit();
 	canvas.segmente = [];
 	canvas.points = [];
 	canvas.addEventListener("click", firstClick);
 	loadButton.addEventListener("click", loadSegments);
-	canvas.removeEventListener("click", find);
-	document.getElementById("shuffleButton").addEventListener("click", shuffle);
+	$("#shuffleButton").click(shuffle);
 
 	this.tridx = 0;
 	this.searchBreakPoints = [];
 	D.init();
-	draw({
-		"shape": "graph",
-		"data":{
-			chart: generalChart,
-			nodeStructure: {}
-		}
-	});
 }
 
 
 function firstClick(event) {
 	var punct = genericEvent(event);
 	if (!pointOk(punct)) {
-		return;
+		return false;
 	}
 	canvas.removeEventListener("click", firstClick);
 	canvas.firstPoint = punct;
 
 	canvas.addEventListener("click", secondClick);
 	canvas.addEventListener("mousemove", mouseMove);
+
+	return true;
 }
 
 function tooNear(point, segm) {
@@ -679,16 +675,16 @@ function secondClick(event) {
 
 function instantInsert(p1, p2) {
 	var ev1 = genericEventReverse(p1);
-	firstClick(ev1);
-
-	var ev2 = genericEventReverse(p2);
-	secondClick(ev2);
+	if(firstClick(ev1)) {
+		var ev2 = genericEventReverse(p2);
+		secondClick(ev2);
+	}
 }
 
 function loadSegments() {
 	loadButton.style.visibility = "hidden";
 	for (var idx in TrapezMap) {
-		var segm =TrapezMap[idx];
+		var segm = TrapezMap[idx];
 		instantInsert(segm.p1, segm.p2);
 	}
 	loadButton.removeEventListener("click", loadSegments);
@@ -717,7 +713,7 @@ function mouseMove(event) {
 
 function shuffle() {
 	permute(canvas.segmente);
-
+	run();
 }
 
 function find(event) {
@@ -730,16 +726,21 @@ function find(event) {
 	searchBreakPoints = [];
 	var where = D.search(point);
 	console.log(where.info);
+	runButton.style.visibility = "hidden";
+	startButton.style.visibility = "hidden";
+	shuffleButton.style.visibility = "hidden";
 
-	var speed = speedMap[speedSelector.value];
 	var idx = 0;
 	function timer() {
 		if (idx == searchBreakPoints.length){
+			runButton.style.visibility = "visible";
+			startButton.style.visibility = "visible";
+			shuffleButton.style.visibility = "visible";
 			return null;
 		}
 		action(searchBreakPoints[idx]);
 		idx++;
-		setTimeout(timer, speed);
+		setTimeout(timer, speedMap[speedSelector.value]);
 	}
 	timer();
 }
@@ -752,6 +753,7 @@ function run() {
 	D.init();
 	breakPoints = [];
 	$('#messList').empty();
+	canvas.removeEventListener("click", find);
 	breakPointsIdx = 0;
 	canvas.permanent_drawings = [];
 	for (var idx in canvas.segmente) {
@@ -781,8 +783,8 @@ function firstPart() {
 	canvas.removeEventListener("click", firstClick);
 	startButton.removeEventListener("click", startAlgorithm);
 	loadButton.removeEventListener("click", loadSegments);
+	shuffleButton.style.visibility = "hidden";
 
-	canvas.addEventListener("click", find);
 
 	breakPointsIdx = 0;
 	canvas.permanent_drawings = [];
@@ -794,4 +796,12 @@ function firstPart() {
 		}
 	});
 	return true;
+}
+function callback() {
+	canvas.addEventListener("click", find);
+	startButton.addEventListener("click", startAlgorithm);
+	startButton.innerText = "Restart";
+	runButton.style.visibility = "visible";
+	startButton.style.visibility = "visible";
+	shuffleButton.style.visibility = "visible";
 }

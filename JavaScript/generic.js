@@ -14,23 +14,14 @@ function load() {
 	this.messList = $("#messList");
 	this.ctx = canvas.getContext("2d");
 	this.breakPointsIdx = null;
-	init();
-}
 
-function genericInit() {
 	startButton.addEventListener("click", startAlgorithm);
 	runButton.addEventListener("click", autorun);
-
-	loadButton.style.visibility = "visible";
-	startButton.style.visibility = "visible";
-	speedSelector.style.visibility = "visible";
-	runButton.style.visibility = "visible";
-
-	$('#messList').empty();
 	canvas.permanent_drawings = [];
 	this.breakPoints = [];
 	canvas.points = [];
 	canvas.liter = 'A';
+	init()
 }
 
 function getNearPoint(point) {
@@ -95,9 +86,7 @@ function action(drawing) {
 
 function nextStep() {
 	if (breakPointsIdx > breakPoints.length - 1) {
-		redraw();
-		message.innerText = "Algoritmul s-a sfarsit";
-		startButton.removeEventListener("click", nextStep);
+		genericCB();
 		return null;
 	}
 
@@ -112,6 +101,13 @@ function nextStep() {
 		action(to_draw[idx]);
 	}
 	return true;
+}
+
+function genericCB() {
+	startButton.removeEventListener("click", nextStep);
+	message.innerText = "Algoritmul s-a sfarsit";
+	redraw();
+	callback();
 }
 
 function startAlgorithm() {
@@ -131,13 +127,13 @@ function autorun() {
 		return null;
 	loadButton.style.visibility = "hidden";
 	startButton.style.visibility = "hidden";
-	var speed = speedMap[speedSelector.value];
+	runButton.style.visibility = "hidden";
 
 	function timer() {
 		if (null === nextStep()){
 			return null;
 		}
-		setTimeout(timer, speed);
+		setTimeout(timer, speedMap[speedSelector.value]);
 	}
 	timer();
 }
@@ -150,11 +146,7 @@ function redraw() {
 }
 
 function reset() {
-	startButton.removeEventListener("click", nextStep);
-	startButton.innerText = "Start";
-	message.innerText = "";
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	init();
+	location.reload();
 }
 
 function getSweepY(y) {

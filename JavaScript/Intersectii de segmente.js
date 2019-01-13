@@ -78,7 +78,6 @@ function compareSP(segm) {
 }
 
 function init() {
-	genericInit();
 	canvas.points = [];
 	canvas.eventPoints = {
 		events: [],
@@ -376,4 +375,8 @@ function firstPart() {
 
 	breakPointsIdx = 0;
 	return true;
+}
+
+function callback(){
+	return;
 }
