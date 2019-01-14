@@ -1,5 +1,15 @@
 var speedMap = [0, 500, 1000, 3000, 5000];
 
+var generalChart = {
+	container: "#tree-simple",
+	connectors: {
+		type: "straight"
+	},
+	node: {
+		collapsable: true
+	}
+}
+
 function load() {
 	this.canvas = document.getElementById("myCanvas");
 	this.startButton = document.getElementById("startButton");

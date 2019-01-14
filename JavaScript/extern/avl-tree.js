@@ -24,21 +24,37 @@ var AvlTree = function (customCompare, secondCompare) {
   }
 };
 
-AvlTree.prototype.rightNeigh = function(point) {
+AvlTree.prototype.getChart = function() {
+  var nodeStructure = {
+    text: {
+      name: ''
+    },
+    children : []
+  };
+  if (this._root) {
+    nodeStructure = this._root.chart();
+  }
+  return {
+    chart: generalChart,
+    nodeStructure: nodeStructure
+  };
+}
+
+AvlTree.prototype.rightNeigh = function() {
   var keys = this._SRD(this._root);
   for (var idx in keys) {
-    if (this._compareSP(keys[idx], point) > 0) {
+    if (this._compareSP(keys[idx]) > 0) {
       return keys[idx];
     }
   }
   return null;
 }
 
-AvlTree.prototype.leftNeigh = function(point) {
+AvlTree.prototype.leftNeigh = function() {
   var keys = this._SRD(this._root);
   var neigh = null;
   for (var idx in keys) {
-    if (this._compareSP(keys[idx], point) >= 0) {
+    if (this._compareSP(keys[idx]) >= 0) {
       break;
     }
     neigh = keys[idx];

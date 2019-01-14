@@ -20,6 +20,32 @@ var Node = function (key, value) {
   this.value = value;
 };
 
+var emptyChild = {
+  text: {
+    name: ""
+  },
+  children : []
+};
+
+Node.prototype.chart = function() {
+  var leftChild = emptyChild;
+  var rightChild = emptyChild;
+
+  if (this.left != null) {
+    leftChild = this.left.chart();
+  }
+  if (this.right != null) {
+    rightChild = this.right.chart();
+  }
+
+  return {
+    text: {
+      name: this.key.str()
+    },
+    children: [leftChild, rightChild]
+  };
+}
+
 /**
  * Performs a right rotate on this node.
  *

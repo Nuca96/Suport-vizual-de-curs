@@ -140,29 +140,20 @@ Node.prototype.chart = function() {
 	if (this.type == "segment") {
 		var name = this.info.str();
 	}
+
 	var children = [];
 	if (this.leftn != null) {
 		children.push(this.leftn.chart());
 	}
-	var rightChild = {};
 	if (this.rightn != null) {
 		children.push(this.rightn.chart());
 	}
+
 	return {
 		text: {
 			name: name
 		},
 		children : children
-	}
-}
-
-var generalChart = {
-	container: "#tree-simple",
-	connectors: {
-		type: "straight"
-	},
-	node: {
-		collapsable: true
 	}
 }
 
@@ -187,7 +178,7 @@ var D = {
 	search: function(point) {
 		return this.root.search(point);
 	},
-	get_chart: function() {
+	getChart: function() {
 		return {
 			chart: generalChart,
 			nodeStructure: this.root.chart()
@@ -392,7 +383,7 @@ function createMiddleTrapezoids(segm, trList) {
 		});
 		drawings.push({
 			"shape": "graph",
-			"data": D.get_chart()
+			"data": D.getChart()
 		});
 		drawings.push({
 			"shape": "markers",
@@ -430,7 +421,7 @@ function createLeftTrapez(point, trList) {
 		"message": "Se creeaza trapezul " + leftTrapez.str
 	},{
 		"shape": "graph",
-		"data": D.get_chart()
+		"data": D.getChart()
 	},{
 		"shape": "markers",
 		"data": D.getLeafs()
@@ -464,7 +455,7 @@ function createRightTrapez(point, trList) {
 		"message": "Se creeaza trapezul " + rightTrapez.str
 	},{
 		"shape": "graph",
-		"data": D.get_chart()
+		"data": D.getChart()
 	},{
 		"shape": "markers",
 		"data": D.getLeafs()
@@ -549,7 +540,7 @@ function modifyTrapezoids(segm) {
 	redraw();
 	draw({
 		"shape": "graph",
-		"data": D.get_chart()
+		"data": D.getChart()
 	});
 	draw({
 		"shape": "markers",
