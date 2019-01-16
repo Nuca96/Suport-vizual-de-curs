@@ -2,8 +2,8 @@ var globalPoint;
 
 function compareSS(segm1, segm2, purpose) {
 	function compfct(y) {
-		var int1 = intersection(segm1, getSweepY(y));
-		var int2 = intersection(segm2, getSweepY(y));
+		var int1 = intersection(segm1, canvas.getSweepY(y));
+		var int2 = intersection(segm2, canvas.getSweepY(y));
 		return comparePointsX(int1, int2);
 	}
 
@@ -24,7 +24,7 @@ function compareSS(segm1, segm2, purpose) {
 
 function compareSP(segm) {
 	point = globalPoint;
-	var int = intersection(segm, getSweepY(point.y));
+	var int = intersection(segm, canvas.getSweepY(point.y));
 	if (areNear(point, int)) {
 		return 0;
 	}
@@ -41,8 +41,7 @@ function pointInArray(point, array) {
 }
 
 function init() {
-	canvas.points = [];
-	canvas.eventPoints = {
+	this.eventPoints = {
 		events: [],
 		intersections: [],
 		idx: -1,
@@ -92,7 +91,7 @@ function init() {
 			point.C.push(segment);
 		},
 		add: function(point) {
-			addPointToCanvas(point);
+			canvas.addPoint(point);
 
 			for (var idx=0; idx<this.events.length; idx++) {
 				if (comparePointsY(this.events[idx], point) > 0) {
@@ -111,31 +110,31 @@ function init() {
 			this.overWriteEvent(point, type, segment);
 		}
 	};
-	canvas.addEventListener("click", firstClick);
+	canvas.addEvent("click", firstClick);
 	loadButton.addEventListener("click", loadSegments);
 }
 
 function firstClick(event) {
-	canvas.removeEventListener("click", firstClick);
-	var punct = genericEvent(event);
+	canvas.removeEvent("click", firstClick);
+	var punct = canvas.genericEvent(event);
 	canvas.firstPoint = punct;
 
-	canvas.addEventListener("click", secondClick);
-	canvas.addEventListener("mousemove", mouseMove);
+	canvas.addEvent("click", secondClick);
+	canvas.addEvent("mousemove", mouseMove);
 }
 
 function secondClick(event) {
-	canvas.removeEventListener("click", secondClick);
-	canvas.removeEventListener("mousemove", mouseMove);
+	canvas.removeEvent("click", secondClick);
+	canvas.removeEvent("mousemove", mouseMove);
 
-	var punct = genericEvent(event);
+	var punct = canvas.genericEvent(event);
 	var segment = getSegmentY(canvas.firstPoint, punct);
 
-	canvas.eventPoints.insert(segment.firstPoint, "upper", segment);
-	canvas.eventPoints.insert(segment.secondPoint, "lower", segment);
+	eventPoints.insert(segment.firstPoint, "upper", segment);
+	eventPoints.insert(segment.secondPoint, "lower", segment);
 
 	canvas.firstPoint = null;
-	canvas.addEventListener("click", firstClick);
+	canvas.addEvent("click", firstClick);
 
 	//draw new elements
 	var permanents = [{
@@ -149,33 +148,33 @@ function secondClick(event) {
 		"data": segment,
 		"colour": "DarkCyan"
 	}];
-	canvas.permanent_drawings.push.apply(canvas.permanent_drawings, permanents);
+	extend(canvas.permanent_drawings, permanents);
 
-	redraw();
+	canvas.redraw();
 }
 
 function loadSegments() {
 	loadButton.style.visibility = "hidden";
 	for (var idx in Intersection) {
 		var segm = Intersection[idx];
-		var ev1 = genericEventReverse(segm.p1);
+		var ev1 = canvas.genericEventReverse(segm.p1);
 		firstClick(ev1);
 
-		var ev2 = genericEventReverse(segm.p2);
+		var ev2 = canvas.genericEventReverse(segm.p2);
 		secondClick(ev2);
 	}
 	loadButton.removeEventListener("click", loadSegments);
 }
 
 function mouseMove(event) {
-	redraw();
-	var punct = genericEvent(event);
+	canvas.redraw();
+	var punct = canvas.genericEvent(event);
 	var drawing = {
 		"shape": "segment",
 		"data": getSegmentY(canvas.firstPoint, punct),
 		"colour": "CadetBlue"
 	};
-	draw(drawing);
+	canvas.draw(drawing);
 }
 
 function findNewEvent(seg1, seg2) {
@@ -203,9 +202,9 @@ function findNewEvent(seg1, seg2) {
 		return;
 	}
 
-	var point = getNearPoint(int);
-	canvas.eventPoints.insert(point, "inter", seg1);
-	canvas.eventPoints.insert(point, "inter", seg2);
+	var point = canvas.getNearPoint(int);
+	eventPoints.insert(point, "inter", seg1);
+	eventPoints.insert(point, "inter", seg2);
 
 	return point;
 }
@@ -260,7 +259,7 @@ function handleEvent(activeSegments, point) {
 	var toAdd = point.U.concat(point.C);
 	var toDelete = point.L.concat(point.C);
 	if (toAdd.concat(point.L).length > 1) {
-		canvas.eventPoints.addIntersection(point);
+		eventPoints.addIntersection(point);
 	}
 	deleteSegmentsFromTree(activeSegments, toDelete);
 	insertSegmentsIntoTree(activeSegments, toAdd);
@@ -293,7 +292,7 @@ function run() {
 	var activeSegments = new AvlTree(compareSS, compareSP);
 
 	while(true) {
-		var point = canvas.eventPoints.next();
+		var point = eventPoints.next();
 		if (typeof point === "undefined")
 			break;
 		var drawing = {
@@ -312,9 +311,9 @@ function run() {
 
 function firstPart() {
 	if (canvas.firstPoint != null) {
-		canvas.removeEventListener("click", secondClick);
-		canvas.removeEventListener("mousemove", mouseMove);
-		redraw();
+		canvas.removeEvent("click", secondClick);
+		canvas.removeEvent("mousemove", mouseMove);
+		canvas.redraw();
 	}
 
 	var res = run();
@@ -322,7 +321,7 @@ function firstPart() {
 		message.innerText = "error";
 		return null;
 	}
-	canvas.removeEventListener("click", firstClick);
+	canvas.removeEvent("click", firstClick);
 	startButton.removeEventListener("click", startAlgorithm);
 	loadButton.removeEventListener("click", loadSegments);
 	runButton.style.visibility = "hidden";

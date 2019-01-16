@@ -1,11 +1,11 @@
 function init() {
-	canvas.addEventListener("click", addPoint);
+	canvas.addEvent("click", addPoint);
 	loadButton.addEventListener("click", loadPoints);
 }
 
 function addPoint(event) {
-	var punct = genericEvent(event);
-	addPointToCanvas(punct);
+	var punct = canvas.genericEvent(event);
+	canvas.addPoint(punct);
 
 	var permanents = [{
 		"shape":"point",
@@ -14,14 +14,14 @@ function addPoint(event) {
 		"shape":"liter",
 		"data": punct
 	}]
-	canvas.permanent_drawings.push.apply(canvas.permanent_drawings, permanents);
-	redraw();
+	extend(canvas.permanent_drawings, permanents);
+	canvas.redraw();
 }
 
 function loadPoints() {
 	loadButton.style.visibility = "hidden";
 	for (var idx in Jarvis) {
-		var ev = genericEventReverse(Jarvis[idx]);
+		var ev = canvas.genericEventReverse(Jarvis[idx]);
 		addPoint(ev);
 	}
 	loadButton.removeEventListener("click", loadPoints);
@@ -35,7 +35,7 @@ function run(){
 	var valid = true;
 	var S, to_draw;
 	var L = [];
-	L.push(leftmostPoint(canvas.points));
+	L.push(canvas.leftmostPoint());
 
 	// break point
 	to_draw = {
@@ -136,7 +136,7 @@ function firstPart() {
 	runButton.style.visibility = "hidden";
 
 	startButton.removeEventListener("click", startAlgorithm);
-	canvas.removeEventListener("click", addPoint);
+	canvas.removeEvent("click", addPoint);
 	loadButton.removeEventListener("click", loadPoints);
 	runButton.removeEventListener("click", autorun);
 

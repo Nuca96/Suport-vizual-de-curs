@@ -19,8 +19,8 @@ function Trapez(top, bottom, leftp, rightp) {
 
 Trapez.prototype.getPolygon = function() {
 	var polygon = [];
-	var leftSweep = getSweepX(this.leftp.x);
-	var rightSweep = getSweepX(this.rightp.x);
+	var leftSweep = canvas.getSweepX(this.leftp.x);
+	var rightSweep = canvas.getSweepX(this.rightp.x);
 	if (this.leftp.lower === this.bottom) {
 		polygon.push(intersection(leftSweep, this.bottom));
 	}
@@ -202,10 +202,10 @@ function createExtension(point, trapez) {
 	if (!newPoint(point)) {
 		return false;
 	}
-	var sweep = getSweepX(point.x);
+	var sweep = canvas.getSweepX(point.x);
 	point.upper = trapez.top;
 	point.lower = trapez.bottom;
-	addPointToCanvas(point);
+	canvas.addPoint(point);
 
 	return true;
 }
@@ -228,7 +228,7 @@ function getIntersectList(segm) {
 	var point = segm.firstPoint;
 	if (!newPoint(point)) {
 		// se ia un punct de pe segment putin mai la dreapta
-		point = intersection(segm, getSweepX(segm.firstPoint.x + near));
+		point = intersection(segm, canvas.getSweepX(segm.firstPoint.x + near));
 	}
 
 	var node = D.search(point);
@@ -537,12 +537,12 @@ function modifyTrapezoids(segm) {
 	}
 	createMiddleTrapezoids(segm, trList);
 
-	redraw();
-	draw({
+	canvas.redraw();
+	canvas.draw({
 		"shape": "graph",
 		"data": D.getChart()
 	});
-	draw({
+	canvas.draw({
 		"shape": "markers",
 		"data":  D.getLeafs()
 	});
@@ -551,7 +551,7 @@ function modifyTrapezoids(segm) {
 function init() {
 	canvas.segmente = [];
 	canvas.points = [];
-	canvas.addEventListener("click", firstClick);
+	canvas.addEvent("click", firstClick);
 	loadButton.addEventListener("click", loadSegments);
 	$("#shuffleButton").click(shuffle);
 
@@ -562,15 +562,15 @@ function init() {
 
 
 function firstClick(event) {
-	var punct = genericEvent(event);
+	var punct = canvas.genericEvent(event);
 	if (!pointOk(punct)) {
 		return false;
 	}
-	canvas.removeEventListener("click", firstClick);
+	canvas.removeEvent("click", firstClick);
 	canvas.firstPoint = punct;
 
-	canvas.addEventListener("click", secondClick);
-	canvas.addEventListener("mousemove", mouseMove);
+	canvas.addEvent("click", secondClick);
+	canvas.addEvent("mousemove", mouseMove);
 
 	return true;
 }
@@ -641,7 +641,7 @@ function segmentOk(verif) {
 }
 
 function secondClick(event) {
-	var punct = genericEvent(event);
+	var punct = canvas.genericEvent(event);
 	if (!pointOk(punct)) {
 		return;
 	}
@@ -655,9 +655,9 @@ function secondClick(event) {
 		return;
 	}
 
-	canvas.removeEventListener("click", secondClick);
-	canvas.removeEventListener("mousemove", mouseMove);
-	canvas.addEventListener("click", firstClick);
+	canvas.removeEvent("click", secondClick);
+	canvas.removeEvent("mousemove", mouseMove);
+	canvas.addEvent("click", firstClick);
 	canvas.firstPoint = null;
 
 	canvas.segmente.push(segment);
@@ -665,9 +665,9 @@ function secondClick(event) {
 }
 
 function instantInsert(p1, p2) {
-	var ev1 = genericEventReverse(p1);
+	var ev1 = canvas.genericEventReverse(p1);
 	if(firstClick(ev1)) {
-		var ev2 = genericEventReverse(p2);
+		var ev2 = canvas.genericEventReverse(p2);
 		secondClick(ev2);
 	}
 }
@@ -682,9 +682,9 @@ function loadSegments() {
 }
 
 function mouseMove(event) {
-	redraw();
+	canvas.redraw();
 
-	var punct = genericEvent(event);
+	var punct = canvas.genericEvent(event);
 	if (!pointOk(punct)) {
 		return;
 	}
@@ -699,7 +699,7 @@ function mouseMove(event) {
 		"data": segm,
 		"colour": "CadetBlue"
 	};
-	draw(drawing);
+	canvas.draw(drawing);
 }
 
 function shuffle() {
@@ -708,8 +708,8 @@ function shuffle() {
 }
 
 function find(event) {
-	redraw();
-	var point = genericEvent(event);
+	canvas.redraw();
+	var point = canvas.genericEvent(event);
 	if (!pointOk(point)) {
 		return;
 	}
@@ -729,7 +729,7 @@ function find(event) {
 			shuffleButton.style.visibility = "visible";
 			return null;
 		}
-		action(searchBreakPoints[idx]);
+		canvas.action(searchBreakPoints[idx]);
 		idx++;
 		setTimeout(timer, speedMap[speedSelector.value]);
 	}
@@ -744,7 +744,7 @@ function run() {
 	D.init();
 	breakPoints = [];
 	$('#messList').empty();
-	canvas.removeEventListener("click", find);
+	canvas.removeEvent("click", find);
 	breakPointsIdx = 0;
 	canvas.permanent_drawings = [];
 	for (var idx in canvas.segmente) {
@@ -761,9 +761,9 @@ function run() {
 
 function firstPart() {
 	if (canvas.firstPoint != null) {
-		canvas.removeEventListener("click", secondClick);
-		canvas.removeEventListener("mousemove", mouseMove);
-		redraw();
+		canvas.removeEvent("click", secondClick);
+		canvas.removeEvent("mousemove", mouseMove);
+		canvas.redraw();
 	}
 
 	var res = run();
@@ -771,7 +771,7 @@ function firstPart() {
 		message.innerText = "error";
 		return null;
 	}
-	canvas.removeEventListener("click", firstClick);
+	canvas.removeEvent("click", firstClick);
 	startButton.removeEventListener("click", startAlgorithm);
 	loadButton.removeEventListener("click", loadSegments);
 	shuffleButton.style.visibility = "hidden";
@@ -779,7 +779,7 @@ function firstPart() {
 
 	breakPointsIdx = 0;
 	canvas.permanent_drawings = [];
-	draw({
+	canvas.draw({
 		"shape": "graph",
 		"data": {
 			chart: generalChart,
@@ -789,7 +789,7 @@ function firstPart() {
 	return true;
 }
 function callback() {
-	canvas.addEventListener("click", find);
+	canvas.addEvent("click", find);
 	startButton.addEventListener("click", startAlgorithm);
 	startButton.innerText = "Restart";
 	runButton.style.visibility = "visible";

@@ -12,25 +12,6 @@ function copy(obj) {
 	return JSON.parse(JSON.stringify(obj));
 }
 
-function leftmostPoint(pointList) {
-	if (pointList.length == 0)
-		return null;
-
-	var leftmost = pointList[0];
-	for (idx in pointList) {
-		point = pointList[idx];
-		if (point.x == "undefined"){
-			console.log("leftPoint function must get list of correct points");
-			return null;
-		}
-		if (point.x < leftmost.x){
-			leftmost = point;
-		}
-	}
-
-	return leftmost;
-}
-
 function random(min, max) {
 	if (min > max)
 		return null;
@@ -102,50 +83,6 @@ function orientation(p1, p2, p3) {
 		return "dreapta";
 	if (D < 0)
 		return "stanga";
-}
-
-function drawPoint(ctx, point, colour, size) {
-	ctx.beginPath();
-	ctx.arc(point.x, point.y, size, 0, 2 * Math.PI);		// un punct este de fapt un cerc plin
-	ctx.fillStyle = colour;
-	ctx.fill();
-	ctx.closePath();
-}
-
-function drawLiter(ctx, point, colour) {
-	ctx.beginPath();
-	ctx.font = "15px Arial";
-	ctx.fillStyle = colour;
-    ctx.fillText(point.litera, point.x-10, point.y-10);
-	ctx.closePath();
-}
-
-function drawPolygon(ctx, points, colour) {
-	ctx.beginPath();
-	ctx.fillStyle = colour;
-	ctx.moveTo(points[0].x, points[0].y);
-
-	for (var idx=1; idx<points.length; idx++){
-		ctx.lineTo(points[idx].x, points[idx].y);
-	}
-
-	ctx.closePath();
-	ctx.fill();
-
-	for (var idx=1; idx<points.length; idx++){
-		var segm = getSegmentY(points[idx - 1], points[idx]);
-		drawLine(ctx, segm, "black", 1);
-	}
-}
-
-function drawLine(ctx, segment, colour, width) {
-	ctx.beginPath();
-	ctx.moveTo(segment.firstPoint.x, segment.firstPoint.y);
-	ctx.lineTo(segment.secondPoint.x, segment.secondPoint.y);
-	ctx.lineWidth = width;
-    ctx.strokeStyle = colour;
-	ctx.stroke();
-	ctx.closePath();
 }
 
 function sort(list, compare) {
