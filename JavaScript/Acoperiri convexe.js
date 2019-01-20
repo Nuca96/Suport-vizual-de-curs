@@ -1,4 +1,5 @@
 function init() {
+	this.algorithm =  document.getElementById("algorithmSelector");
 	canvas.addEvent("click", addPoint);
 	loadButton.addEventListener("click", loadPoints);
 }
@@ -27,11 +28,10 @@ function loadPoints() {
 	loadButton.removeEventListener("click", loadPoints);
 }
 
-function run(){
+function runJarvis(){
 	if(canvas.points.length < 2){
 		return null;
 	}
-	var k = 0;
 	var valid = true;
 	var S, to_draw;
 	var L = [];
@@ -45,16 +45,17 @@ function run(){
 		"message": "Punctul " + L[0].litera + " e cel mai din dreapta."
 	};
 	breakPoints.push(to_draw)
-	while (valid == true) {
+	while (true) {
+		var last = lastElem(L);
 		do {
 			var nr = Math.floor(random(0, canvas.points.length));
 			S = canvas.points[nr];
-		} while(S == L[k])
+		} while (S == last)
 
 		// break point
 		to_draw = [{
 			"shape": "segment",
-			"data": getSegmentY(L[k], S),
+			"data": getSegmentY(last, S),
 			"colour": "CadetBlue",
 			"events": ["push", "redraw"]
 		},{
@@ -68,9 +69,9 @@ function run(){
 
 		for (var idx in canvas.points) {
 			var pct = canvas.points[idx];
-			var orient = orientation(L[k], S, pct);
+			var orient = orientation(last, S, pct);
 			var message1 = "Punctul " + pct.litera + " ";
-			var message2 = " la dreapta muchiei orientate " + L[k].litera + S.litera;
+			var message2 = " la dreapta muchiei orientate " + last.litera + S.litera;
 
 			// break point
 			to_draw = {
@@ -94,7 +95,7 @@ function run(){
 			// break point
 			to_draw = [{
 				"shape": "segment",
-				"data": getSegmentY(L[k], pct),
+				"data": getSegmentY(last, pct),
 				"colour": "CadetBlue",
 				"events": ["pop", "pop", "push", "redraw"]
 			},{
@@ -110,25 +111,41 @@ function run(){
 		// break point
 		to_draw = {
 			"shape": "segment",
-			"data": getSegmentY(L[k], S),
+			"data": getSegmentY(last, S),
 			"events": ["pop", "pop", "push", "redraw"],
-			"message": "Muchia " + L[k].litera + S.litera + " face parte din acoperirea convexa."
+			"message": "Muchia " + last.litera + S.litera + " face parte din acoperirea convexa."
 		};
 		breakPoints.push(to_draw);
 
-		if (S != L[0]) {
-			k = k + 1;
-			L.push(S);
+		if (S == L[0]) {
+			break;
 		}
-		else {
-			valid = false;
-		}
+		L.push(S);
 	}
 	return L;
 }
 
+function runGrahams() {
+	var sortedPoints = sort(canvas.points, comparePointsX);
+
+	for (var idx in sortedPoints) {
+		breakPoints.push({
+			"shape": "point",
+			"data": sortedPoints[idx],
+			"colour": "red",
+			"size": 4,
+			"events": ["redraw"]
+		});
+	}
+	return true;
+}
+
 function firstPart() {
-	var res = run();
+	if (algorithm.value == 0) {
+		var res = runGrahams();
+	} else {
+		var res = runJarvis();
+	}
 	if (res == null) {
 		message.innerText = "at least 2 points";
 		return null;

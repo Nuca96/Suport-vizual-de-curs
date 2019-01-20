@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Jarvi's March</title>
+    <title>Acoperiri convexe</title>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" type="text/css" href="CSS/generic.css">
@@ -9,7 +9,7 @@
 		<script src="JavaScript/utils.js"></script>
     <script src="JavaScript/generic.js"></script>
     <script src="JavaScript/canvas.js"></script>
-		<script src="JavaScript/Jarvi's_March.js"></script>
+		<script src="JavaScript/Acoperiri convexe.js"></script>
   </head>
 
 <body onload="load()">
@@ -21,7 +21,7 @@
 
   <div id="content">
   <div id="Titlu">
-      <h2> <b> Jarvi's march </b></h2>
+      <h2> <b> Acoperiri convexe </b></h2>
   </div>
 
   <p style="color: #003366;"> Adaugati punctele. </p>
@@ -32,6 +32,11 @@
   </canvas>
   <br>
   <button class="buton" onclick="reset()">Reset</button>
+  Algoritm dorit:
+  <select id="algorithmSelector">
+    <option value="0">Graham's Scan</option>
+    <option value="1">Jarvi's March</option>
+  </select>
   <button class="buton" id="loadButton">Incarca puncte</button>
   <br>
   <br>

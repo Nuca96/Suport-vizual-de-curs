@@ -34,10 +34,10 @@ function compareSP(segm) {
 function pointInArray(point, array) {
 	for (var idx in array) {
 		if (areNear(point, array[idx])) {
-			return true;
+			return array[idx];
 		}
 	}
-	return false;
+	return null;
 }
 
 function init() {
@@ -101,7 +101,10 @@ function init() {
 			this.events.splice(idx, 0, point);
 		},
 		insert: function(point, type, segment) {
-			if (false === pointInArray(point, this.events)) {
+			var p = pointInArray(point, this.events)
+			if (p) {
+				point = p;
+			} else {
 				point.L = [];
 				point.U = [];
 				point.C = [];
@@ -138,15 +141,15 @@ function secondClick(event) {
 
 	//draw new elements
 	var permanents = [{
+		"shape": "segment",
+		"data": segment,
+		"colour": "DarkCyan"
+	}, {
 		"shape": "liter",
 		"data": segment.secondPoint
 	}, {
 		"shape": "liter",
 		"data": segment.firstPoint
-	}, {
-		"shape": "segment",
-		"data": segment,
-		"colour": "DarkCyan"
 	}];
 	extend(canvas.permanent_drawings, permanents);
 
