@@ -42,7 +42,7 @@ function runJarvis(){
 		"shape": "point",
 		"data": L[0],
 		"colour": "cyan",
-		"message": "Punctul " + L[0].litera + " e cel mai din dreapta."
+		"message": "Punctul <b>" + L[0].litera + "</b> e cel mai din dreapta."
 	};
 	breakPoints.push(to_draw)
 	while (true) {
@@ -63,46 +63,40 @@ function runJarvis(){
 			"data": S,
 			"colour": "cyan",
 			"events": ["push", "redraw"],
-			"message": "Punctul " + S.litera + " a fost ales random."
+			"message": "Punctul <b>" + S.litera + "</b> este pivotul ales random."
 		}];
 		breakPoints.push(to_draw);
 
 		for (var idx in canvas.points) {
 			var pct = canvas.points[idx];
 			var orient = orientation(last, S, pct);
-			var message1 = "Punctul " + pct.litera + " ";
-			var message2 = " la dreapta muchiei orientate " + last.litera + S.litera;
 
 			// break point
-			to_draw = {
+			breakPoints.push({
 				"shape": "point",
 				"data": pct,
 				"colour": "red",
 				"size": 4,
-				"events": ["redraw"]
-			};
+				"events": ["redraw"],
+				"message": "Punctul <b>" + pct.litera + "</b> este in <b>" + orient + "</b> segmentului <b>" + last.litera + S.litera + "</b>"
+			});
 
 			if (orient !== "dreapta") {
-				var message = message1 + "<b>NU ESTE</b>" + message2;
-				to_draw.message = message;
-				breakPoints.push(to_draw);
 				continue;
 			}
-			var message = message1 + "<b>ESTE</b>" + message2;
-			to_draw.message = message;
-			breakPoints.push(to_draw);
 
 			// break point
 			to_draw = [{
 				"shape": "segment",
 				"data": getSegmentY(last, pct),
 				"colour": "CadetBlue",
-				"events": ["pop", "pop", "push", "redraw"]
+				"events": ["pop", "pop", "push"]
 			},{
 				"shape": "point",
 				"data": pct,
 				"colour": "cyan",
-				"events": ["push", "redraw"]
+				"events": ["push", "redraw"],
+				"message": "Punctul <b>" + pct.litera + "</b> devine pivot."
 			}];
 			breakPoints.push(to_draw);
 			S = pct;
@@ -113,7 +107,7 @@ function runJarvis(){
 			"shape": "segment",
 			"data": getSegmentY(last, S),
 			"events": ["pop", "pop", "push", "redraw"],
-			"message": "Muchia " + last.litera + S.litera + " face parte din acoperirea convexa."
+			"message": "Punctul <b>" + S.litera + "</b> face parte din acoperirea convexa."
 		};
 		breakPoints.push(to_draw);
 
@@ -127,17 +121,90 @@ function runJarvis(){
 
 function runGrahams() {
 	var sortedPoints = sort(canvas.points, comparePointsX);
+	var sortedLen = sortedPoints.length;
 
-	for (var idx in sortedPoints) {
+	function check(array, point) {
 		breakPoints.push({
 			"shape": "point",
-			"data": sortedPoints[idx],
-			"colour": "red",
+			"data": point,
+			"colour": "DeepSkyBlue",
 			"size": 4,
-			"events": ["redraw"]
+			"events": ["redraw"],
+			"message": "Urmatorul punct in lista este <b>" + point.litera + "</b>"
+		});
+		do {
+			var len = array.length;
+			var last = array[len-1];
+			var anteLast = array[len-2];
+			var orient = orientation(anteLast, last, point);
+			var segm = getSegmentX(last, anteLast);
+			breakPoints.push([{
+				"shape": "segment",
+				"data": segm,
+				"colour": "DeepSkyBlue",
+				"events": ["redraw"]
+				}, {
+				"shape": "point",
+				"data": point,
+				"colour": "DeepSkyBlue",
+				"size": 4,
+				"message": "Punctul <b>" + point.litera + "</b> este in <b>" + orient + "</b> segmentului <b>" + anteLast.litera + last.litera + "</b>"
+			}]);
+			if (orient !== "stanga") {
+				array.pop();
+				breakPoints.push({
+					"shape": "segment",
+					"data": segm,
+					"colour": "red",
+					"message": "Se sterge punctul <b>" + last.litera + "</b>",
+					"events": ["pop"]
+				});
+			} else {
+				break;
+			}
+		} while (len >=3);
+
+		array.push(point);
+
+		var len = array.length;
+		var segm = getSegmentX(array[len-2], array[len-1]);
+		breakPoints.push({
+			"shape": "segment",
+			"data": segm,
+			"events": ["push", "redraw"],
+			"message": "Se adauga punctul <b>" + point.litera + "</b>"
 		});
 	}
-	return true;
+
+	var lower = [];
+	lower.push(sortedPoints[0]);
+	lower.push(sortedPoints[1]);
+	breakPoints.push({
+		"shape": "segment",
+		"data": getSegmentX(lower[0], lower[1]),
+		"events": ["push"],
+		"message": "Frontiera inferioara - puncte de start: <b>" + lower[0].litera + " " + lower[1].litera + "</b>"
+	});
+
+	for (var idx=2; idx<sortedLen; idx++) {
+		check(lower, sortedPoints[idx])
+	}
+
+	var upper = [];
+	upper.push(sortedPoints[sortedLen-1]);
+	upper.push(sortedPoints[sortedLen-2]);
+	breakPoints.push({
+		"shape": "segment",
+		"data": getSegmentX(upper[0], upper[1]),
+		"events": ["push"],
+		"message": "Frontiera superioara - puncte de start: <b>" + upper[0].litera + " " + upper[1].litera + "</b>"
+	});
+
+	for (var idx=sortedLen-3; idx>=0; idx--) {
+		check(upper, sortedPoints[idx]);
+	}
+
+	return extend(lower, upper);
 }
 
 function firstPart() {
@@ -150,6 +217,7 @@ function firstPart() {
 		message.innerText = "at least 2 points";
 		return null;
 	}
+	canvas.acoperirea = res;
 	runButton.style.visibility = "hidden";
 
 	startButton.removeEventListener("click", startAlgorithm);
@@ -162,5 +230,13 @@ function firstPart() {
 }
 
 function callback(){
+	for (var idx in canvas.acoperirea) {
+		canvas.draw({
+			"shape": "point",
+			"data": canvas.acoperirea[idx],
+			"colour": "red",
+			"size": 4
+		});
+	}
 	return;
 }

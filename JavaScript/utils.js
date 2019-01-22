@@ -6,6 +6,7 @@ function nextChar(c) {
 
 function extend(array1, array2) {
 	array1.push.apply(array1, array2);
+	return array1;
 }
 
 function copy(obj) {

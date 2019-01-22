@@ -62,7 +62,7 @@ function init() {
 				"shape": "liter",
 				"data": point,
 				"events": ["push"],
-				"message": point.litera + " este un nou punct de intersectie"
+				"message": "<b>" + point.litera + "</b> este un nou punct de intersectie"
 			}]);
 		},
 		overWriteEvent: function(point, type, segment) {
@@ -196,7 +196,7 @@ function findNewEvent(seg1, seg2) {
 		"shape": "segment",
 		"data": seg2,
 		"colour": "purple",
-		"message": "Se calculeaza intersectia dintre " + seg1.str() + " si " + seg2.str()
+		"message": "Se calculeaza intersectia dintre <b>" + seg1.str() + "</b> si <b>" + seg2.str() + "</b>"
 	}];
 	breakPoints.push(drawing);
 
@@ -218,7 +218,7 @@ function deleteSegmentsFromTree(activeSegments, toDelete) {
 		return;
 	}
 
-	var message = "Sterge ";
+	var message = "Sterge <b>";
 	for (var idx in toDelete) {
 		var segm = toDelete[idx];
 		activeSegments.delete(segm);
@@ -229,7 +229,7 @@ function deleteSegmentsFromTree(activeSegments, toDelete) {
 			},{
 			"shape": "graph",
 			"data": activeSegments.getChart(),
-			"message": message + segm.str()
+			"message": message + segm.str() + "</b>"
 		}]);
 	}
 }
@@ -240,7 +240,7 @@ function insertSegmentsIntoTree(activeSegments, toAdd) {
 		return;
 	}
 
-	var message = "Insereaza ";
+	var message = "Insereaza <b>";
 	for (var idx in toAdd) {
 		var segm = toAdd[idx];
 		activeSegments.insert(segm);
@@ -251,7 +251,7 @@ function insertSegmentsIntoTree(activeSegments, toAdd) {
 			},{
 			"shape": "graph",
 			"data": activeSegments.getChart(),
-			"message": message + segm.str()
+			"message": message + segm.str() + "</b>"
 		}]);
 	}
 }
@@ -303,7 +303,7 @@ function run() {
 			"data": point,
 			"colour": "red",
 			"events": ["redraw"],
-			"message": "Dreapta de baleiere ajunge la punctul " + point.litera
+			"message": "Dreapta de baleiere ajunge la punctul <b>" + point.litera + "</b>"
 		};
 		breakPoints.push(drawing)
 
