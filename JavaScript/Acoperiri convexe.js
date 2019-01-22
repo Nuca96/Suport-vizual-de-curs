@@ -21,8 +21,8 @@ function addPoint(event) {
 
 function loadPoints() {
 	loadButton.style.visibility = "hidden";
-	for (var idx in Jarvis) {
-		var ev = canvas.genericEventReverse(Jarvis[idx]);
+	for (var idx in acoperiri) {
+		var ev = canvas.genericEventReverse(acoperiri[idx]);
 		addPoint(ev);
 	}
 	loadButton.removeEventListener("click", loadPoints);

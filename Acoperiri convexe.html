@@ -24,10 +24,10 @@
       <h2> <b> Acoperiri convexe </b></h2>
   </div>
 
-  <p style="color: #003366;"> Adaugati punctele. </p>
+  <p style="color: #003366;"> Adaugati punctele. Alegeti algoritmul dorit. Apasati START pentru rulare manuala sau RUN pentru rulare automata (puteti seta viteza dorita). Pasii algoritmului sunt descrisi in dreapta.</p>
   <div class="row">
   <div class="column" id="left">
-  <canvas id = "myCanvas" width = "500" height = "500" style = "border:1px solid #000000; cursor:crosshair" >
+  <canvas id = "myCanvas" width = "500" height = "500">
     Your browser does not support the canvas element.
   </canvas>
   <br>
@@ -37,7 +37,7 @@
     <option value="0">Graham's Scan</option>
     <option value="1">Jarvi's March</option>
   </select>
-  <button class="buton" id="loadButton">Incarca puncte</button>
+  <button class="buton" id="loadButton">Incarca din fisier</button>
   <br>
   <br>
   <button class="buton" id="startButton">Start</button>
@@ -51,8 +51,6 @@
     <option value="4">4</option>
   </select>
   <br><br>
-<!--   <button id="prev">Prev</button> -->
-<!-- <button id="nextButton">Next</button> -->
   <div id="message"></div>
 </div>
 <div class="column" id="right">

@@ -1,7 +1,7 @@
 //punctele pe care vrem sa le incarcam automat pentru diversi algoritmi
 // x si y trebuie sa fie cuprinsi intre 0 si 500
 
-var Jarvis = [{
+var acoperiri = [{
 		x: 80,
 		y: 300
 	},{
@@ -34,6 +34,8 @@ var Jarvis = [{
 	},
 ];
 
+
+//segmente determinate de doua puncte
 var Intersection = [{
 		p1: {
 			x:200,

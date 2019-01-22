@@ -24,6 +24,10 @@ select {
 ol {
 	font-family: "Times New Roman", Times, serif;
 }
+canvas {
+	border:1px solid #000000;
+	cursor:crosshair;
+}
 
 #TitluMare
 {

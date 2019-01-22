@@ -8,7 +8,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <script src="JavaScript/PlanPrimal_PlanDual.js"></script>
 
-		<link rel="stylesheet" type="text/css" href="CSS/PlanPrimal_PlanDual.css">
 		<link rel="stylesheet" type="text/css" href="CSS/generic.css">
 
 	</head>
@@ -23,15 +22,15 @@
 
 
 
+<div id="content">
 <center>
 <div id="Titlu">
 		<h2> <b> Planul primal si planul dual </b></h2>
 </div>
 </center>
 
-
-<div id="content">
-<div id="canvas1">
+<div class="row">
+<div class="column" id="left">
 
 	<canvas id = "myCanvas" width = "500" height = "500">
 	Your browser does not support the canvas element.
@@ -57,7 +56,7 @@
 </div>
 
 
-<div id="canvas2">
+<div class="column" id="right">
 
 	<canvas id = "myCanvas2" width = "500" height = "500">
 	Your browser does not support the canvas element.
@@ -77,11 +76,12 @@
 		<button class="buton" onclick="frontiera_convexa2()">Frontiera convexa</button>
     </div>
 
-	<p id="paragrafX"> Xcoord:</p> <input id="Xcoord" type="number"></p>
-	<p id="paragrafY"> Ycoord:</p> <input id="Ycoord" type="number"></p>
+	<p id="paragrafX"> Xcoord: <input id="Xcoord" type="number"></p>
+	<p id="paragrafY"> Ycoord: <input id="Ycoord" type="number"></p>
 <!--	<button onclick="adauga()" style="position:fixed; margin-left: 42%; margin-top: -3.5%;">Adaugă</button> -->
 	 <p id="stare_canvas2"></p>
 
+</div>
 </div>
 </div>
 </body>
