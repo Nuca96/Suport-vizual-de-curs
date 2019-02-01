@@ -26,22 +26,22 @@
       <div id="Titlu">
           <h2> <b> Harti trapezoidale </b></h2>
       </div>
-      <p style="color: #003366;"> Adaugati segmentele. Vizualizati cum se modifica structura de cautare din dreapta. Daca doriti sa schimbati ordinea in care sunt introduse segmentele, apasat SHUFFLE. Apasati START pentru rulare manuala sau RUN pentru rulare automata (puteti seta viteza dorita). Pasii algoritmului sunt descrisi mai jos. Dupa ce s-a terminat rularea, puteti sa vedeti cum functioneaza cautarea unui punct dand click pe figura.</p>
+      <p style="color: #003366;"> Adăugați segmentele. Vizualizați cum se modifică structura de căutare din dreapta. Dacă doriți să schimbați ordinea în care sunt introduse segmentele, apăsați AMESTECĂ. Apăsați START pentru rulare manuală sau RULEAZĂ AUTOMAT pentru rulare automată (puteți seta viteza dorită). Pașii algoritmului sunt descriși mai jos. După ce s-a terminat rularea, puteți să vedeți cum funcționează căutarea unui punct dând click pe figură.</p>
       <div class="row">
 
         <div class="column" id="left">
           <canvas id = "myCanvas" width = "500" height = "500">
             Your browser does not support the canvas element.
           </canvas>
-          <br>
-          <button class="buton" onclick="reset()">Reset</button>
-          <button class="buton" id="shuffleButton">Shuffle</button>
-          <button class="buton" id="loadButton">Incarca din fisier</button>
+          <br><br>
+          <button class="buton" onclick="reset()">Șterge tot</button>
+          <button class="buton" id="shuffleButton">Amestecă</button>
+          <button class="buton" id="loadButton">Incarcă din fișier</button>
           <br>
           <br>
           <button class="buton" id="startButton">Start</button>
-          <button class="buton" id="runButton">Run</button>
-          Speed:
+          <button class="buton" id="runButton">Rulează automat</button>
+          Viteză:
           <select id="speedSelector">
             <option value="0">Instant</option>
             <option value="1">1</option>
@@ -61,7 +61,7 @@
         <div id="flip">Click pentru a vedea pașii efectuați de algoritm. </div>
         <div id="panel"> <ol id="messList"> </ol> </div>
       </div>
-      <div id="errorMessage"> Dimensiunea ferestrei este prea mica.</div>
+      <div id="errorMessage"> Dimensiunea ferestrei este prea mică.</div>
     </div>
   </body>
 </html>

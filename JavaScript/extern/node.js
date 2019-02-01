@@ -28,21 +28,24 @@ var emptyChild = {
 };
 
 Node.prototype.chart = function() {
-  var leftChild = emptyChild;
-  var rightChild = emptyChild;
+  var children = [emptyChild, emptyChild];
+
 
   if (this.left != null) {
-    leftChild = this.left.chart();
+    children[0] = this.left.chart();
   }
   if (this.right != null) {
-    rightChild = this.right.chart();
+    children[1] = this.right.chart();
+  }
+  if (this.left == null && this.right == null) {
+    children = [];
   }
 
   return {
     text: {
       name: this.key.str()
     },
-    children: [leftChild, rightChild]
+    children: children
   };
 }
 

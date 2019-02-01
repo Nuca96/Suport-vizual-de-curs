@@ -53,7 +53,7 @@ function startAlgorithm() {
 	runButton.style.visibility = "hidden";
 
 	startButton.addEventListener("click", nextStep);
-	startButton.innerText = "Next";
+	startButton.innerText = "Următorul pas";
 
 	nextStep();
 }

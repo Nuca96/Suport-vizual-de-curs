@@ -36,7 +36,7 @@ var acoperiri = [{
 
 
 //segmente determinate de doua puncte
-var Intersection = [{
+var intersectii = [{
 		p1: {
 			x:200,
 			y:50
@@ -126,7 +126,7 @@ var Intersection = [{
 	}
 ];
 
-var TrapezMap = [{
+var harti = [{
 		p1: {
 			x:57,
 			y:108

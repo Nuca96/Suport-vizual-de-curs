@@ -169,6 +169,7 @@ Canvas.prototype.getSweepX = function(x) {
 }
 
 Canvas.prototype.genericEvent = function(event) {
+	// this.element = document.getElementById(canvasId);
 	var rect = this.element.getBoundingClientRect();
 	var punct = {
 		"x": event.clientX - rect.left,
@@ -176,6 +177,7 @@ Canvas.prototype.genericEvent = function(event) {
 	};
 	return this.getNearPoint(punct);
 }
+
 Canvas.prototype.genericEventReverse = function(point) {
 	var rect = this.element.getBoundingClientRect();
 	var event = {

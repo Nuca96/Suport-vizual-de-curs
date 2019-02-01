@@ -62,7 +62,7 @@ function init() {
 				"shape": "liter",
 				"data": point,
 				"events": ["push"],
-				"message": "<b>" + point.litera + "</b> este un nou punct de intersectie"
+				"message": "<b>" + point.litera + "</b> este un nou punct de intersecție"
 			}]);
 		},
 		overWriteEvent: function(point, type, segment) {
@@ -158,8 +158,8 @@ function secondClick(event) {
 
 function loadSegments() {
 	loadButton.style.visibility = "hidden";
-	for (var idx in Intersection) {
-		var segm = Intersection[idx];
+	for (var idx in intersectii) {
+		var segm = intersectii[idx];
 		var ev1 = canvas.genericEventReverse(segm.p1);
 		firstClick(ev1);
 
@@ -196,7 +196,7 @@ function findNewEvent(seg1, seg2) {
 		"shape": "segment",
 		"data": seg2,
 		"colour": "purple",
-		"message": "Se calculeaza intersectia dintre <b>" + seg1.str() + "</b> si <b>" + seg2.str() + "</b>"
+		"message": "Se calculează intersecția dintre <b>" + seg1.str() + "</b> și <b>" + seg2.str() + "</b>"
 	}];
 	breakPoints.push(drawing);
 

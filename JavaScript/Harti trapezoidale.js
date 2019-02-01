@@ -1,10 +1,9 @@
 function Trapez(top, bottom, leftp, rightp) {
-	this.idx = tridx;
-	tridx++;
 	this.bottom = bottom;
 	this.top = top;
 	this.leftp = leftp;
 	this.rightp = rightp;
+
 	this.node = null; //this property will be updated lately
 
 	this.topLeft = null;
@@ -12,6 +11,9 @@ function Trapez(top, bottom, leftp, rightp) {
 	this.bottomLeft = null;
 	this.bottomRight = null;
 
+	// properties for drawing
+	this.idx = tridx;
+	tridx++;
 	this.polygon = this.getPolygon();
 	this.center = this.getCenter();
 	this.str = this.idx;
@@ -65,13 +67,20 @@ Trapez.prototype.updateNeighbors = function(topLeft, topRight, bottomLeft, botto
 	}
 };
 
-var Node = function(type, leftn, rightn, info) {
+var Node = function(info) {
+	this.type = "trapez";
+	this.leftn = null;
+	this.rightn = null;
+	this.info = info;
+	info.node = this;
+};
+
+Node.prototype.changeType = function(type, leftn, rightn, info) {
 	this.type = type;
 	this.leftn = leftn;
 	this.rightn = rightn;
 	this.info = info;
-	info.node = this;
-};
+}
 
 Node.prototype.getLeafs = function() {
 	if (this.leftn && this.rightn) {
@@ -171,8 +180,7 @@ var D = {
 		br.upper = top;
 		var tr = new Trapez(top, bottom, tl, br);
 
-		tr.updateNeighbors(null, null, null, null);
-		var nod = new Node("trapez", null, null, tr);
+		var nod = new Node(tr);
 		this.root = nod;
 	},
 	search: function(point) {
@@ -202,7 +210,6 @@ function createExtension(point, trapez) {
 	if (!newPoint(point)) {
 		return false;
 	}
-	var sweep = canvas.getSweepX(point.x);
 	point.upper = trapez.top;
 	point.lower = trapez.bottom;
 	canvas.addPoint(point);
@@ -211,9 +218,6 @@ function createExtension(point, trapez) {
 }
 
 function nextTrapez(segm, trapez) {
-	if (segm.secondPoint === trapez.rightp) {
-		return NaN;
-	}
 	var orient = orientation(segm.firstPoint, segm.secondPoint, trapez.rightp);
 	if (orient == "dreapta") {
 		return trapez.topRight;
@@ -221,6 +225,7 @@ function nextTrapez(segm, trapez) {
 	if (orient == "stanga") {
 		return trapez.bottomRight;
 	}
+	console.log("error with trList");
 	return NaN;
 }
 
@@ -257,7 +262,7 @@ function createTrapez(segm, trapez, nodes, where) {
 	} else {
 		var newTrapez = new Trapez(trapez.top, segm, leftp, trapez.rightp);
 	}
-	var newNode = new Node("trapez", null, null, newTrapez);
+	var newNode = new Node(newTrapez);
 
 	nodes.push(newNode);
 }
@@ -295,24 +300,21 @@ function createMiddleTrapezoids(segm, trList) {
 		var trapez = trList[idx];
 		var drawings = [];
 		var thisNode = trapez.node;
-		var message = "Se actualizeaza extensia <b>";
+		var message = "Se actualizează extensia <b>";
+		thisNode.changeType("segment", topNodes[tidx], bottomNodes[bidx], segm);
 
-		thisNode.type = "segment";
-		thisNode.leftn = topNodes[tidx];
-		thisNode.rightn = bottomNodes[bidx];
-		thisNode.info = segm;
 		breakPoints.push([{
 			"shape": "trapez",
 			"data": trapez,
 			"colour": "DeepSkyBlue",
-			"message": "Se analizeaza trapezul <b>" + trapez.str + "</b>"
+			"message": "Se analizează trapezul <b>" + trapez.str + "</b>"
 		}, {
 			"shape": "segment",
 			"data": segm
 		}]);
 
 		if (trapez.type != "top") {
-			message = message + "superioara";
+			message = message + "superioară";
 			var topLeft = null;
 			var topRight = null;
 			var bottomLeft = trapez.bottomLeft;
@@ -332,12 +334,12 @@ function createMiddleTrapezoids(segm, trList) {
 				"shape": "trapez",
 				"data": bottomNodes[bidx].info,
 				"colour": "SteelBlue",
-				"message": "Se creeaza trapezul <b>" + bottomNodes[bidx].info.str + "</b>"
+				"message": "Se creează trapezul <b>" + bottomNodes[bidx].info.str + "</b>"
 			});
 			bidx++;
 		}
 		if (trapez.type != "bottom") {
-			message = message + "inferioara";
+			message = message + "inferioară";
 			var topLeft = trapez.topLeft;
 			var topRight = trapez.topRight;
 			var bottomLeft = null;
@@ -357,7 +359,7 @@ function createMiddleTrapezoids(segm, trList) {
 				"shape": "trapez",
 				"data": topNodes[tidx].info,
 				"colour": "RoyalBlue",
-				"message": "Se creeaza trapezul <b>" + topNodes[tidx].info.str + "</b>"
+				"message": "Se creează trapezul <b>" + topNodes[tidx].info.str + "</b>"
 			});
 			tidx++;
 		}
@@ -403,14 +405,10 @@ function createLeftTrapez(point, trList) {
 	leftTrapez.updateNeighbors(trapez.topLeft, null, trapez.bottomLeft, null);
 	fakeTrapez.updateNeighbors(leftTrapez, trapez.topRight, leftTrapez, trapez.bottomRight);
 
-	var leftNode = new Node("trapez", null, null, leftTrapez);
-	var fakeNode = new Node("trapez", null, null, fakeTrapez);
+	var leftNode = new Node(leftTrapez);
+	var fakeNode = new Node(fakeTrapez);
 
-	var oldNode = trapez.node;
-	oldNode.type = "point";
-	oldNode.leftn = leftNode;
-	oldNode.rightn = fakeNode;
-	oldNode.info = point;
+	trapez.node.changeType("point", leftNode, fakeNode, point);
 
 	trList[0] = fakeTrapez;
 
@@ -437,14 +435,10 @@ function createRightTrapez(point, trList) {
 	rightTrapez.updateNeighbors(null, trapez.topRight, null, trapez.bottomRight);
 	fakeTrapez.updateNeighbors(trapez.topLeft, rightTrapez, trapez.bottomLeft, rightTrapez);
 
-	var rightNode = new Node("trapez", null, null, rightTrapez);
-	var fakeNode = new Node("trapez", null, null, fakeTrapez);
+	var rightNode = new Node(rightTrapez);
+	var fakeNode = new Node(fakeTrapez);
 
-	var oldNode = trapez.node;
-	oldNode.type = "point";
-	oldNode.leftn = fakeNode;
-	oldNode.rightn = rightNode;
-	oldNode.info = point;
+	trapez.node.changeType("point", fakeNode, rightNode, point);
 
 	trList[trList.length-1] = fakeTrapez;
 
@@ -452,7 +446,7 @@ function createRightTrapez(point, trList) {
 		"shape": "trapez",
 		"data": rightTrapez,
 		"colour": "Teal",
-		"message": "Se creeaza trapezul <b>" + rightTrapez.str + "</b>"
+		"message": "Se creează trapezul <b>" + rightTrapez.str + "</b>"
 	},{
 		"shape": "graph",
 		"data": D.getChart()
@@ -501,7 +495,7 @@ function modifyTrapezoids(segm) {
 				"lower": point.lower,
 				"upper": point.upper
 			},
-			"message": "Se creeaza punctul <b>" + point.litera + "</b> si extensia acestuia"
+			"message": "Se creează punctul <b>" + point.litera + "</b> și extensia acestuia"
 		}];
 		extend(canvas.permanent_drawings, drawings);
 		breakPoints.push(drawings);
@@ -528,7 +522,7 @@ function modifyTrapezoids(segm) {
 				"lower": point.lower,
 				"upper": point.upper
 			},
-			"message": "Se creeaza punctul <b>" + point.litera + "</b> si extensia acestuia"
+			"message": "Se creează punctul <b>" + point.litera + "</b> și extensia acestuia"
 		}];
 		extend(canvas.permanent_drawings, drawings);
 		breakPoints.push(drawings);
@@ -674,8 +668,8 @@ function instantInsert(p1, p2) {
 
 function loadSegments() {
 	loadButton.style.visibility = "hidden";
-	for (var idx in TrapezMap) {
-		var segm = TrapezMap[idx];
+	for (var idx in harti) {
+		var segm = harti[idx];
 		instantInsert(segm.p1, segm.p2);
 	}
 	loadButton.removeEventListener("click", loadSegments);
