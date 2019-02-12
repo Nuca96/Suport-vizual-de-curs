@@ -41,29 +41,46 @@ function nextStep() {
 
 function genericCB() {
 	startButton.removeEventListener("click", nextStep);
+	startButton.addEventListener("click", startAlgorithm);
+	startButton.style.visibility = "visible";
+	startButton.innerText = "Restart";
+
 	message.innerText = "Algoritmul s-a sfarsit";
+	runButton.style.visibility = "visible";
 	canvas.redraw();
 	callback();
 }
 
-function startAlgorithm() {
-	if (null === firstPart())
-		return null;
+function genericFP(){
 	loadButton.style.visibility = "hidden";
-	runButton.style.visibility = "hidden";
 
+	startButton.removeEventListener("click", startAlgorithm);
 	startButton.addEventListener("click", nextStep);
 	startButton.innerText = "Următorul pas";
 
+	message.innerText = "Algoritmul este in curs de rulare";
+	runButton.style.visibility = "hidden";
+	canvas.permanent_drawings = [];
+	breakPointsIdx = 0;
+	$('#messList').empty();
+	breakPoints = [];
+	firstPart();
+}
+
+function startAlgorithm() {
+	if (!condition()) {
+		return null;
+	}
+	genericFP()
 	nextStep();
 }
 
 function autorun() {
-	if (!firstPart())
+	if (!condition()){
 		return null;
-	loadButton.style.visibility = "hidden";
+	}
+	genericFP();
 	startButton.style.visibility = "hidden";
-	runButton.style.visibility = "hidden";
 
 	function timer() {
 		if (null === nextStep()){

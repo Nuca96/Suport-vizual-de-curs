@@ -217,16 +217,15 @@ function createExtension(point, trapez) {
 	return true;
 }
 
-function nextTrapez(segm, trapez) {
+function nextTrapezPosition(segm, trapez) {
 	var orient = orientation(segm.firstPoint, segm.secondPoint, trapez.rightp);
 	if (orient == "dreapta") {
-		return trapez.topRight;
+		return "top";
 	}
 	if (orient == "stanga") {
-		return trapez.bottomRight;
+		return "bottom";
 	}
-	console.log("error with trList");
-	return NaN;
+	return "none";
 }
 
 function getIntersectList(segm) {
@@ -243,7 +242,12 @@ function getIntersectList(segm) {
 		if (lastTr.rightp.x >=  segm.secondPoint.x) {
 			break;
 		}
-		trList.push(nextTrapez(segm, lastTr));
+		if (nextTrapezPosition(segm, lastTr) == "bottom") {
+			trList.push(lastTr.bottomRight);
+		}
+		if (nextTrapezPosition(segm, lastTr) == "top") {
+			trList.push(lastTr.topRight);
+		}
 	} while(true);
 
 	return trList;
@@ -273,16 +277,17 @@ function createMiddleTrapezoids(segm, trList) {
 
 	for (var idx in trList) {
 		var trapez = trList[idx];
+		trapez.type = nextTrapezPosition(segm, trapez);
 
-		if (nextTrapez(segm, trapez) == trapez.topRight) {
-			trapez.rightp.upper = segm;
+		if (nextTrapezPosition(segm, trapez) == "top") {
 			trapez.type = "bottom";
+			trapez.rightp.upper = segm;
 			createTrapez(segm, trapez, bottomNodes, "bottom");
 			continue;
 		}
-		if (nextTrapez(segm, trapez) == trapez.bottomRight) {
-			trapez.rightp.lower = segm;
+		if (nextTrapezPosition(segm, trapez) == "bottom") {
 			trapez.type = "top";
+			trapez.rightp.lower = segm;
 			createTrapez(segm, trapez, topNodes, "top");
 			continue;
 		}
@@ -737,13 +742,13 @@ function run() {
 	this.searchBreakPoints = [];
 	D.init();
 	breakPoints = [];
-	$('#messList').empty();
 	canvas.removeEvent("click", find);
-	breakPointsIdx = 0;
 	canvas.permanent_drawings = [];
 	for (var idx in canvas.segmente) {
 		modifyTrapezoids(canvas.segmente[idx]);
 	}
+}
+function condition() {
 	return true;
 }
 
@@ -754,19 +759,11 @@ function firstPart() {
 		canvas.redraw();
 	}
 
-	var res = run();
-	if (res == null) {
-		message.innerText = "error";
-		return null;
-	}
+	run();
 	canvas.removeEvent("click", firstClick);
-	startButton.removeEventListener("click", startAlgorithm);
-	loadButton.removeEventListener("click", loadSegments);
 	shuffleButton.style.visibility = "hidden";
-
-
-	breakPointsIdx = 0;
 	canvas.permanent_drawings = [];
+
 	canvas.draw({
 		"shape": "graph",
 		"data": {
@@ -776,6 +773,7 @@ function firstPart() {
 	});
 	return true;
 }
+
 function callback() {
 	canvas.permanent_drawings.push({
 		"shape": "markers",
@@ -783,9 +781,5 @@ function callback() {
 	});
 	canvas.redraw();
 	canvas.addEvent("click", find);
-	startButton.addEventListener("click", startAlgorithm);
-	startButton.innerText = "Restart";
-	runButton.style.visibility = "visible";
-	startButton.style.visibility = "visible";
 	shuffleButton.style.visibility = "visible";
 }

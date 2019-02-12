@@ -65,6 +65,13 @@ function determinant2(matrice) {
 	return l0[0]*l1[1] - l0[1]*l1[0];
 }
 
+function floor(point) {
+	return {
+		x: Math.floor(point.x),
+		y: Math.floor(point.y)
+	};
+}
+
 function lastElem(array) {
 	var len = array.length;
 	if (len == 0) {
@@ -184,8 +191,15 @@ function ecuatia_dreptei(segm) {
 	return {
 		"x_coef": A.y - B.y,
 		"y_coef": B.x - A.x,
-		"termen_liber": A.x*B.y - B.x*A.y
+		"termen_liber": - A.x*B.y + B.x*A.y
 	}
+}
+
+function concat(a1, a2, a3) {
+	var a = a1.concat(a2);
+	if (typeof a3 === "undefined")
+		return a;
+	return a.concat(a3);
 }
 
 function intersection(seg1, seg2) {
@@ -198,12 +212,12 @@ function intersection(seg1, seg2) {
 	if (delta == 0)
 		return false;
 
-	matrice = [[-dr1.termen_liber, dr1.y_coef],
-			   [-dr2.termen_liber, dr2.y_coef]];
+	matrice = [[dr1.termen_liber, dr1.y_coef],
+			   [dr2.termen_liber, dr2.y_coef]];
 	var x = determinant2(matrice) / delta;
 
-	matrice = [[-dr1.termen_liber, dr1.x_coef],
-			   [-dr2.termen_liber, dr2.x_coef]]
+	matrice = [[dr1.termen_liber, dr1.x_coef],
+			   [dr2.termen_liber, dr2.x_coef]]
 	var y = - determinant2(matrice) / delta;
 
 	return {

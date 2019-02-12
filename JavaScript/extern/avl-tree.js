@@ -43,7 +43,7 @@ AvlTree.prototype.getChart = function() {
 AvlTree.prototype.rightNeigh = function() {
   var keys = this._SRD(this._root);
   for (var idx in keys) {
-    if (this._compareSP(keys[idx]) > 0) {
+    if (this._compareSP(keys[idx], "right") > 0) {
       return keys[idx];
     }
   }
@@ -54,7 +54,7 @@ AvlTree.prototype.leftNeigh = function() {
   var keys = this._SRD(this._root);
   var neigh = null;
   for (var idx in keys) {
-    if (this._compareSP(keys[idx]) >= 0) {
+    if (this._compareSP(keys[idx], "left") >= 0) {
       break;
     }
     neigh = keys[idx];

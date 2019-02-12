@@ -8,15 +8,14 @@ function addPoint(event) {
 	var punct = canvas.genericEvent(event);
 	canvas.addPoint(punct);
 
-	var permanents = [{
+	canvas.draw({
 		"shape":"point",
 		"data": punct
-	}, {
+	});
+	canvas.draw({
 		"shape":"liter",
 		"data": punct
-	}]
-	extend(canvas.permanent_drawings, permanents);
-	canvas.redraw();
+	});
 }
 
 function loadPoints() {
@@ -206,24 +205,34 @@ function runGrahams() {
 	return extend(lower, upper);
 }
 
-function firstPart() {
+function condition() {
 	if (canvas.points.length < 2) {
 		message.innerText = "at least 2 points";
 		return null;
 	}
+	return true;
+}
+
+function firstPart() {
+	canvas.removeEvent("click", addPoint);
+
+	for (var idx in canvas.points) {
+		extend(canvas.permanent_drawings, [{
+			"shape":"point",
+			"data": canvas.points[idx]
+		}, {
+			"shape":"liter",
+			"data": canvas.points[idx]
+		}]);
+	}
+	canvas.redraw();
+
 	if (algorithm.value == 0) {
 		canvas.acoperirea = runGrahams();
 	} else {
 		canvas.acoperirea = runJarvis();
 	}
-	runButton.style.visibility = "hidden";
 
-	startButton.removeEventListener("click", startAlgorithm);
-	canvas.removeEvent("click", addPoint);
-	loadButton.removeEventListener("click", loadPoints);
-	runButton.removeEventListener("click", autorun);
-
-	breakPointsIdx = 0;
 	return true;
 }
 
@@ -236,5 +245,6 @@ function callback(){
 			"size": 4
 		});
 	}
+
 	return;
 }
