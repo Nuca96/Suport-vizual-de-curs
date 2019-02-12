@@ -200,7 +200,7 @@ Canvas.prototype.getNearPoint = function(point) {
 Canvas.prototype.addPoint = function(point) {
 	// point.litera = "P" + canvas.points.length;
 	point.litera = this.liter;
-	this.liter = nextChar(this.liter);
+	this.liter = nextLiter(this.liter);
 
 	this.points.push(point);
 }

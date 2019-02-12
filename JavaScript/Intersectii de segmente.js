@@ -41,24 +41,25 @@ function compareSP(segm) {
 	return 0;
 }
 
-function pointInArray(point, array) {
-	for (var idx in array) {
-		if (theSamePoint(point, array[idx])) {
-			return array[idx];
-		}
-	}
-	return null;
-}
-
 var events = function() {
 	this.intersections = [];
 	this.next = function() {
-		return this.events[this.idx++];
+		var point = this.eventQ.findMinimum();
+		this.eventQ.delete(point);
+		return point;
 	}
 }
 
+events.prototype.newSegment = function(segment) {
+	var upper = this.getPoint(segment.firstPoint);
+	var lower = this.getPoint(segment.secondPoint);
+
+	upper.U.push(segment);
+	lower.L.push(segment);
+}
+
 events.prototype.again = function(){
-	this.events = [];
+	this.eventQ = new AvlTree(comparePointsY);
 	this.idx = 0;
 	for (var idx in canvas.segmente) {
 		this.newSegment(canvas.segmente[idx]);
@@ -83,24 +84,15 @@ events.prototype.addIntersection = function(point) {
 	}]);
 };
 
-events.prototype.add = function(point) {
-	for (var idx=0; idx<this.events.length; idx++) {
-		if (comparePointsY(this.events[idx], point) > 0) {
-			break;
-		}
-	}
-	this.events.splice(idx, 0, point);
-}
-
 events.prototype.getPoint = function(point) {
-	var p = pointInArray(point, this.events);
+	var p = this.eventQ.get(point);
 	if (p) {
 		point = p;
 	} else {
 		point.L = [];
 		point.U = [];
 		point.C = [];
-		this.add(point);
+		this.eventQ.insert(point);
 	}
 	return point;
 }
@@ -122,14 +114,6 @@ events.prototype.newIntersection = function(seg1, seg2, point) {
 	var p = this.getPoint(point);
 	this.overWriteEvent(p, seg1);
 	this.overWriteEvent(p, seg2);
-}
-
-events.prototype.newSegment = function(segment) {
-	var upper = this.getPoint(segment.firstPoint);
-	var lower = this.getPoint(segment.secondPoint);
-
-	upper.U.push(segment);
-	lower.L.push(segment);
 }
 
 function init() {
@@ -226,7 +210,9 @@ function findNewEvent(seg1, seg2) {
 	if (false == int) {
 		return;
 	}
-	eventPoints.newIntersection(seg1, seg2, int);
+	if (comparePointsY(globalPoint, int) < 0) {
+		eventPoints.newIntersection(seg1, seg2, int);
+	}
 
 	return int;
 }
@@ -319,7 +305,7 @@ function run() {
 	eventPoints.again();
 	while(true) {
 		var point = eventPoints.next();
-		if (typeof point === "undefined")
+		if (!point)
 			break;
 		var drawing = {
 			"shape": "sweepY",

@@ -4,6 +4,19 @@ function nextChar(c) {
     return String.fromCharCode(c.charCodeAt(0) + 1);
 }
 
+function nextLiter(c) {
+	if (c == "Z"){
+		return "Aa";
+	}
+
+    if (c.length == 1) {
+    	return nextChar(c);
+    }
+    if (c[1] == "z")
+    	return nextChar(c[0]) + "a";
+    return c[0] + nextChar(c[1]);
+}
+
 function extend(array1, array2) {
 	array1.push.apply(array1, array2);
 	return array1;

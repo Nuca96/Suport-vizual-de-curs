@@ -246,8 +246,12 @@ AvlTree.prototype.get = function (key) {
   if (this._root === null) {
     return null;
   }
+  var node = this._get(key, this._root);
 
-  return this._get(key, this._root).value;
+  if (node)
+    return node.key;
+  else
+    return null;
 };
 
 /**
@@ -307,7 +311,11 @@ AvlTree.prototype.contains = function (key) {
  * @return {Object} The minimum key in the tree.
  */
 AvlTree.prototype.findMinimum = function () {
-  return minValueNode(this._root).key;
+  var node = minValueNode(this._root);
+  if (!node) {
+    return null;
+  }
+  return node.key;
 };
 
 /**
@@ -319,6 +327,9 @@ AvlTree.prototype.findMinimum = function () {
  */
 function minValueNode(root) {
   var current = root;
+  if (!root) {
+    return null;
+  }
   while (current.left) {
     current = current.left;
   }
