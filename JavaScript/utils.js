@@ -78,6 +78,13 @@ function determinant2(matrice) {
 	return l0[0]*l1[1] - l0[1]*l1[0];
 }
 
+function coliniare(p1, p2, p3) {
+	var matrice = [[p1.x, p1.y, 1],
+				   [p2.x, p2.y, 1],
+				   [p3.x, p3.y, 1]];
+	return determinant3(matrice) == 0;
+}
+
 function floor(point) {
 	return {
 		x: Math.floor(point.x),

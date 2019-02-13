@@ -196,6 +196,21 @@ Canvas.prototype.getNearPoint = function(point) {
 	return point;
 }
 
+Canvas.prototype.pointOK = function(point) {
+	if (typeof point !== "object" ||
+		typeof point.x !== "number" ||
+		typeof point.y !== "number") {
+		return false;
+	}
+	if (isNaN(point.x) || isNaN(point.y)) {
+		return false;
+	}
+	if (point.x < 0 || point.x > this.width ||
+		point.y < 0 || point.y > this.height) {
+		return false;
+	}
+	return true;
+}
 
 Canvas.prototype.addPoint = function(point) {
 	// point.litera = "P" + canvas.points.length;

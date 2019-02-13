@@ -7,6 +7,7 @@ function load() {
 	this.loadButton = document.getElementById("loadButton");
 	this.runButton = document.getElementById("runButton");
 	this.speedSelector = document.getElementById("speedSelector");
+	message.innerText = "Introduceti datele de intrare";
 
     $("#flip").click(function(){
         $("#panel").slideToggle("slow");
@@ -17,6 +18,7 @@ function load() {
 	startButton.addEventListener("click", startAlgorithm);
 	runButton.addEventListener("click", autorun);
 	this.breakPoints = [];
+
 	init();
 }
 

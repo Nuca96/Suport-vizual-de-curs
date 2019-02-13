@@ -624,6 +624,13 @@ function segmentOk(verif) {
 			return false;
 		}
 
+		if ((theSamePoint(segm.firstPoint, verif.firstPoint) ||
+			theSamePoint(segm.firstPoint, verif.secondPoint)) &&
+			(theSamePoint(segm.secondPoint, verif.firstPoint) ||
+			theSamePoint(segm.secondPoint, verif.secondPoint))) {
+			return false;
+		}
+
 		var int = has_intersection(verif, segm);
 		if (false === int) {
 			continue;
@@ -673,11 +680,28 @@ function instantInsert(p1, p2) {
 
 function loadSegments() {
 	loadButton.style.visibility = "hidden";
+	loadButton.removeEventListener("click", loadSegments);
+
+	if (typeof harti === 'undefined') {
+		alert("nu s-a gasit variabila 'harti' în fișierul 'puncte.js'")
+		return;
+	}
+	if (typeof harti !== 'object') {
+		alert("variabila 'harti' nu este o lista")
+		return;
+	}
+	var ok = true;
 	for (var idx in harti) {
 		var segm = harti[idx];
+		if (!canvas.pointOK(segm.p1) || !canvas.pointOK(segm.p2)) {
+			ok = false;
+			continue;
+		}
 		instantInsert(segm.p1, segm.p2);
 	}
-	loadButton.removeEventListener("click", loadSegments);
+	if (!ok) {
+		alert("unele date din lista sunt corupte");
+	}
 }
 
 function mouseMove(event) {
@@ -712,6 +736,10 @@ function find(event) {
 	if (!pointOk(point)) {
 		return;
 	}
+	canvas.draw({
+		"shape": "point",
+		"data": point
+	});
 
 	searchBreakPoints = [];
 	var where = D.search(point);
@@ -726,6 +754,10 @@ function find(event) {
 			runButton.style.visibility = "visible";
 			startButton.style.visibility = "visible";
 			shuffleButton.style.visibility = "visible";
+			canvas.draw({
+				"shape": "point",
+				"data": point
+			});
 			return null;
 		}
 		canvas.action(searchBreakPoints[idx]);
@@ -742,7 +774,6 @@ function run() {
 	this.searchBreakPoints = [];
 	D.init();
 	breakPoints = [];
-	canvas.removeEvent("click", find);
 	canvas.permanent_drawings = [];
 	for (var idx in canvas.segmente) {
 		modifyTrapezoids(canvas.segmente[idx]);

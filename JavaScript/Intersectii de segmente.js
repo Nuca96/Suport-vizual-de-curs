@@ -132,47 +132,80 @@ function firstClick(event) {
 	canvas.addEvent("mousemove", mouseMove);
 }
 
-function secondClick(event) {
-	canvas.removeEvent("click", secondClick);
-	canvas.removeEvent("mousemove", mouseMove);
+function segmentOk(segm) {
+	for (var idx in canvas.segmente) {
+		var s = canvas.segmente[idx];
+		if (coliniare(s.firstPoint, s.secondPoint, segm.firstPoint) &&
+			coliniare(s.firstPoint, s.secondPoint, segm.secondPoint)) {
+			return false;
+		}
+	}
+	return true;
+}
 
-	var punct = canvas.genericEvent(event);
-	var segment = getSegmentY(canvas.firstPoint, punct);
-	canvas.segmente.push(segment);
-
-	canvas.firstPoint = null;
-	canvas.addEvent("click", firstClick);
-	canvas.addPoint(segment.firstPoint);
-	canvas.addPoint(segment.secondPoint);
+function insert(segm) {
+	canvas.segmente.push(segm);
+	canvas.addPoint(segm.firstPoint);
+	canvas.addPoint(segm.secondPoint);
 
 	//draw new elements
 	var permanents = [{
 		"shape": "segment",
-		"data": segment,
+		"data": segm,
 		"colour": "DarkCyan"
 	}, {
 		"shape": "liter",
-		"data": segment.secondPoint
+		"data": segm.secondPoint
 	}, {
 		"shape": "liter",
-		"data": segment.firstPoint
+		"data": segm.firstPoint
 	}];
 	extend(canvas.permanent_drawings, permanents);
 
 	canvas.redraw();
 }
 
+function secondClick(event) {
+	var punct = canvas.genericEvent(event);
+	var segment = getSegmentY(canvas.firstPoint, punct);
+
+	if (!segmentOk(segment)) {
+		return;
+	}
+	canvas.removeEvent("click", secondClick);
+	canvas.removeEvent("mousemove", mouseMove);
+	canvas.firstPoint = null;
+	canvas.addEvent("click", firstClick);
+	insert(segment);
+}
+
 function loadSegments() {
 	loadButton.style.visibility = "hidden";
+	loadButton.removeEventListener("click", loadSegments);
+
+	if (typeof intersectii === 'undefined') {
+		alert("nu s-a gasit variabila 'intersectii' în fișierul 'puncte.js'")
+		return;
+	}
+	if (typeof intersectii !== 'object') {
+		alert("variabila 'intersectii' nu este o lista")
+		return;
+	}
+	var ok = true;
 	for (var idx in intersectii) {
 		var segm = intersectii[idx];
-		var ev1 = canvas.genericEventReverse(segm.p1);
-		firstClick(ev1);
-
-		var ev2 = canvas.genericEventReverse(segm.p2);
-		secondClick(ev2);
+		if (!canvas.pointOK(segm.p1) || !canvas.pointOK(segm.p2)) {
+			ok = false;
+			continue;
+		}
+		var trueSegm = getSegmentY(segm.p1, segm.p2);
+		if (segmentOk(trueSegm)) {
+			insert(trueSegm);
+		}
 	}
-	loadButton.removeEventListener("click", loadSegments);
+	if (!ok) {
+		alert("unele date din lista sunt corupte");
+	}
 }
 
 function mouseMove(event) {

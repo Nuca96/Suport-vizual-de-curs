@@ -20,11 +20,27 @@ function addPoint(event) {
 
 function loadPoints() {
 	loadButton.style.visibility = "hidden";
+	loadButton.removeEventListener("click", loadPoints);
+	if (typeof acoperiri === 'undefined') {
+		alert("nu s-a gasit variabila 'acoperiri' în fișierul 'puncte.js'")
+		return;
+	}
+	var ok = true;
+	if (typeof acoperiri !== 'object') {
+		alert("variabila 'acoperiri' nu este o lista")
+		return;
+	}
 	for (var idx in acoperiri) {
+		if (!canvas.pointOK(acoperiri[idx])) {
+			ok = false;
+			continue;
+		}
 		var ev = canvas.genericEventReverse(acoperiri[idx]);
 		addPoint(ev);
 	}
-	loadButton.removeEventListener("click", loadPoints);
+	if (!ok) {
+		alert("unele date din lista sunt corupte");
+	}
 }
 
 function runJarvis(){
